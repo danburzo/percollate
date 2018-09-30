@@ -7,6 +7,7 @@
   "author": "Dan Burzo <danburzo@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "caporal": "^0.10.0",
     "got": "^9.2.2",
     "jsdom": "^12.1.0",
     "nunjucks": "^3.1.3",

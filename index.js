@@ -1,3 +1,6 @@
+#!/usr/bin/env node
+const prog = require('caporal');
+const pkg = require('./package.json');
 const pup = require('puppeteer');
 const readability = require('./vendor/readability');
 const got = require('got');
@@ -7,11 +10,9 @@ const tmp = require('tmp');
 const fs = require('fs');
 const { imagesAtFullSize } = require('./src/enhancements');
 
-let url = process.argv[2];
-
 nunjucks.configure('templates', { autoescape: false, noCache: true });
 
-(async () => {
+async function handle(url) {
 
 	console.log(`Fetching: ${url}`);
 	const content = (await got(url)).body;
@@ -45,4 +46,13 @@ nunjucks.configure('templates', { autoescape: false, noCache: true });
 	await page.pdf({ path: `${metadata.title}.pdf`, format: 'A5', margin: { top: '1cm', left: '1cm', right: '1cm', bottom: '2cm' } });
 
 	await browser.close();
-})();
+};
+
+prog
+	.version(pkg.version)
+	.argument('[urls...]', "List of URLs to bundle")
+	.action(function(args, options) {
+		args.urls.forEach(handle);
+	})
+
+prog.parse(process.argv);
