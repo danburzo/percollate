@@ -9,7 +9,7 @@ const { imagesAtFullSize } = require('./src/enhancements');
 
 let url = process.argv[2];
 
-nunjucks.configure('templates', { autoescape: false });
+nunjucks.configure('templates', { autoescape: false, noCache: true });
 
 (async () => {
 
@@ -42,7 +42,7 @@ nunjucks.configure('templates', { autoescape: false });
 	await page.goto(`file://${temp_file}`, { waitUntil: 'load' });
 
 	console.log('Generating PDF');
-	await page.pdf({ path: `${metadata.title}.pdf`, format: 'A4' });
+	await page.pdf({ path: `${metadata.title}.pdf`, format: 'A5', margin: { top: '1cm', left: '1cm', right: '1cm', bottom: '2cm' } });
 
 	await browser.close();
 })();
