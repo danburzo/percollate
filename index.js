@@ -12,7 +12,7 @@ const { imagesAtFullSize } = require('./src/enhancements');
 
 nunjucks.configure('templates', { autoescape: false, noCache: true });
 
-async function handle(url) {
+async function cleanup(url) {
 
 	console.log(`Fetching: ${url}`);
 	const content = (await got(url)).body;
@@ -24,14 +24,19 @@ async function handle(url) {
 	imagesAtFullSize(doc);
 
 	console.log('Running through Readability');
-	const metadata = new readability(doc).parse();
+	return new readability(doc).parse();
+};
 
+async function bundle(items, output_path) {
 	console.log('Generating HTML');
-	const html = nunjucks.render('default.html', metadata);
+	const html = nunjucks.render('default.html', {
+		items: items
+	});
 
 	var temp_file = tmp.tmpNameSync({
 		postfix: '.html'
 	});
+
 	console.log(`Writing to temporary file: ${temp_file}`);
 	fs.writeFileSync(temp_file, html);
 
@@ -43,16 +48,22 @@ async function handle(url) {
 	await page.goto(`file://${temp_file}`, { waitUntil: 'load' });
 
 	console.log('Generating PDF');
-	await page.pdf({ path: `${metadata.title}.pdf`, format: 'A5', margin: { top: '1cm', left: '1cm', right: '1cm', bottom: '2cm' } });
+	await page.pdf({ path: output_path, format: 'A5', margin: { top: '1cm', left: '1cm', right: '1cm', bottom: '2cm' } });
 
 	await browser.close();
-};
+}
+
+async function run(urls, options) {
+	let items = await Promise.all(urls.map(cleanup));
+	bundle(items, options.output);
+}
 
 prog
 	.version(pkg.version)
-	.argument('[urls...]', "List of URLs to bundle")
+	.argument('<urls...>', "One or more URLs to bundle")
+	.option('-o [path], --output [path]', "Path for the generated PDF")
 	.action(function(args, options) {
-		args.urls.forEach(handle);
+		run(args.urls, options);
 	})
 
 prog.parse(process.argv);

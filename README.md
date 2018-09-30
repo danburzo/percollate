@@ -2,7 +2,7 @@
 
 ⚠️ _under-construction.gif_
 
-Percollate will be a command-line tool to turn web pages as beautifully formatted PDFs.
+Percollate is a command-line tool to turn web pages as beautifully formatted PDFs.
 
 ## What the plan is
 
@@ -15,7 +15,7 @@ It will be able to collate a set of web pages into a single PDF.
 
 ## Installation
 
-_Note: the package does nothing for now._
+You can install `percollate` globally:
 
 ```bash
 # using npm
@@ -27,12 +27,26 @@ yarn global add percollate
 
 ## Usage
 
-_Note: hypothetical usage._
+To transform a single web page to a PDF:
 
 ```bash
-percollate -i https://some-url -o some.pdf
+percollate -o some.pdf https://example.com
 ```
 
+To bundle several web pages into a single PDF:
+
 ```bash
-cat urls.txt > percollate -o some.pdf
+percollate -o some.pdf https://example.com/page1 https://example.com/page2
 ```
+
+Or you can keep them in a newline-separated text file and use common Unix commands:
+
+```bash
+cat urls.txt | xargs percollate -o some.pdf
+```
+
+### Available options
+
+Run `percolate --help` to see a list of available options.
+
+* `-o, --output` — the path to the PDF
