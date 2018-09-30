@@ -10,8 +10,16 @@ const tmp = require('tmp');
 const fs = require('fs');
 const { imagesAtFullSize } = require('./src/enhancements');
 
+/*
+	Some setup
+	----------
+ */
 nunjucks.configure('templates', { autoescape: false, noCache: true });
 
+/*
+	Fetch a web page and clean the HTML
+	-----------------------------------
+ */
 async function cleanup(url) {
 	console.log(`Fetching: ${url}`);
 	const content = (await got(url)).body;
@@ -19,13 +27,20 @@ async function cleanup(url) {
 	console.log('Enhancing web page');
 	const doc = new JSDOM(content).window.document;
 
-	// Run enhancements
+	/* 
+		Run enhancements
+		----------------
+	*/
 	imagesAtFullSize(doc);
 
 	// Run through readability and return
 	return new readability(doc).parse();
 }
 
+/*
+	Bundle the HTML files into a PDF
+	--------------------------------
+ */
 async function bundle(items, output_path) {
 	var temp_file = tmp.tmpNameSync({
 		postfix: '.html'
@@ -55,16 +70,26 @@ async function bundle(items, output_path) {
 	await browser.close();
 }
 
-async function run(urls, options) {
-	let items = await Promise.all(urls.map(cleanup));
-	bundle(items, options.output);
-}
+/*
+	Command-Line Interface definition
+	---------------------------------
+ */
 
 prog.version(pkg.version)
 	.argument('<urls...>', 'One or more URLs to bundle')
-	.option('-o [path], --output [path]', 'Path for the generated PDF')
-	.action(function(args, options) {
-		run(args.urls, options);
-	});
+	.option('-o, --output [path]', 'Path for the generated PDF')
+	.action(run);
 
 prog.parse(process.argv);
+
+/*
+	Main action
+	-----------
+ */
+async function run(args, options) {
+	let items = [];
+	for (let url of args.urls) {
+		items.push(await cleanup(url));
+	}
+	bundle(items, options.output);
+}
