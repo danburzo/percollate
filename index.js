@@ -13,42 +13,44 @@ const { imagesAtFullSize } = require('./src/enhancements');
 nunjucks.configure('templates', { autoescape: false, noCache: true });
 
 async function cleanup(url) {
-
 	console.log(`Fetching: ${url}`);
 	const content = (await got(url)).body;
 
-	console.log('Parsing DOM');
+	console.log('Enhancing web page');
 	const doc = new JSDOM(content).window.document;
 
-	console.log('Enhancing');
+	// Run enhancements
 	imagesAtFullSize(doc);
 
-	console.log('Running through Readability');
+	// Run through readability and return
 	return new readability(doc).parse();
-};
+}
 
 async function bundle(items, output_path) {
-	console.log('Generating HTML');
-	const html = nunjucks.render('default.html', {
-		items: items
-	});
-
 	var temp_file = tmp.tmpNameSync({
 		postfix: '.html'
 	});
 
-	console.log(`Writing to temporary file: ${temp_file}`);
+	console.log(`Generating temporary HTML file at: ${temp_file}`);
+
+	const html = nunjucks.render('default.html', {
+		items: items
+	});
+
 	fs.writeFileSync(temp_file, html);
 
-	console.log('Opening Puppeteer');
+	console.log('Saving as PDF');
 	const browser = await pup.launch({
 		headless: true
 	});
 	const page = await browser.newPage();
 	await page.goto(`file://${temp_file}`, { waitUntil: 'load' });
 
-	console.log('Generating PDF');
-	await page.pdf({ path: output_path, format: 'A5', margin: { top: '1cm', left: '1cm', right: '1cm', bottom: '2cm' } });
+	await page.pdf({
+		path: output_path,
+		format: 'A5',
+		margin: { top: '1cm', left: '1cm', right: '1cm', bottom: '2cm' }
+	});
 
 	await browser.close();
 }
@@ -58,12 +60,11 @@ async function run(urls, options) {
 	bundle(items, options.output);
 }
 
-prog
-	.version(pkg.version)
-	.argument('<urls...>', "One or more URLs to bundle")
-	.option('-o [path], --output [path]', "Path for the generated PDF")
+prog.version(pkg.version)
+	.argument('<urls...>', 'One or more URLs to bundle')
+	.option('-o [path], --output [path]', 'Path for the generated PDF')
 	.action(function(args, options) {
 		run(args.urls, options);
-	})
+	});
 
 prog.parse(process.argv);
