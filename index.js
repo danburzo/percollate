@@ -58,7 +58,7 @@ async function bundle(items, options) {
 		resolve(options.template || './templates/default.html'),
 		{
 			items: items,
-			stylesheet: resolve(options.stylesheet || './templates/default.css')
+			stylesheet: resolve(options.style || './templates/default.css')
 		}
 	);
 
