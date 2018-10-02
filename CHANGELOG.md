@@ -1,5 +1,9 @@
 # Percollate Changelog
 
+# 0.1.6
+
+-   Uses Puppeteer's `preferCSSPageSize` to make the page size and margins configurable from the CSS
+
 # 0.1.5
 
 -   Only replace single image SRCs with their parent's HREF if the latter matches an image file
