@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-const prog = require('caporal');
+const program = require('commander');
 const pkg = require('./package.json');
 const pup = require('puppeteer');
 const readability = require('./vendor/readability');
@@ -75,21 +75,51 @@ async function bundle(items, output_path) {
 	---------------------------------
  */
 
-prog.version(pkg.version)
-	.argument('<urls...>', 'One or more URLs to bundle')
-	.option('-o, --output [path]', 'Path for the generated PDF')
-	.action(run);
+program.version(pkg.version);
 
-prog.parse(process.argv);
+program
+	.command('pdf [urls...]')
+	.option('-o, --output [output]', 'Path for the generated PDF')
+	.action(pdf);
+
+program
+	.command('epub [urls...]')
+	.option('-o, --output [output]', 'Path for the generated EPUB')
+	.action(epub);
+
+program
+	.command('html [urls...]')
+	.option('-o, --output [output]', 'Path for the generated HTML')
+	.action(html);
+
+program.parse(process.argv);
 
 /*
-	Main action
-	-----------
+	CLI commands
+	------------
  */
-async function run(args, options) {
+
+/*
+	Generate PDF
+ */
+async function pdf(urls, options) {
 	let items = [];
-	for (let url of args.urls) {
+	for (let url of urls) {
 		items.push(await cleanup(url));
 	}
 	bundle(items, options.output);
+}
+
+/*
+	Generate EPUB
+ */
+async function epub(urls, options) {
+	console.log('TODO', urls, options);
+}
+
+/*
+	Generate HTML
+ */
+async function html(urls, options) {
+	console.log('TODO', urls, options);
 }
