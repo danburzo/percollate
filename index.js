@@ -54,10 +54,13 @@ async function bundle(items, options) {
 
 	console.log(`Generating temporary HTML file at: ${temp_file}`);
 
-	const html = nunjucks.render(resolve(options.template || './templates/default.html'), {
-		items: items,
-		stylesheet: resolve(options.stylesheet || './templates/default.css')
-	});
+	const html = nunjucks.render(
+		resolve(options.template || './templates/default.html'),
+		{
+			items: items,
+			stylesheet: resolve(options.stylesheet || './templates/default.css')
+		}
+	);
 
 	fs.writeFileSync(temp_file, html);
 
