@@ -1,0 +1,17 @@
+@media print {
+	html {
+		font-size: 12pt;
+	}
+}
+
+@page {
+	margins: 2cm 2cm 3cm;
+}
+
+img {
+	max-width: 100%;
+}
+
+body {
+	font-family: sans-serif;
+}

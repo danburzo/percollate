@@ -30,23 +30,25 @@ yarn global add percollate
 To transform a single web page to a PDF:
 
 ```bash
-percollate -o some.pdf https://example.com
+percollate pdf -o some.pdf https://example.com
 ```
 
 To bundle several web pages into a single PDF:
 
 ```bash
-percollate -o some.pdf https://example.com/page1 https://example.com/page2
+percollate pdf -o some.pdf https://example.com/page1 https://example.com/page2
 ```
 
 Or you can keep them in a newline-separated text file and use common Unix commands:
 
 ```bash
-cat urls.txt | xargs percollate -o some.pdf
+cat urls.txt | xargs percollate pdf -o some.pdf
 ```
 
 ### Available options
 
 Run `percolate --help` to see a list of available options.
 
-* `-o, --output` — the path to the PDF
+-   `-o, --output` — the path to the PDF
+-   `-t, --template` — the path to the custom HTML template
+-   `-s, --style` — the path to the custom CSS stylesheet

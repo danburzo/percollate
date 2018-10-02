@@ -3,27 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<title>🌐 Percollate</title>
-	<style type="text/css">
-
-		@media print {
-			html {
-				font-size: 12pt;
-			}
-		}
-
-		@page {
-			margins: 2cm 2cm 3cm;
-		}
-
-		img {
-			max-width: 100%;
-		}
-
-		body {
-			font-family: sans-serif;
-		}
-
-	</style>
+	<link rel='stylesheet' media='print' href="{{ stylesheet }}"/>
 </head>
 <body>
 	{% for item in items %}

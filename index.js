@@ -10,11 +10,17 @@ const tmp = require('tmp');
 const fs = require('fs');
 const { imagesAtFullSize } = require('./src/enhancements');
 
+function resolve(path) {
+	return require.resolve(path, {
+		paths: [process.cwd(), __dirname]
+	});
+}
+
 /*
 	Some setup
 	----------
  */
-nunjucks.configure('templates', { autoescape: false, noCache: true });
+nunjucks.configure({ autoescape: false, noCache: true });
 
 /*
 	Fetch a web page and clean the HTML
@@ -41,15 +47,16 @@ async function cleanup(url) {
 	Bundle the HTML files into a PDF
 	--------------------------------
  */
-async function bundle(items, output_path) {
+async function bundle(items, options) {
 	var temp_file = tmp.tmpNameSync({
 		postfix: '.html'
 	});
 
 	console.log(`Generating temporary HTML file at: ${temp_file}`);
 
-	const html = nunjucks.render('default.html', {
-		items: items
+	const html = nunjucks.render(resolve(options.template || './templates/default.html'), {
+		items: items,
+		stylesheet: resolve(options.stylesheet || './templates/default.css')
 	});
 
 	fs.writeFileSync(temp_file, html);
@@ -62,7 +69,7 @@ async function bundle(items, output_path) {
 	await page.goto(`file://${temp_file}`, { waitUntil: 'load' });
 
 	await page.pdf({
-		path: output_path,
+		path: options.output,
 		format: 'A5',
 		margin: { top: '1cm', left: '1cm', right: '1cm', bottom: '2cm' }
 	});
@@ -80,16 +87,22 @@ program.version(pkg.version);
 program
 	.command('pdf [urls...]')
 	.option('-o, --output [output]', 'Path for the generated PDF')
+	.option('-t, --template [template]', 'Path to custom HTML template')
+	.option('-s, --style [stylesheet]', 'Path to custom CSS')
 	.action(pdf);
 
 program
 	.command('epub [urls...]')
 	.option('-o, --output [output]', 'Path for the generated EPUB')
+	.option('-t, --template [template]', 'Path to custom HTML template')
+	.option('-s, --style [stylesheet]', 'Path to custom CSS')
 	.action(epub);
 
 program
 	.command('html [urls...]')
 	.option('-o, --output [output]', 'Path for the generated HTML')
+	.option('-t, --template [template]', 'Path to custom HTML template')
+	.option('-s, --style [stylesheet]', 'Path to custom CSS')
 	.action(html);
 
 program.parse(process.argv);
@@ -107,7 +120,7 @@ async function pdf(urls, options) {
 	for (let url of urls) {
 		items.push(await cleanup(url));
 	}
-	bundle(items, options.output);
+	bundle(items, options);
 }
 
 /*
