@@ -1,11 +1,10 @@
-@media print {
-	html {
-		font-size: 12pt;
-	}
+@page {
+	size: A5 portrait;
+	margin: 1cm 1cm 2cm;
 }
 
-@page {
-	margins: 2cm 2cm 3cm;
+html {
+	font-size: 12pt;
 }
 
 img {

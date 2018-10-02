@@ -73,8 +73,7 @@ async function bundle(items, options) {
 
 	await page.pdf({
 		path: options.output,
-		format: 'A5',
-		margin: { top: '1cm', left: '1cm', right: '1cm', bottom: '2cm' }
+		preferCSSPageSize: true
 	});
 
 	await browser.close();
