@@ -66,6 +66,10 @@ cat urls.txt | xargs percollate pdf --output some.pdf
 
 > ⚠️ TODO add example here
 
+### Customizing the page header / footer
+
+> ⚠️ TODO add example here
+
 ## How it works
 
 1. Fetch the page(s) using [`got`](https://github.com/sindresorhus/got)

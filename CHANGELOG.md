@@ -1,5 +1,9 @@
 # Percollate Changelog
 
+# 0.1.8
+
+-   Adds support for a custom page header/footer via the HTML template and CSS stylesheet
+
 # 0.1.6
 
 -   Uses Puppeteer's `preferCSSPageSize` to make the page size and margins configurable from the CSS
