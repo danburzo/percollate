@@ -9,6 +9,8 @@ const nunjucks = require('nunjucks');
 const tmp = require('tmp');
 const fs = require('fs');
 const { imagesAtFullSize } = require('./src/enhancements');
+const css = require('css');
+const get_style_attribute_value = require('./src/get-style-attribute-value');
 
 function resolve(path) {
 	return require.resolve(path, {
@@ -33,6 +35,10 @@ async function cleanup(url) {
 	console.log('Enhancing web page');
 	const doc = new JSDOM(content).window.document;
 
+	doc.baseURI = doc.documentURI = url;
+
+	// console.log(doc.baseURI, doc.documentURI);
+
 	/* 
 		Run enhancements
 		----------------
@@ -54,13 +60,61 @@ async function bundle(items, options) {
 
 	console.log(`Generating temporary HTML file at: ${temp_file}`);
 
+	const stylesheet = resolve(options.style || './templates/default.css');
+
 	const html = nunjucks.render(
 		resolve(options.template || './templates/default.html'),
 		{
 			items: items,
-			stylesheet: resolve(options.style || './templates/default.css')
+			stylesheet: stylesheet
 		}
 	);
+
+	const doc = new JSDOM(html).window.document;
+	let headerTemplate = doc.querySelector('.header-template');
+	let footerTemplate = doc.querySelector('.footer-template');
+	let header = new JSDOM(
+		headerTemplate ? headerTemplate.innerHTML : '<span></span>'
+	).window.document;
+	let footer = new JSDOM(
+		footerTemplate ? footerTemplate.innerHTML : '<span></span>'
+	).window.document;
+
+	if (fs.existsSync(stylesheet)) {
+		const css_ast = css.parse(fs.readFileSync(stylesheet, 'utf8'));
+
+		const header_style = get_style_attribute_value(
+			css_ast,
+			'.header-template'
+		);
+		const header_div = header.querySelector('body :first-child');
+
+		if (header_div && header_style) {
+			header_div.setAttribute(
+				'style',
+				`
+					${header_style};
+					${header_div.getAttribute('style') || ''}
+				`
+			);
+		}
+
+		const footer_style = get_style_attribute_value(
+			css_ast,
+			'.footer-template'
+		);
+		const footer_div = footer.querySelector('body :first-child');
+
+		if (footer_div && footer_style) {
+			footer_div.setAttribute(
+				'style',
+				`
+					${footer_style};
+					${footer_div.getAttribute('style') || ''}
+				`
+			);
+		}
+	}
 
 	fs.writeFileSync(temp_file, html);
 
@@ -73,7 +127,11 @@ async function bundle(items, options) {
 
 	await page.pdf({
 		path: options.output,
-		preferCSSPageSize: true
+		preferCSSPageSize: true,
+		displayHeaderFooter: true,
+		headerTemplate: header.body.innerHTML,
+		footerTemplate: footer.body.innerHTML,
+		printBackground: true
 	});
 
 	await browser.close();

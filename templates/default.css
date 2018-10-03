@@ -3,8 +3,21 @@
 	margin: 1cm 1cm 2cm;
 }
 
+.header-template {
+}
+
+.footer-template {
+	font-size: 10pt;
+	font-weight: bold;
+}
+
 html {
-	font-size: 12pt;
+	font-size: 13pt;
+	line-height: 1.3;
+}
+
+article {
+	font-size: 1em;
 }
 
 img {
@@ -12,5 +25,23 @@ img {
 }
 
 body {
+	font-family: serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	margin-bottom: 0.5em;
 	font-family: sans-serif;
+}
+
+p {
+	margin: 0;
+}
+
+p + p {
+	text-indent: 2em;
 }
