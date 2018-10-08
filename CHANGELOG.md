@@ -1,5 +1,11 @@
 # Percollate Changelog
 
+### 0.2.1
+
+-   Some Wikipedia-specific enhancements: remove `edit` links next to headings.
+-   Added more print styles to the default stylesheet.
+-   Fixes relative links (https://github.com/danburzo/percollate/issues/12)
+
 ### 0.2.0
 
 -   Deprecates short names for some options (#16)

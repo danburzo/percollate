@@ -29,6 +29,19 @@ function imagesAtFullSize(doc) {
 	});
 }
 
+function wikipediaSpecific(doc) {
+	/*
+		Remove some screen-only things from wikipedia pages:
+		- edit links next to headings
+	 */
+	Array.from(
+		doc.querySelectorAll(`
+		.mw-editsection
+	`)
+	).forEach(el => el.remove());
+}
+
 module.exports = {
-	imagesAtFullSize
+	imagesAtFullSize,
+	wikipediaSpecific
 };

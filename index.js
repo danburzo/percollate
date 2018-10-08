@@ -8,7 +8,7 @@ const { JSDOM } = require('jsdom');
 const nunjucks = require('nunjucks');
 const tmp = require('tmp');
 const fs = require('fs');
-const { imagesAtFullSize } = require('./src/enhancements');
+const { imagesAtFullSize, wikipediaSpecific } = require('./src/enhancements');
 const css = require('css');
 const get_style_attribute_value = require('./src/get-style-attribute-value');
 
@@ -33,20 +33,18 @@ async function cleanup(url) {
 	const content = (await got(url)).body;
 
 	console.log('Enhancing web page');
-	const doc = new JSDOM(content).window.document;
-
-	doc.baseURI = doc.documentURI = url;
-
-	// console.log(doc.baseURI, doc.documentURI);
+	const dom = new JSDOM(content);
+	dom.reconfigure({ url: url });
 
 	/* 
 		Run enhancements
 		----------------
 	*/
-	imagesAtFullSize(doc);
+	imagesAtFullSize(dom.window.document);
+	wikipediaSpecific(dom.window.document);
 
 	// Run through readability and return
-	return new readability(doc).parse();
+	return new readability(dom.window.document).parse();
 }
 
 /*
