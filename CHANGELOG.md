@@ -1,5 +1,9 @@
 # Percollate Changelog
 
+# 0.1.9
+
+-   Fixes template path resolution (#17) when percollate is installed globally
+
 # 0.1.8
 
 -   Adds support for a custom page header/footer via the HTML template and CSS stylesheet
