@@ -145,27 +145,25 @@ async function bundle(items, options) {
 	---------------------------------
  */
 
+function with_common_options(cmd) {
+	return cmd
+		.option('-o, --output [output]', 'Path for the generated bundle')
+		.option('--template [template]', 'Path to custom HTML template')
+		.option('--style [stylesheet]', 'Path to custom CSS');
+}
+
 program.version(pkg.version);
 
-program
-	.command('pdf [urls...]')
-	.option('-o, --output [output]', 'Path for the generated PDF')
-	.option('-t, --template [template]', 'Path to custom HTML template')
-	.option('-s, --style [stylesheet]', 'Path to custom CSS')
+with_common_options(program.command('pdf [urls...]'))
+	.description('Bundle web pages as a PDF file')
 	.action(pdf);
 
-program
-	.command('epub [urls...]')
-	.option('-o, --output [output]', 'Path for the generated EPUB')
-	.option('-t, --template [template]', 'Path to custom HTML template')
-	.option('-s, --style [stylesheet]', 'Path to custom CSS')
+with_common_options(program.command('epub [urls...]'))
+	.description('Bundle web pages as an EPUB file')
 	.action(epub);
 
-program
-	.command('html [urls...]')
-	.option('-o, --output [output]', 'Path for the generated HTML')
-	.option('-t, --template [template]', 'Path to custom HTML template')
-	.option('-s, --style [stylesheet]', 'Path to custom CSS')
+with_common_options(program.command('html [urls...]'))
+	.description('Bundle web pages as a HTML file')
 	.action(html);
 
 program.parse(process.argv);

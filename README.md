@@ -30,11 +30,11 @@ yarn global add percollate
 
 The `pdf`, `epub`, and `html` commands have these options:
 
-| Option           | What it does                                    |
-| ---------------- | ----------------------------------------------- |
-| `-o, --output`   | (**Required**) The path of the resulting bundle |
-| `-t, --template` | Path to a custom HTML template                  |
-| `-s, --style`    | Path to a custom CSS                            |
+| Option       | What it does                                    |
+| ------------ | ----------------------------------------------- |
+| `--output`   | (**Required**) The path of the resulting bundle |
+| `--template` | Path to a custom HTML template                  |
+| `--style`    | Path to a custom CSS                            |
 
 ## Examples
 
