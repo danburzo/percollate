@@ -69,7 +69,7 @@ a:after {
 	font-family: sans-serif;
 }
 
-img,
+table,
 figure {
 	page-break-inside: avoid;
 }
