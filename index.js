@@ -62,8 +62,11 @@ async function bundle(items, options) {
 
 	const stylesheet = resolve(options.style || './templates/default.css');
 
-	const html = nunjucks.render(
-		resolve(options.template || './templates/default.html'),
+	const html = nunjucks.renderString(
+		fs.readFileSync(
+			resolve(options.template || './templates/default.html'),
+			'utf8'
+		),
 		{
 			items: items,
 			stylesheet: stylesheet
