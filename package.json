@@ -1,6 +1,6 @@
 {
 	"name": "percollate",
-	"version": "0.2.1",
+	"version": "0.2.2",
 	"description": "A command-line tool to grab web pages as PDF",
 	"main": "index.js",
 	"repository": "git@github.com:danburzo/percollate.git",
