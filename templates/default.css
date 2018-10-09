@@ -41,6 +41,14 @@ a:not(.no-href):after {
 }
 
 /*
+	Don't display hidden elements
+ */
+[hidden],
+[aria-hidden] {
+	display: none;
+}
+
+/*
 	Article formatting
 	----------------------------------------------------
  */
@@ -126,6 +134,14 @@ article:not(:last-of-type) {
 	height: 0.5pt;
 	margin: 1.3em 0;
 	background: #000;
+}
+
+.article__content blockquote {
+	font-size: 0.9em;
+	line-height: 1.44;
+	padding-left: 2em;
+	border-left: 3pt solid #000;
+	margin-left: 0;
 }
 
 /*

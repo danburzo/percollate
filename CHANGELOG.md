@@ -1,5 +1,9 @@
 # Percollate Changelog
 
+### 0.2.5
+
+-   More print styles to handle blockquotes and `aria-hidden` elements (Re: https://github.com/danburzo/percollate/issues/19)
+
 ### 0.2.2
 
 -   Adds article header, including byline, where it exists, and the source URL (https://github.com/danburzo/percollate/issues/18)
