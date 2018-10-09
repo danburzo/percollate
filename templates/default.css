@@ -3,40 +3,16 @@
 	margin: 1cm 1cm 2cm;
 }
 
-.header-template {
-}
-
-.footer-template {
-	font-size: 10pt;
-	font-weight: bold;
-}
-
 html {
 	font-size: 13pt;
 	line-height: 1.3;
+	font-family: serif;
 }
 
 body {
 	margin: 0;
 	padding: 0;
 	width: 100%;
-}
-
-article {
-	font-size: 1em;
-}
-
-img {
-	width: 100%;
-}
-
-figure {
-	margin: 1.5em 0;
-	padding: 0;
-}
-
-body {
-	font-family: serif;
 }
 
 h1,
@@ -52,16 +28,6 @@ h6 {
 	page-break-before: avoid;
 }
 
-p {
-	margin: 0;
-	orphans: 3;
-	widows: 3;
-}
-
-p + p {
-	text-indent: 2em;
-}
-
 a {
 	color: inherit;
 }
@@ -74,12 +40,56 @@ a:not(.no-href):after {
 	font-family: sans-serif;
 }
 
-table,
-figure {
+/*
+	Article formatting
+	----------------------------------------------------
+ */
+
+article {
+	font-size: 1em;
+}
+
+/*
+	Article Header
+	--------------
+ */
+
+.article__header {
+	margin: 0 0 1.3em;
+}
+
+.article__title {
+	font-size: 2.4em;
+	margin: 0 0 0.25em;
+	letter-spacing: -0.03em;
+	line-height: 1.1;
+}
+
+.article__url {
+	font-style: italic;
+	font-size: 0.9em;
+}
+
+/*
+	Article Content
+	---------------
+ */
+
+.article__content img {
+	max-width: 100%;
+}
+
+.article__content figure {
+	margin: 1.5em 0;
+	padding: 0;
+}
+
+.article__content table,
+.article__content figure {
 	page-break-inside: avoid;
 }
 
-pre {
+.article__content pre {
 	border: 0.25pt solid #000;
 	padding: 0.75em;
 	font-size: 0.9em;
@@ -87,9 +97,9 @@ pre {
 	word-wrap: break-word;
 }
 
-kbd,
-var,
-samp {
+.article__content kbd,
+.article__content var,
+.article__content samp {
 	padding: 0 0.5em;
 	box-shadow: 2pt 2pt 0 #ccc;
 	border: 0.5pt solid #000;
@@ -97,12 +107,37 @@ samp {
 	font-size: 0.9em;
 }
 
+.article__content p {
+	margin: 0;
+	orphans: 3;
+	widows: 3;
+}
+
+.article__content p + p {
+	text-indent: 2em;
+}
+
+.article__content hr {
+	border: none;
+	height: 0.5pt;
+	margin: 1.3em 0;
+	background: #000;
+}
+
 /*
-	Article formatting
-	------------------
+	Page header / footer
+	--------------------
+
+	These are extracted when generating the PDF
+	and are not subject to the page's CSS cascade.
+
+	They're just placed here for easier style coordination
  */
 
-.article__url {
-	font-style: italic;
-	font-size: 0.9em;
+.header-template {
+}
+
+.footer-template {
+	font-size: 10pt;
+	font-weight: bold;
 }
