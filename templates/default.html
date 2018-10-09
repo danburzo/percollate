@@ -7,9 +7,25 @@
 </head>
 <body>
 	{% for item in items %}
-	<article>
-		<h1>{{ item.title }}</h1>
-		{{ item.content }}
+	<article class='article'>
+		<header class='article__header'>
+			<h1 class='article__title'>
+				{{ item.title }}
+			</h1>
+			{% if item.byline %}
+				<p class='article__byline'>
+					By <span>{{ item.byline }}</span>
+				</p>
+			{% endif %}
+			<p class='article__url'>
+				Source: 
+				<a class='no-href' href="{{item.url}}">{{item.url}}</a>
+			</p>
+		</header>
+
+		<div class='article__content'>
+			{{ item.content }}
+		</div>
 	</article>
 	{% endfor %}
 

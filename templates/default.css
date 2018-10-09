@@ -27,7 +27,12 @@ article {
 }
 
 img {
-	max-width: 100%;
+	width: 100%;
+}
+
+figure {
+	margin: 1.5em 0;
+	padding: 0;
 }
 
 body {
@@ -61,7 +66,7 @@ a {
 	color: inherit;
 }
 
-a:after {
+a:not(.no-href):after {
 	content: ' → ' attr(href) '';
 	font-size: 0.8em;
 	word-break: break-all;
@@ -89,5 +94,15 @@ samp {
 	box-shadow: 2pt 2pt 0 #ccc;
 	border: 0.5pt solid #000;
 	border-radius: 0.25em;
+	font-size: 0.9em;
+}
+
+/*
+	Article formatting
+	------------------
+ */
+
+.article__url {
+	font-style: italic;
 	font-size: 0.9em;
 }

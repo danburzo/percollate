@@ -44,7 +44,14 @@ async function cleanup(url) {
 	wikipediaSpecific(dom.window.document);
 
 	// Run through readability and return
-	return new readability(dom.window.document).parse();
+	let parsed = new readability(dom.window.document).parse();
+
+	return {
+		...parsed,
+
+		// Add in some stuff
+		url: url
+	};
 }
 
 /*

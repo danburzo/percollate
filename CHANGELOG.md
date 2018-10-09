@@ -1,5 +1,9 @@
 # Percollate Changelog
 
+### 0.2.2
+
+-   Adds article header, including byline, where it exists, and the source URL (https://github.com/danburzo/percollate/issues/18)
+
 ### 0.2.1
 
 -   Some Wikipedia-specific enhancements: remove `edit` links next to headings.
