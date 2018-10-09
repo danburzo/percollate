@@ -21,7 +21,7 @@ To keep the package up-to-date, you can run:
 npm install -g percollate
 
 # yarn has a separate command
-yarn global upgrade percollate
+yarn global upgrade --latest percollate
 ```
 
 ## Usage
