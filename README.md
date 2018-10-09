@@ -14,6 +14,16 @@ npm install -g percollate
 yarn global add percollate
 ```
 
+To keep the package up-to-date, you can run:
+
+```bash
+# using npm, upgrading is the same command as installing
+npm install -g percollate
+
+# yarn has a separate command
+yarn global upgrade percollate
+```
+
 ## Usage
 
 > 💡 Run `percollate --help` for a list of available commands. For a particular command, `percollate <command> --help` lists all available options.
