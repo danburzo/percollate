@@ -49,6 +49,10 @@ article {
 	font-size: 1em;
 }
 
+article:not(:last-of-type) {
+	page-break-after: always;
+}
+
 /*
 	Article Header
 	--------------
