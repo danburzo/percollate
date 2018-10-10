@@ -91,3 +91,11 @@ cat urls.txt | xargs percollate pdf --output some.pdf
 ## Troubleshooting
 
 On some Linux machines you'll need to [install a few more Chrome dependencies](https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md#chrome-headless-doesnt-launch) before `percollate` works correctly. (_Thanks to @ptica for [sorting it out](https://github.com/danburzo/percollate/issues/19#issuecomment-428496041)_)
+
+## See also
+
+Here are some other projects to check out if you're interested in building books using the browser:
+
+-   [weasyprint](https://github.com/Kozea/WeasyPrint)
+-   [bindery.js](https://github.com/evnbr/bindery)
+-   [HummusJS](https://github.com/galkahana/HummusJS)
