@@ -36,8 +36,8 @@ function wikipediaSpecific(doc) {
 	 */
 	Array.from(
 		doc.querySelectorAll(`
-		.mw-editsection
-	`)
+			.mw-editsection
+		`)
 	).forEach(el => el.remove());
 }
 
