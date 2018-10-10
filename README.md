@@ -87,3 +87,7 @@ cat urls.txt | xargs percollate pdf --output some.pdf
 3. Pass the DOM through [`mozilla/readability`](https://github.com/mozilla/readability) to strip unnecessary elements
 4. Apply the [HTML template](./templates/default.html) and the [print stylesheet](./templates/default.css) to the resulting HTML
 5. Use [`puppeteer`](https://github.com/GoogleChrome/puppeteer) to generate a PDF from the page
+
+## Troubleshooting
+
+On some Linux machines you'll need to [install a few more Chrome dependencies](https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md#chrome-headless-doesnt-launch) before `percollate` works correctly. (_Thanks to @ptica for [sorting it out](https://github.com/danburzo/percollate/issues/19#issuecomment-428496041)_)
