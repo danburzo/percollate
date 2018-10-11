@@ -96,6 +96,8 @@ On some Linux machines you'll need to [install a few more Chrome dependencies](h
 
 Here are some other projects to check out if you're interested in building books using the browser:
 
--   [weasyprint](https://github.com/Kozea/WeasyPrint)
--   [bindery.js](https://github.com/evnbr/bindery)
+-   [weasyprint](https://github.com/Kozea/WeasyPrint) ([website](https://weasyprint.org/))
+-   [bindery.js](https://github.com/evnbr/bindery) ([website](https://evanbrooks.info/bindery/))
 -   [HummusJS](https://github.com/galkahana/HummusJS)
+-   [Editoria](https://gitlab.coko.foundation/editoria/editoria) ([website](https://editoria.pub/))
+-   [pagedjs](https://gitlab.pagedmedia.org/tools/pagedjs) ([article](https://www.pagedmedia.org/pagedjs-sneak-peeks/))
