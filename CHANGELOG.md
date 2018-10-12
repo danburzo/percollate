@@ -1,5 +1,9 @@
 # Percollate Changelog
 
+### 0.2.8
+
+-   Added support for inline CSS styles via the `--css` option (https://github.com/danburzo/percollate/issues/27)
+
 ### 0.2.7
 
 -   Added the ability to run `percollate` with the `--no-sandbox` Puppeteer flag
