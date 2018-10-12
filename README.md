@@ -11,9 +11,9 @@ Percollate is a command-line tool to turn web pages as beautifully formatted PDF
 -   [Examples](#examples)
     -   [Basic PDF Generation](#basic-pdf-generation)
     -   [Custom page size / margins](#custom-page-size-margins)
-    -   [Using a
-        custom HTML template](#using-a-custom-html-template)
-    -   [Using a custom CSS stylesheet](#using-a-custom-css-stylesheet) \* [Customizing the page header / footer](#customizing-the-page-header-footer)
+    -   [Using a custom HTML template](#using-a-custom-html-template)
+    -   [Using a custom CSS stylesheet](#using-a-custom-css-stylesheet)
+    -   [Customizing the page header / footer](#customizing-the-page-header-footer)
 -   [How it works](#how-it-works)
 -   [Troubleshooting](#troubleshooting)
 -   [See also](#see-also)
