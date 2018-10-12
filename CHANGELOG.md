@@ -1,5 +1,9 @@
 # Percollate Changelog
 
+### 0.2.7
+
+-   Added the ability to run `percollate` with the `--no-sandbox` Puppeteer flag
+
 ### 0.2.5
 
 -   More print styles to handle blockquotes and `aria-hidden` elements (Re: https://github.com/danburzo/percollate/issues/19)
