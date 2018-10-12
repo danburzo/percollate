@@ -4,6 +4,8 @@ Percollate is a command-line tool to turn web pages as beautifully formatted PDF
 
 ## Installation
 
+> 💡 `percollate` needs Node.js version 8 or later, as it uses new(ish) JavaScript syntax.
+
 You can install `percollate` globally:
 
 ```bash
@@ -91,6 +93,8 @@ cat urls.txt | xargs percollate pdf --output some.pdf
 ## Troubleshooting
 
 On some Linux machines you'll need to [install a few more Chrome dependencies](https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md#chrome-headless-doesnt-launch) before `percollate` works correctly. (_Thanks to @ptica for [sorting it out](https://github.com/danburzo/percollate/issues/19#issuecomment-428496041)_)
+
+The `percollate pdf` command supports the `--no-sandbox` Puppeteer flag, but make sure you're [aware of the implications](https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md#chrome-headless-fails-due-to-sandbox-issues) before disabling the sandbox.
 
 ## See also
 

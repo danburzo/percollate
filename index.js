@@ -128,7 +128,14 @@ async function bundle(items, options) {
 
 	console.log('Saving as PDF');
 	const browser = await pup.launch({
-		headless: true
+		headless: true,
+		/*
+			Allow running with no sandbox
+			See: https://github.com/danburzo/percollate/issues/26
+		 */
+		args: options.sandbox
+			? undefined
+			: ['--no-sandbox', '--disable-setuid-sandbox']
 	});
 	const page = await browser.newPage();
 	await page.goto(`file://${temp_file}`, { waitUntil: 'load' });
@@ -160,6 +167,7 @@ function with_common_options(cmd) {
 program.version(pkg.version);
 
 with_common_options(program.command('pdf [urls...]'))
+	.option('--no-sandbox', 'Passed to Puppeteer')
 	.description('Bundle web pages as a PDF file')
 	.action(pdf);
 
