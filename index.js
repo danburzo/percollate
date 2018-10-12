@@ -66,6 +66,7 @@ async function bundle(items, options) {
 	console.log(`Generating temporary HTML file at: ${temp_file}`);
 
 	const stylesheet = resolve(options.style || './templates/default.css');
+	const style = fs.readFileSync(stylesheet, 'utf8') + (options.css || '');
 
 	const html = nunjucks.renderString(
 		fs.readFileSync(
@@ -74,6 +75,9 @@ async function bundle(items, options) {
 		),
 		{
 			items: items,
+			style: style,
+
+			// deprecated
 			stylesheet: stylesheet
 		}
 	);
@@ -88,40 +92,32 @@ async function bundle(items, options) {
 		footerTemplate ? footerTemplate.innerHTML : '<span></span>'
 	).window.document;
 
-	if (fs.existsSync(stylesheet)) {
-		const css_ast = css.parse(fs.readFileSync(stylesheet, 'utf8'));
+	const css_ast = css.parse(style);
 
-		const header_style = get_style_attribute_value(
-			css_ast,
-			'.header-template'
+	const header_style = get_style_attribute_value(css_ast, '.header-template');
+	const header_div = header.querySelector('body :first-child');
+
+	if (header_div && header_style) {
+		header_div.setAttribute(
+			'style',
+			`
+				${header_style};
+				${header_div.getAttribute('style') || ''}
+			`
 		);
-		const header_div = header.querySelector('body :first-child');
+	}
 
-		if (header_div && header_style) {
-			header_div.setAttribute(
-				'style',
-				`
-					${header_style};
-					${header_div.getAttribute('style') || ''}
-				`
-			);
-		}
+	const footer_style = get_style_attribute_value(css_ast, '.footer-template');
+	const footer_div = footer.querySelector('body :first-child');
 
-		const footer_style = get_style_attribute_value(
-			css_ast,
-			'.footer-template'
+	if (footer_div && footer_style) {
+		footer_div.setAttribute(
+			'style',
+			`
+				${footer_style};
+				${footer_div.getAttribute('style') || ''}
+			`
 		);
-		const footer_div = footer.querySelector('body :first-child');
-
-		if (footer_div && footer_style) {
-			footer_div.setAttribute(
-				'style',
-				`
-					${footer_style};
-					${footer_div.getAttribute('style') || ''}
-				`
-			);
-		}
 	}
 
 	fs.writeFileSync(temp_file, html);
@@ -161,7 +157,8 @@ function with_common_options(cmd) {
 	return cmd
 		.option('-o, --output [output]', 'Path for the generated bundle')
 		.option('--template [template]', 'Path to custom HTML template')
-		.option('--style [stylesheet]', 'Path to custom CSS');
+		.option('--style [stylesheet]', 'Path to custom CSS')
+		.option('--css [style]', 'Additional CSS style');
 }
 
 program.version(pkg.version);

@@ -2,6 +2,21 @@
 
 Percollate is a command-line tool to turn web pages as beautifully formatted PDFs.
 
+## Table of Contents
+
+-   [Installation](#installation)
+-   [Usage](#usage)
+    _ [Available commands](#available-commands)
+    _ [Available options](#available-options)
+-   [Examples](#examples)
+    _ [Basic PDF Generation](#basic-pdf-generation)
+    _ [Custom page size / margins](#custom-page-size-margins)
+    _ [Using a custom HTML template](#using-a-custom-html-template)
+    _ [Using a custom CSS stylesheet](#using-a-custom-css-stylesheet) \* [Customizing the page header / footer](#customizing-the-page-header-footer)
+-   [How it works](#how-it-works)
+-   [Troubleshooting](#troubleshooting)
+-   [See also](#see-also)
+
 ## Installation
 
 > 💡 `percollate` needs Node.js version 8 or later, as it uses new(ish) JavaScript syntax.
@@ -42,15 +57,16 @@ yarn global upgrade --latest percollate
 
 The `pdf`, `epub`, and `html` commands have these options:
 
-| Option         | What it does                                    |
-| -------------- | ----------------------------------------------- |
-| `-o, --output` | (**Required**) The path of the resulting bundle |
-| `--template`   | Path to a custom HTML template                  |
-| `--style`      | Path to a custom CSS                            |
+| Option         | What it does                                                                                              |
+| -------------- | --------------------------------------------------------------------------------------------------------- |
+| `-o, --output` | (**Required**) The path of the resulting bundle                                                           |
+| `--template`   | Path to a custom HTML template                                                                            |
+| `--style`      | Path to a custom CSS                                                                                      |
+| `--css`        | Additional CSS styles you can pass from the command-line to override the default/custom stylesheet styles |
 
 ## Examples
 
-### Generating a PDF
+### Basic PDF generation
 
 To transform a single web page to PDF:
 
@@ -69,6 +85,21 @@ You can use common Unix commands and keep the list of URLs in a newline-delimite
 ```bash
 cat urls.txt | xargs percollate pdf --output some.pdf
 ```
+
+### Custom page size / margins
+
+The default page size is A5 (portrait). You can use the `--css` option to override it using [any supported CSS `size`](https://www.w3.org/TR/css3-page/#page-size):
+
+```bash
+percollate pdf --output some.pdf --css "@page { size: A3 landscape }" http://example.com
+```
+
+Similarly, you can define:
+
+-   custom margins: `@page { margin: 0 }`
+-   the base font size: `html { font-size: 10pt }`
+
+or, for that matter, any other style defined in the default / custom stylesheet.
 
 ### Using a custom HTML template
 
