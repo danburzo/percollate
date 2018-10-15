@@ -29,19 +29,19 @@ npm install
 yarn
 ```
 
-You can then run the CLI by using `./index.js` instead of `percollate`:
+You can then run the CLI by using `./cli.js` instead of `percollate`:
 
 ```bash
-./index.js pdf --output some.pdf http://example.com
+./cli.js pdf --output some.pdf http://example.com
 ```
 
-> 💡 You may need to add _execution permissions_ to the file using `chmod +x ./index.js`
+> 💡 You may need to add _execution permissions_ to the file using `chmod +x ./cli.js`
 
 ### Debugging the temporary HTML
 
 If the generated PDF doesn't look like you'd expect, you can open the temporary HTML file that `percollate` generates in your browser to inspect the markup and styles.
 
-> ./index.js pdf http://www.huevaluechroma.com/072.php <br>
+> ./cli.js pdf http://www.huevaluechroma.com/072.php <br>
 > Fetching: http://www.huevaluechroma.com/072.php <br>
 > Enhancing web page <br>
 > Generating temporary HTML file at: <br> > **file:///var/folders/yy/h2wycn3j23n6lpf60qf3xmj40000gn/T/tmp-4720cQkEtujUSi0V.html** <br>

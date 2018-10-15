@@ -1,5 +1,9 @@
 # Percollate Changelog
 
+### Unreleased
+
+-   Started separating the CLI from the Node library, working towards a programmatic API (Thank you, [@phenax](https://github.com/phenax)!)
+
 ### 0.2.9
 
 -   Adds a default output file path when the `--output` option is omitted (https://github.com/danburzo/percollate/issues/37)
