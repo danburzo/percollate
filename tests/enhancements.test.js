@@ -63,6 +63,22 @@ describe('Page enhancements', () => {
 			expect(doc.querySelector('img')).not.to.eql(null);
 		});
 
+		it('should not unlink linked img elements if the link doesnt point to an image', () => {
+			const doc = createDocument(`
+                <a href="/some-random-link">
+                    <img src='image.png' width=500 height=200 />
+                </a>
+            `);
+
+			expect(doc.querySelector('a')).not.to.eql(null);
+			expect(doc.querySelector('img').src).to.eql('image.png');
+
+			imagesAtFullSize(doc);
+
+			expect(doc.querySelector('a')).not.to.eql(null);
+			expect(doc.querySelector('img').src).to.eql('image.png');
+		});
+
 		it('should change image source to the link for linked img elements', () => {
 			const doc = createDocument(`
                 <a href="/wow.png">
