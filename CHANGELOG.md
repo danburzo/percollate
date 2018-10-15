@@ -1,6 +1,6 @@
 # Percollate Changelog
 
-### Unreleased
+### 0.2.10
 
 -   Started separating the CLI from the Node library, working towards a programmatic API (Thank you, [@phenax](https://github.com/phenax)!)
 -   Adds `--individual` flag to export many pages as individual PDFs (https://github.com/danburzo/percollate/issues/38)
