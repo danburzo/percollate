@@ -25,4 +25,56 @@ describe('Page enhancements', () => {
 			expect(doc.querySelectorAll('.normal-element').length).to.eql(2);
 		});
 	});
+
+	describe('imagesAtFullSize', () => {
+		it('should strip width and height from all img element', () => {
+			const doc = createDocument(`
+                <img src='image.png' width=500 height=200 />
+                <div>
+                    <img src='imagew.png' width=100 height=200 />
+                </div>
+            `);
+
+			doc.querySelectorAll('img').forEach($img => {
+				expect($img.width).not.to.eql(0);
+				expect($img.height).not.to.eql(0);
+			});
+
+			imagesAtFullSize(doc);
+
+			doc.querySelectorAll('img').forEach($img => {
+				expect($img.width).to.eql(0);
+				expect($img.height).to.eql(0);
+			});
+		});
+
+		it('should unlink linked img elements if the link points to an image', () => {
+			const doc = createDocument(`
+                <a href="/wow.png">
+                    <img src='/wow.png' width=500 height=200 />
+                </a>
+            `);
+
+			expect(doc.querySelector('a')).not.to.eql(null);
+
+			imagesAtFullSize(doc);
+
+			expect(doc.querySelector('a')).to.eql(null);
+			expect(doc.querySelector('img')).not.to.eql(null);
+		});
+
+		it('should change image source to the link for linked img elements', () => {
+			const doc = createDocument(`
+                <a href="/wow.png">
+                    <img src='image.png' width=500 height=200 />
+                </a>
+            `);
+
+			expect(doc.querySelector('img').src).to.eql('image.png');
+
+			imagesAtFullSize(doc);
+
+			expect(doc.querySelector('img').src).to.eql('/wow.png');
+		});
+	});
 });
