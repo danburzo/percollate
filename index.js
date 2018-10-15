@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 const program = require('commander');
 const pkg = require('./package.json');
+
 const pup = require('puppeteer');
-const readability = require('./vendor/readability');
+const Readability = require('./vendor/readability');
 const got = require('got');
 const { JSDOM } = require('jsdom');
 const nunjucks = require('nunjucks');
@@ -12,17 +13,28 @@ const { imagesAtFullSize, wikipediaSpecific } = require('./src/enhancements');
 const css = require('css');
 const get_style_attribute_value = require('./src/get-style-attribute-value');
 
-function resolve(path) {
-	return require.resolve(path, {
-		paths: [process.cwd(), __dirname]
-	});
-}
+const resolve = path => require.resolve(path, {
+	paths: [process.cwd(), __dirname]
+});
+
+const configure = () => nunjucks.configure({ autoescape: false, noCache: true });
+
+const createDom = ({ url, content }) => {
+	const dom = new JSDOM(content);
+	dom.reconfigure({ url });
+	return dom;
+};
+
+const enhancePage = dom => {
+	imagesAtFullSize(dom.window.document);
+	wikipediaSpecific(dom.window.document);
+};
 
 /*
 	Some setup
 	----------
  */
-nunjucks.configure({ autoescape: false, noCache: true });
+configure();
 
 /*
 	Fetch a web page and clean the HTML
@@ -33,25 +45,18 @@ async function cleanup(url) {
 	const content = (await got(url)).body;
 
 	console.log('Enhancing web page');
-	const dom = new JSDOM(content);
-	dom.reconfigure({ url: url });
+	const dom = createDom({ url, content });
 
 	/* 
 		Run enhancements
 		----------------
 	*/
-	imagesAtFullSize(dom.window.document);
-	wikipediaSpecific(dom.window.document);
+	enhancePage(dom);
 
 	// Run through readability and return
-	let parsed = new readability(dom.window.document).parse();
+	const parsed = new Readability(dom.window.document).parse();
 
-	return {
-		...parsed,
-
-		// Add in some stuff
-		url: url
-	};
+	return { ...parsed, url };
 }
 
 /*
@@ -59,9 +64,7 @@ async function cleanup(url) {
 	--------------------------------
  */
 async function bundle(items, options) {
-	var temp_file = tmp.tmpNameSync({
-		postfix: '.html'
-	});
+	const temp_file = tmp.tmpNameSync({ postfix: '.html' });
 
 	console.log(`Generating temporary HTML file at: ${temp_file}`);
 
@@ -74,21 +77,19 @@ async function bundle(items, options) {
 			'utf8'
 		),
 		{
-			items: items,
-			style: style,
-
-			// deprecated
-			stylesheet: stylesheet
+			items,
+			style,
+			stylesheet, // deprecated
 		}
 	);
 
 	const doc = new JSDOM(html).window.document;
-	let headerTemplate = doc.querySelector('.header-template');
-	let footerTemplate = doc.querySelector('.footer-template');
-	let header = new JSDOM(
+	const headerTemplate = doc.querySelector('.header-template');
+	const footerTemplate = doc.querySelector('.footer-template');
+	const header = new JSDOM(
 		headerTemplate ? headerTemplate.innerHTML : '<span></span>'
 	).window.document;
-	let footer = new JSDOM(
+	const footer = new JSDOM(
 		footerTemplate ? footerTemplate.innerHTML : '<span></span>'
 	).window.document;
 
