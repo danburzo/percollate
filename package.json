@@ -17,7 +17,7 @@
 		"tmp": "^0.0.33"
 	},
 	"bin": {
-		"percollate": "./index.js"
+		"percollate": "./cli.js"
 	},
 	"engines": {
 		"node": ">= 8.0.0"
