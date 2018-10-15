@@ -58,12 +58,12 @@ yarn global upgrade --latest percollate
 
 The `pdf`, `epub`, and `html` commands have these options:
 
-| Option         | What it does                                                                                              |
-| -------------- | --------------------------------------------------------------------------------------------------------- |
-| `-o, --output` | (**Required**) The path of the resulting bundle                                                           |
-| `--template`   | Path to a custom HTML template                                                                            |
-| `--style`      | Path to a custom CSS                                                                                      |
-| `--css`        | Additional CSS styles you can pass from the command-line to override the default/custom stylesheet styles |
+| Option         | What it does                                                                                                   |
+| -------------- | -------------------------------------------------------------------------------------------------------------- |
+| `-o, --output` | The path of the resulting bundle; when ommited, we derive the output file name from the title of the web page. |
+| `--template`   | Path to a custom HTML template                                                                                 |
+| `--style`      | Path to a custom CSS                                                                                           |
+| `--css`        | Additional CSS styles you can pass from the command-line to override the default/custom stylesheet styles      |
 
 ## Examples
 

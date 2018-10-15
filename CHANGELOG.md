@@ -1,5 +1,9 @@
 # Percollate Changelog
 
+### 0.2.9
+
+-   Adds a default output file path when the `--output` option is omitted (https://github.com/danburzo/percollate/issues/37)
+
 ### 0.2.8
 
 -   Added support for inline CSS styles via the `--css` option (https://github.com/danburzo/percollate/issues/27)
