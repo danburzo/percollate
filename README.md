@@ -1,6 +1,10 @@
 # percollate
 
-Percollate is a command-line tool to turn web pages as beautifully formatted PDFs.
+Percollate is a command-line tool to turn web pages as beautifully formatted PDFs. See [How it works](#how-it-works).
+
+<img alt="Example Output" src="https://raw.githubusercontent.com/danburzo/percollate/master/img/dimensions-of-colour.png">
+
+_Example spread from the generated PDF of [a chapter in Dimensions of Colour](http://www.huevaluechroma.com/072.php); rendered here in black & white for a smaller image file size._
 
 ## Table of Contents
 
@@ -16,6 +20,7 @@ Percollate is a command-line tool to turn web pages as beautifully formatted PDF
     -   [Customizing the page header / footer](#customizing-the-page-header-footer)
 -   [How it works](#how-it-works)
 -   [Troubleshooting](#troubleshooting)
+-   [Contributing](#contributing)
 -   [See also](#see-also)
 
 ## Installation
@@ -58,12 +63,12 @@ yarn global upgrade --latest percollate
 
 The `pdf`, `epub`, and `html` commands have these options:
 
-| Option         | What it does                                                                                              |
-| -------------- | --------------------------------------------------------------------------------------------------------- |
-| `-o, --output` | (**Required**) The path of the resulting bundle                                                           |
-| `--template`   | Path to a custom HTML template                                                                            |
-| `--style`      | Path to a custom CSS                                                                                      |
-| `--css`        | Additional CSS styles you can pass from the command-line to override the default/custom stylesheet styles |
+| Option         | What it does                                                                                                   |
+| -------------- | -------------------------------------------------------------------------------------------------------------- |
+| `-o, --output` | The path of the resulting bundle; when ommited, we derive the output file name from the title of the web page. |
+| `--template`   | Path to a custom HTML template                                                                                 |
+| `--style`      | Path to a custom CSS                                                                                           |
+| `--css`        | Additional CSS styles you can pass from the command-line to override the default/custom stylesheet styles      |
 
 ## Examples
 
@@ -127,6 +132,10 @@ or, for that matter, any other style defined in the default / custom stylesheet.
 On some Linux machines you'll need to [install a few more Chrome dependencies](https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md#chrome-headless-doesnt-launch) before `percollate` works correctly. (_Thanks to @ptica for [sorting it out](https://github.com/danburzo/percollate/issues/19#issuecomment-428496041)_)
 
 The `percollate pdf` command supports the `--no-sandbox` Puppeteer flag, but make sure you're [aware of the implications](https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md#chrome-headless-fails-due-to-sandbox-issues) before disabling the sandbox.
+
+## Contributing
+
+Contributions of all kinds are welcome! See [CONTRIBUTING.md](./CONTRIBUTING.md) for details.
 
 ## See also
 

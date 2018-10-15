@@ -1,16 +1,15 @@
 #!/usr/bin/env node
-const program = require('commander');
-const pkg = require('./package.json');
-
 const pup = require('puppeteer');
-const Readability = require('./vendor/readability');
 const got = require('got');
 const { JSDOM } = require('jsdom');
 const nunjucks = require('nunjucks');
 const tmp = require('tmp');
 const fs = require('fs');
-const { imagesAtFullSize, wikipediaSpecific } = require('./src/enhancements');
 const css = require('css');
+const slugify = require('slugify');
+const Readability = require('./vendor/readability');
+
+const { imagesAtFullSize, wikipediaSpecific } = require('./src/enhancements');
 const get_style_attribute_value = require('./src/get-style-attribute-value');
 
 const resolve = path =>
@@ -124,7 +123,6 @@ async function bundle(items, options) {
 
 	fs.writeFileSync(temp_file, html);
 
-	console.log('Saving as PDF');
 	const browser = await pup.launch({
 		headless: true,
 		/*
@@ -138,8 +136,23 @@ async function bundle(items, options) {
 	const page = await browser.newPage();
 	await page.goto(`file://${temp_file}`, { waitUntil: 'load' });
 
+	/*
+		When no output path is present,
+		produce the file name from the web page title
+		(if a single page was sent as argument), 
+		or a timestamped file (for the moment) 
+		in case we're bundling many web pages.
+	 */
+	const output_path =
+		options.output ||
+		(items.length === 1
+			? `${slugify(items[0].title || 'Untitled page')}.pdf`
+			: `percollate-${Date.now()}.pdf`);
+
+	console.log(`Saving PDF: ${output_path}`);
+
 	await page.pdf({
-		path: options.output,
+		path: output_path,
 		preferCSSPageSize: true,
 		displayHeaderFooter: true,
 		headerTemplate: header.body.innerHTML,
