@@ -1,3 +1,4 @@
-const flatten = arr => arr.reduce((acc, item) => [...acc, ...item], []);
+const flatten = arr =>
+	arr.reduce((array, subArray) => array.concat(subArray), []);
 
 module.exports = { flatten };
