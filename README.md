@@ -93,6 +93,12 @@ You can use common Unix commands and keep the list of URLs in a newline-delimite
 cat urls.txt | xargs percollate pdf --output some.pdf
 ```
 
+To transform several web pages into individual PDF files at once, use the `--individual` flag:
+
+```bash
+percollate pdf --individual --output some.pdf https://example.com/page1 https://example.com/page2
+```
+
 ### Custom page size / margins
 
 The default page size is A5 (portrait). You can use the `--css` option to override it using [any supported CSS `size`](https://www.w3.org/TR/css3-page/#page-size):
