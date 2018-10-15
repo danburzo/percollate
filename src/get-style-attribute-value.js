@@ -1,16 +1,15 @@
-module.exports = function(css_ast, selector) {
-	let rules = css_ast.stylesheet.rules.filter(
-		rule => rule.type === 'rule' && rule.selectors.includes(selector)
+const { flatten } = require('./utils');
+
+const matchSelector = selector => rule =>
+	rule.type === 'rule' && rule.selectors.includes(selector);
+
+module.exports = function(cssAst, selector) {
+	const ruleDeclarations = cssAst.stylesheet.rules.filter(
+		matchSelector(selector)
 	);
-	if (!rules.length) {
-		return '';
-	}
-	return rules
-		.map(rule =>
-			rule.declarations
-				.filter(d => d.type === 'declaration')
-				.map(d => `${d.property}: ${d.value}`)
-				.join(';')
-		)
+
+	return flatten(ruleDeclarations.map(rule => rule.declarations))
+		.filter(d => d.type === 'declaration')
+		.map(d => `${d.property}: ${d.value}`)
 		.join(';');
 };
