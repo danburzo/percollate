@@ -13,10 +13,10 @@ const { imagesAtFullSize, wikipediaSpecific } = require('./src/enhancements');
 const css = require('css');
 const get_style_attribute_value = require('./src/get-style-attribute-value');
 
-const resolve = path => require.resolve(path, {
-	paths: [process.cwd(), __dirname]
-});
-
+const resolve = path =>
+	require.resolve(path, {
+		paths: [process.cwd(), __dirname]
+	});
 
 const enhancePage = function(dom) {
 	imagesAtFullSize(dom.window.document);
@@ -29,7 +29,6 @@ function createDom({ url, content }) {
 	return dom;
 }
 
-
 /*
 	Some setup
 	----------
@@ -37,7 +36,6 @@ function createDom({ url, content }) {
 function configure() {
 	nunjucks.configure({ autoescape: false, noCache: true });
 }
-
 
 /*
 	Fetch a web page and clean the HTML
@@ -82,7 +80,7 @@ async function bundle(items, options) {
 		{
 			items,
 			style,
-			stylesheet, // deprecated
+			stylesheet // deprecated
 		}
 	);
 
@@ -152,4 +150,29 @@ async function bundle(items, options) {
 	await browser.close();
 }
 
-module.exports = { configure, cleanup, bundle };
+/*
+	Generate PDF
+ */
+async function pdf(urls, options) {
+	let items = [];
+	for (let url of urls) {
+		items.push(await cleanup(url));
+	}
+	bundle(items, options);
+}
+
+/*
+	Generate EPUB
+ */
+async function epub(urls, options) {
+	console.log('TODO', urls, options);
+}
+
+/*
+	Generate HTML
+ */
+async function html(urls, options) {
+	console.log('TODO', urls, options);
+}
+
+module.exports = { configure, pdf, epub, html };

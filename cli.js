@@ -2,15 +2,13 @@
 const program = require('commander');
 const pkg = require('./package.json');
 
-const { configure, cleanup, bundle } = require('.');
-
+const { configure, pdf, epub, html } = require('.');
 
 /*
 	Some setup
 	----------
  */
 configure();
-
 
 /*
 	Command-Line Interface definition
@@ -41,33 +39,3 @@ with_common_options(program.command('html [urls...]'))
 	.action(html);
 
 program.parse(process.argv);
-
-/*
-	CLI commands
-	------------
- */
-
-/*
-	Generate PDF
- */
-async function pdf(urls, options) {
-	let items = [];
-	for (let url of urls) {
-		items.push(await cleanup(url));
-	}
-	bundle(items, options);
-}
-
-/*
-	Generate EPUB
- */
-async function epub(urls, options) {
-	console.log('TODO', urls, options);
-}
-
-/*
-	Generate HTML
- */
-async function html(urls, options) {
-	console.log('TODO', urls, options);
-}
