@@ -17,24 +17,27 @@ const resolve = path => require.resolve(path, {
 	paths: [process.cwd(), __dirname]
 });
 
-const configure = () => nunjucks.configure({ autoescape: false, noCache: true });
 
-const createDom = ({ url, content }) => {
-	const dom = new JSDOM(content);
-	dom.reconfigure({ url });
-	return dom;
-};
-
-const enhancePage = dom => {
+const enhancePage = function(dom) {
 	imagesAtFullSize(dom.window.document);
 	wikipediaSpecific(dom.window.document);
 };
+
+function createDom({ url, content }) {
+	const dom = new JSDOM(content);
+	dom.reconfigure({ url });
+	return dom;
+}
+
 
 /*
 	Some setup
 	----------
  */
-configure();
+function configure() {
+	nunjucks.configure({ autoescape: false, noCache: true });
+}
+
 
 /*
 	Fetch a web page and clean the HTML
@@ -149,62 +152,4 @@ async function bundle(items, options) {
 	await browser.close();
 }
 
-/*
-	Command-Line Interface definition
-	---------------------------------
- */
-
-function with_common_options(cmd) {
-	return cmd
-		.option('-o, --output [output]', 'Path for the generated bundle')
-		.option('--template [template]', 'Path to custom HTML template')
-		.option('--style [stylesheet]', 'Path to custom CSS')
-		.option('--css [style]', 'Additional CSS style');
-}
-
-program.version(pkg.version);
-
-with_common_options(program.command('pdf [urls...]'))
-	.option('--no-sandbox', 'Passed to Puppeteer')
-	.description('Bundle web pages as a PDF file')
-	.action(pdf);
-
-with_common_options(program.command('epub [urls...]'))
-	.description('Bundle web pages as an EPUB file')
-	.action(epub);
-
-with_common_options(program.command('html [urls...]'))
-	.description('Bundle web pages as a HTML file')
-	.action(html);
-
-program.parse(process.argv);
-
-/*
-	CLI commands
-	------------
- */
-
-/*
-	Generate PDF
- */
-async function pdf(urls, options) {
-	let items = [];
-	for (let url of urls) {
-		items.push(await cleanup(url));
-	}
-	bundle(items, options);
-}
-
-/*
-	Generate EPUB
- */
-async function epub(urls, options) {
-	console.log('TODO', urls, options);
-}
-
-/*
-	Generate HTML
- */
-async function html(urls, options) {
-	console.log('TODO', urls, options);
-}
+module.exports = { configure, cleanup, bundle };
