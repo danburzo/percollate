@@ -2,6 +2,10 @@
 
 Percollate is a command-line tool to turn web pages as beautifully formatted PDFs. See [How it works](#how-it-works).
 
+<img alt="Example Output" src="https://raw.githubusercontent.com/danburzo/percollate/master/img/dimensions-of-colour.png">
+
+_Example spread from the generated PDF of [a chapter in Dimensions of Colour](http://www.huevaluechroma.com/072.php); rendered here in black & white for a smaller image file size._
+
 ## Table of Contents
 
 -   [Installation](#installation)
