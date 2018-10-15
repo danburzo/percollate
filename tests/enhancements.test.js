@@ -3,12 +3,23 @@ const { expect } = require('chai');
 
 const { wikipediaSpecific, imagesAtFullSize } = require('../src/enhancements');
 
-describe('Page enhancements', () => {
-	const createDocument = content => new JSDOM(content).window.document;
+const createDoc = content => new JSDOM(content).window.document;
 
+describe('Page enhancements', () => {
 	describe('wikipediaSpecific', () => {
+		it('should leave non-wikipedia specific content untouched', () => {
+			const doc = createDoc(`
+                <div class='normal-element'>Hello world</div>
+                <span class='normal-element'>Hello</span>
+            `);
+
+			wikipediaSpecific(doc);
+
+			expect(doc.querySelectorAll('.normal-element').length).to.eql(2);
+		});
+
 		it('should remove all edit links', () => {
-			const doc = createDocument(`
+			const doc = createDoc(`
                 <div class='normal-element'>Hello world</div>
                 <span class='mw-editsection'>Hello</span>
                 <span class='normal-element'>Hello</span>
@@ -28,7 +39,7 @@ describe('Page enhancements', () => {
 
 	describe('imagesAtFullSize', () => {
 		it('should strip width and height from all img element', () => {
-			const doc = createDocument(`
+			const doc = createDoc(`
                 <img src='image.png' width=500 height=200 />
                 <div>
                     <img src='imagew.png' width=100 height=200 />
@@ -49,7 +60,7 @@ describe('Page enhancements', () => {
 		});
 
 		it('should unlink linked img elements if the link points to an image', () => {
-			const doc = createDocument(`
+			const doc = createDoc(`
                 <a href="/wow.png">
                     <img src='/wow.png' width=500 height=200 />
                 </a>
@@ -64,7 +75,7 @@ describe('Page enhancements', () => {
 		});
 
 		it('should not unlink linked img elements if the link doesnt point to an image', () => {
-			const doc = createDocument(`
+			const doc = createDoc(`
                 <a href="/some-random-link">
                     <img src='image.png' width=500 height=200 />
                 </a>
@@ -80,7 +91,7 @@ describe('Page enhancements', () => {
 		});
 
 		it('should change image source to the link for linked img elements', () => {
-			const doc = createDocument(`
+			const doc = createDoc(`
                 <a href="/wow.png">
                     <img src='image.png' width=500 height=200 />
                 </a>
