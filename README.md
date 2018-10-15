@@ -1,6 +1,6 @@
 # percollate
 
-Percollate is a command-line tool to turn web pages as beautifully formatted PDFs.
+Percollate is a command-line tool to turn web pages as beautifully formatted PDFs. See [How it works](#how-it-works).
 
 ## Table of Contents
 
@@ -16,6 +16,7 @@ Percollate is a command-line tool to turn web pages as beautifully formatted PDF
     -   [Customizing the page header / footer](#customizing-the-page-header-footer)
 -   [How it works](#how-it-works)
 -   [Troubleshooting](#troubleshooting)
+-   [Contributing](#contributing)
 -   [See also](#see-also)
 
 ## Installation
@@ -127,6 +128,10 @@ or, for that matter, any other style defined in the default / custom stylesheet.
 On some Linux machines you'll need to [install a few more Chrome dependencies](https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md#chrome-headless-doesnt-launch) before `percollate` works correctly. (_Thanks to @ptica for [sorting it out](https://github.com/danburzo/percollate/issues/19#issuecomment-428496041)_)
 
 The `percollate pdf` command supports the `--no-sandbox` Puppeteer flag, but make sure you're [aware of the implications](https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md#chrome-headless-fails-due-to-sandbox-issues) before disabling the sandbox.
+
+## Contributing
+
+Contributions of all kinds are welcome! See [CONTRIBUTING.md](./CONTRIBUTING.md) for details.
 
 ## See also
 
