@@ -1,6 +1,6 @@
 # percollate
 
-Percollate is a command-line tool to turn web pages as beautifully formatted PDFs. See [How it works](#how-it-works).
+Percollate is a command-line tool to turn web pages into beautifully formatted PDFs. See [How it works](#how-it-works).
 
 <img alt="Example Output" src="https://raw.githubusercontent.com/danburzo/percollate/master/img/dimensions-of-colour.png">
 

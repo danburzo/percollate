@@ -36,3 +36,13 @@ You can then run the CLI by using `./index.js` instead of `percollate`:
 ```
 
 > 💡 You may need to add _execution permissions_ to the file using `chmod +x ./index.js`
+
+### Debugging the temporary HTML
+
+If the generated PDF doesn't look like you'd expect, you can open the temporary HTML file that `percollate` generates in your browser to inspect the markup and styles.
+
+> ./index.js pdf http://www.huevaluechroma.com/072.php <br>
+> Fetching: http://www.huevaluechroma.com/072.php <br>
+> Enhancing web page <br>
+> Generating temporary HTML file at: <br> > **file:///var/folders/yy/h2wycn3j23n6lpf60qf3xmj40000gn/T/tmp-4720cQkEtujUSi0V.html** <br>
+> Saving PDF: The-Dimensions-of-Colour-traditional-colour-wheel.pdf

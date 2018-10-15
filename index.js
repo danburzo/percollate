@@ -66,7 +66,7 @@ async function bundle(items, options) {
 		postfix: '.html'
 	});
 
-	console.log(`Generating temporary HTML file at: ${temp_file}`);
+	console.log(`Generating temporary HTML file:\nfile://${temp_file}`);
 
 	const stylesheet = resolve(options.style || './templates/default.css');
 	const style = fs.readFileSync(stylesheet, 'utf8') + (options.css || '');
