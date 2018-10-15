@@ -10,7 +10,10 @@ const slugify = require('slugify');
 const Readability = require('./vendor/readability');
 
 const { imagesAtFullSize, wikipediaSpecific } = require('./src/enhancements');
-const get_style_attribute_value = require('./src/get-style-attribute-value');
+const getStyleAttributeValue = require('./src/get-style-attribute-value');
+
+const DEFAULT_STYLESHEET_PATH = './templates/default.css';
+const DEFAULT_TEMPLATE_PATH = './templates/default.html';
 
 const resolve = path =>
 	require.resolve(path, {
@@ -24,9 +27,13 @@ const enhancePage = function(dom) {
 
 function createDom({ url, content }) {
 	const dom = new JSDOM(content);
-	dom.reconfigure({ url });
+	if (url) {
+		dom.reconfigure({ url });
+	}
 	return dom;
 }
+
+const createDocument = content => createDom({ content }).window.document;
 
 /*
 	Some setup
@@ -40,7 +47,7 @@ function configure() {
 	Fetch a web page and clean the HTML
 	-----------------------------------
  */
-async function cleanup(url) {
+async function fetchDocument(url) {
 	console.log(`Fetching: ${url}`);
 	const content = (await got(url)).body;
 
@@ -59,69 +66,64 @@ async function cleanup(url) {
 	return { ...parsed, url };
 }
 
+const createPartialDocument = (content, { style } = {}) => {
+	const doc = createDocument(content);
+
+	const rootDiv = doc.querySelector('body :first-child');
+
+	if (rootDiv && style) {
+		rootDiv.setAttribute(
+			'style',
+			`
+				${style};
+				${rootDiv.getAttribute('style') || ''};
+			`
+		);
+	}
+
+	return doc;
+};
+
 /*
 	Bundle the HTML files into a PDF
 	--------------------------------
  */
 async function bundle(items, options) {
-	const temp_file = tmp.tmpNameSync({ postfix: '.html' });
+	const tempFilePath = tmp.tmpNameSync({ postfix: '.html' });
 
-	console.log(`Generating temporary HTML file:\nfile://${temp_file}`);
+	console.log(`Generating temporary HTML file:\nfile://${tempFilePath}`);
 
-	const stylesheet = resolve(options.style || './templates/default.css');
+	const stylesheet = resolve(options.style || DEFAULT_STYLESHEET_PATH);
 	const style = fs.readFileSync(stylesheet, 'utf8') + (options.css || '');
 
 	const html = nunjucks.renderString(
 		fs.readFileSync(
-			resolve(options.template || './templates/default.html'),
+			resolve(options.template || DEFAULT_TEMPLATE_PATH),
 			'utf8'
 		),
+		{ items, style, stylesheet } // stylesheet is deprecated
+	);
+
+	const doc = createDocument(html);
+	const cssAst = css.parse(style);
+
+	const headerTemplate = doc.querySelector('.header-template');
+	const header = createPartialDocument(
+		headerTemplate ? headerTemplate.innerHTML : '<span></span>',
 		{
-			items,
-			style,
-			stylesheet // deprecated
+			style: getStyleAttributeValue(cssAst, '.header-template')
 		}
 	);
 
-	const doc = new JSDOM(html).window.document;
-	const headerTemplate = doc.querySelector('.header-template');
 	const footerTemplate = doc.querySelector('.footer-template');
-	const header = new JSDOM(
-		headerTemplate ? headerTemplate.innerHTML : '<span></span>'
-	).window.document;
-	const footer = new JSDOM(
-		footerTemplate ? footerTemplate.innerHTML : '<span></span>'
-	).window.document;
+	const footer = createPartialDocument(
+		footerTemplate ? footerTemplate.innerHTML : '<span></span>',
+		{
+			style: getStyleAttributeValue(cssAst, '.footer-template')
+		}
+	);
 
-	const css_ast = css.parse(style);
-
-	const header_style = get_style_attribute_value(css_ast, '.header-template');
-	const header_div = header.querySelector('body :first-child');
-
-	if (header_div && header_style) {
-		header_div.setAttribute(
-			'style',
-			`
-				${header_style};
-				${header_div.getAttribute('style') || ''}
-			`
-		);
-	}
-
-	const footer_style = get_style_attribute_value(css_ast, '.footer-template');
-	const footer_div = footer.querySelector('body :first-child');
-
-	if (footer_div && footer_style) {
-		footer_div.setAttribute(
-			'style',
-			`
-				${footer_style};
-				${footer_div.getAttribute('style') || ''}
-			`
-		);
-	}
-
-	fs.writeFileSync(temp_file, html);
+	fs.writeFileSync(tempFilePath, html);
 
 	const browser = await pup.launch({
 		headless: true,
@@ -134,7 +136,7 @@ async function bundle(items, options) {
 			: ['--no-sandbox', '--disable-setuid-sandbox']
 	});
 	const page = await browser.newPage();
-	await page.goto(`file://${temp_file}`, { waitUntil: 'load' });
+	await page.goto(`file://${tempFilePath}`, { waitUntil: 'load' });
 
 	/*
 		When no output path is present,
@@ -169,7 +171,7 @@ async function bundle(items, options) {
 async function pdf(urls, options) {
 	let items = [];
 	for (let url of urls) {
-		items.push(await cleanup(url));
+		items.push(await fetchDocument(url));
 	}
 	bundle(items, options);
 }
