@@ -66,6 +66,7 @@ The `pdf`, `epub`, and `html` commands have these options:
 | Option         | What it does                                                                                                   |
 | -------------- | -------------------------------------------------------------------------------------------------------------- |
 | `-o, --output` | The path of the resulting bundle; when ommited, we derive the output file name from the title of the web page. |
+| `--individual` | Export each web page as an individual file.                                                                    |
 | `--template`   | Path to a custom HTML template                                                                                 |
 | `--style`      | Path to a custom CSS                                                                                           |
 | `--css`        | Additional CSS styles you can pass from the command-line to override the default/custom stylesheet styles      |
@@ -90,6 +91,12 @@ You can use common Unix commands and keep the list of URLs in a newline-delimite
 
 ```bash
 cat urls.txt | xargs percollate pdf --output some.pdf
+```
+
+To transform several web pages into individual PDF files at once, use the `--individual` flag:
+
+```bash
+percollate pdf --individual --output some.pdf https://example.com/page1 https://example.com/page2
 ```
 
 ### Custom page size / margins

@@ -20,7 +20,8 @@ function with_common_options(cmd) {
 		.option('-o, --output [output]', 'Path for the generated bundle')
 		.option('--template [template]', 'Path to custom HTML template')
 		.option('--style [stylesheet]', 'Path to custom CSS')
-		.option('--css [style]', 'Additional CSS style');
+		.option('--css [style]', 'Additional CSS style')
+		.option('--individual', 'Export each web page as an individual file');
 }
 
 program.version(pkg.version);

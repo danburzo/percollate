@@ -169,9 +169,16 @@ async function bundle(items, options) {
 async function pdf(urls, options) {
 	let items = [];
 	for (let url of urls) {
-		items.push(await cleanup(url));
+		let item = await cleanup(url);
+		if (options.individual) {
+			await bundle([item], options);
+		} else {
+			items.push(item);
+		}
 	}
-	bundle(items, options);
+	if (!options.individual) {
+		await bundle(items, options);
+	}
 }
 
 /*
