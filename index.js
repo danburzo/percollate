@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 const pup = require('puppeteer');
 const got = require('got');
+const ora = require('ora');
 const { JSDOM } = require('jsdom');
 const nunjucks = require('nunjucks');
 const tmp = require('tmp');
@@ -8,6 +9,8 @@ const fs = require('fs');
 const css = require('css');
 const slugify = require('slugify');
 const Readability = require('./vendor/readability');
+
+const spinner = ora();
 
 const {
 	imagesAtFullSize,
@@ -46,24 +49,32 @@ function configure() {
 	-----------------------------------
  */
 async function cleanup(url) {
-	console.log(`Fetching: ${url}`);
-	const content = (await got(url)).body;
+	try {
+		spinner.start(`Fetching: ${url}`);
+		const content = (await got(url)).body;
+		spinner.succeed();
 
-	console.log('Enhancing web page');
-	const dom = createDom({ url, content });
+		spinner.start('Enhancing web page');
+		const dom = createDom({ url, content });
 
-	/* 
-		Run enhancements
-		----------------
-	*/
-	enhancePage(dom);
+		/* 
+			Run enhancements
+			----------------
+		*/
+		enhancePage(dom);
 
-	// Run through readability and return
-	const parsed = new Readability(dom.window.document, {
-		classesToPreserve: ['no-href']
-	}).parse();
+		// Run through readability and return
+		const parsed = new Readability(dom.window.document, {
+			classesToPreserve: ['no-href']
+		}).parse();
 
-	return { ...parsed, url };
+		spinner.succeed();
+
+		return { ...parsed, url };
+	} catch (error) {
+		spinner.fail(error.message);
+		throw new Error(error);
+	}
 }
 
 /*
@@ -71,9 +82,8 @@ async function cleanup(url) {
 	--------------------------------
  */
 async function bundle(items, options) {
+	spinner.start('Generating temporary HTML file');
 	const temp_file = tmp.tmpNameSync({ postfix: '.html' });
-
-	console.log(`Generating temporary HTML file:\nfile://${temp_file}`);
 
 	const stylesheet = resolve(options.style || './templates/default.css');
 	const style = fs.readFileSync(stylesheet, 'utf8') + (options.css || '');
@@ -130,6 +140,10 @@ async function bundle(items, options) {
 
 	fs.writeFileSync(temp_file, html);
 
+	spinner.succeed(`Temporary HTML file: file://${temp_file}`);
+
+	spinner.start('Saving PDF');
+
 	const browser = await pup.launch({
 		headless: true,
 		/*
@@ -156,8 +170,6 @@ async function bundle(items, options) {
 			? `${slugify(items[0].title || 'Untitled page')}.pdf`
 			: `percollate-${Date.now()}.pdf`);
 
-	console.log(`Saving PDF: ${output_path}`);
-
 	await page.pdf({
 		path: output_path,
 		preferCSSPageSize: true,
@@ -168,6 +180,8 @@ async function bundle(items, options) {
 	});
 
 	await browser.close();
+
+	spinner.succeed(`Saving PDF: ${output_path}`);
 }
 
 /*
