@@ -39,11 +39,11 @@ with_common_options(program.command('html [urls...]'))
 	.description('Bundle web pages as a HTML file')
 	.action(html);
 
-with_common_options(
-	program.command('', 'default command', { isDefault: true })
-).action(() => {
-	program.outputHelp();
-});
+// with_common_options(
+// 	program.command('', 'default command', { isDefault: true })
+// ).action(() => {
+// 	program.outputHelp();
+// });
 
 program.parse(process.argv);
 
