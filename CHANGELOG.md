@@ -1,6 +1,6 @@
 # Percollate Changelog
 
-### Unreleased
+### 0.2.11
 
 -   Bump required Node version to 8.6.0 ([#45](https://github.com/danburzo/percollate/issues/45))
 -   Show help when no arguments provided or command chosen ([#36](https://github.com/danburzo/percollate/issues/36), thanks [@tanmayrajani](https://github.com/tanmayrajani)!)
