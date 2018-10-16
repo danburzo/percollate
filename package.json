@@ -20,7 +20,7 @@
 		"percollate": "./cli.js"
 	},
 	"engines": {
-		"node": ">= 8.0.0"
+		"node": ">= 8.6.0"
 	},
 	"devDependencies": {
 		"husky": "^1.0.1",

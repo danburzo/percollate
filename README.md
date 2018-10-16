@@ -25,7 +25,7 @@ _Example spread from the generated PDF of [a chapter in Dimensions of Colour](ht
 
 ## Installation
 
-> 💡 `percollate` needs Node.js version 8 or later, as it uses new(ish) JavaScript syntax.
+> 💡 `percollate` needs Node.js version 8.6.0 or later, as it uses new(ish) JavaScript syntax. If you get _SyntaxError: Unexpected token_ errors, check your Node version with `node --version`.
 
 You can install `percollate` globally:
 
