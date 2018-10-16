@@ -1,17 +1,23 @@
 # Percollate Changelog
 
+### Unreleased
+
+-   Bump required Node version to 8.6.0 ([#45](https://github.com/danburzo/percollate/issues/45))
+-   Show help when no arguments provided or command chosen ([#36](https://github.com/danburzo/percollate/issues/36), thanks [@tanmayrajani](https://github.com/tanmayrajani)!)
+-   Don't append the HREF for in-page anchors or anchors which have the full URL as their text content ([#31](https://github.com/danburzo/percollate/issues/31))
+
 ### 0.2.10
 
 -   Started separating the CLI from the Node library, working towards a programmatic API (Thank you, [@phenax](https://github.com/phenax)!)
--   Adds `--individual` flag to export many pages as individual PDFs (https://github.com/danburzo/percollate/issues/38)
+-   Adds `--individual` flag to export many pages as individual PDFs ([#38](https://github.com/danburzo/percollate/issues/38))
 
 ### 0.2.9
 
--   Adds a default output file path when the `--output` option is omitted (https://github.com/danburzo/percollate/issues/37)
+-   Adds a default output file path when the `--output` option is omitted ([#37](https://github.com/danburzo/percollate/issues/37))
 
 ### 0.2.8
 
--   Added support for inline CSS styles via the `--css` option (https://github.com/danburzo/percollate/issues/27)
+-   Added support for inline CSS styles via the `--css` option ([#27](https://github.com/danburzo/percollate/issues/27))
 
 ### 0.2.7
 
@@ -19,25 +25,25 @@
 
 ### 0.2.5
 
--   More print styles to handle blockquotes and `aria-hidden` elements (Re: https://github.com/danburzo/percollate/issues/19)
+-   More print styles to handle blockquotes and `aria-hidden` elements; re: [#19](https://github.com/danburzo/percollate/issues/19)
 
 ### 0.2.2
 
--   Adds article header, including byline, where it exists, and the source URL (https://github.com/danburzo/percollate/issues/18)
+-   Adds article header, including byline, where it exists, and the source URL ([#18](https://github.com/danburzo/percollate/issues/18))
 
 ### 0.2.1
 
 -   Some Wikipedia-specific enhancements: remove `edit` links next to headings.
 -   Added more print styles to the default stylesheet.
--   Fixes relative links (https://github.com/danburzo/percollate/issues/12)
+-   Fixes relative links ([#12](https://github.com/danburzo/percollate/issues/12))
 
 ### 0.2.0
 
--   Deprecates short names for some options (#16)
+-   Deprecates short names for some options ([#16](https://github.com/danburzo/percollate/issues/16))
 
 ### 0.1.9
 
--   Fixes template path resolution (#17) when percollate is installed globally
+-   Fixes template path resolution ([#17](https://github.com/danburzo/percollate/issues/17)) when percollate is installed globally
 
 ### 0.1.8
 

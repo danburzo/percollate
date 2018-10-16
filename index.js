@@ -9,7 +9,11 @@ const css = require('css');
 const slugify = require('slugify');
 const Readability = require('./vendor/readability');
 
-const { imagesAtFullSize, wikipediaSpecific } = require('./src/enhancements');
+const {
+	imagesAtFullSize,
+	wikipediaSpecific,
+	noUselessHref
+} = require('./src/enhancements');
 const get_style_attribute_value = require('./src/get-style-attribute-value');
 
 const resolve = path =>
@@ -19,6 +23,7 @@ const resolve = path =>
 
 const enhancePage = function(dom) {
 	imagesAtFullSize(dom.window.document);
+	noUselessHref(dom.window.document);
 	wikipediaSpecific(dom.window.document);
 };
 
@@ -54,7 +59,9 @@ async function cleanup(url) {
 	enhancePage(dom);
 
 	// Run through readability and return
-	const parsed = new Readability(dom.window.document).parse();
+	const parsed = new Readability(dom.window.document, {
+		classesToPreserve: ['no-href']
+	}).parse();
 
 	return { ...parsed, url };
 }
@@ -167,6 +174,7 @@ async function bundle(items, options) {
 	Generate PDF
  */
 async function pdf(urls, options) {
+	if (!urls.length) return;
 	let items = [];
 	for (let url of urls) {
 		let item = await cleanup(url);

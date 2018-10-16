@@ -41,7 +41,25 @@ function wikipediaSpecific(doc) {
 	).forEach(el => el.remove());
 }
 
+function noUselessHref(doc) {
+	/* 
+		Mark some links as not needing their HREF appended:
+		- links whose text content is the HREF
+		- in-page anchors
+	*/
+
+	Array.from(doc.querySelectorAll(`a`))
+		.filter(function(el) {
+			return (
+				(el.getAttribute('href') || '').match(/^\#/) ||
+				el.getAttribute('href') === el.textContent.trim()
+			);
+		})
+		.forEach(el => el.classList.add('no-href'));
+}
+
 module.exports = {
 	imagesAtFullSize,
+	noUselessHref,
 	wikipediaSpecific
 };
