@@ -181,7 +181,7 @@ async function bundle(items, options) {
 
 	await browser.close();
 
-	spinner.succeed(`Saving PDF: ${output_path}`);
+	spinner.succeed(`Saved PDF: ${output_path}`);
 }
 
 /*
