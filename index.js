@@ -28,8 +28,11 @@ const enhancePage = function(dom) {
 };
 
 function createDom({ url, content }) {
-	const dom = new JSDOM(content);
-	dom.reconfigure({ url });
+	const dom = new JSDOM(content, { url });
+
+	// Force relative URL resolution
+	dom.window.document.body.setAttribute(null, null);
+
 	return dom;
 }
 
