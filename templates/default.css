@@ -125,8 +125,23 @@ article:not(:last-of-type) {
 	widows: 3;
 }
 
+/*
+	Indent all subsequent paragraphs.
+ */
 .article__content p + p {
 	text-indent: 2em;
+}
+
+/*
+	Fixes the text indent for images
+	that get wrapped in a <p> tag
+	by Readability.
+
+	Reference:
+	https://github.com/danburzo/percollate/issues/48
+ */
+.article__content p + p > img:only-child {
+	text-indent: -2em;
 }
 
 .article__content hr {

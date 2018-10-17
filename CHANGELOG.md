@@ -1,5 +1,9 @@
 # Percollate Changelog
 
+### Unreleased
+
+-   Fixes indentation of images wrapped in `<p>` tags ([#48](https://github.com/danburzo/percollate/issues/48))
+
 ### 0.2.11
 
 -   Bump required Node version to 8.6.0 ([#45](https://github.com/danburzo/percollate/issues/45))
