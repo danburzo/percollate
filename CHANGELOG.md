@@ -3,6 +3,7 @@
 ### Unreleased
 
 -   Fixes indentation of images wrapped in `<p>` tags ([#48](https://github.com/danburzo/percollate/issues/48))
+-   Adds basic styles for tables ([#50](https://github.com/danburzo/percollate/issues/50))
 
 ### 0.2.11
 

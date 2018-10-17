@@ -40,6 +40,10 @@ a:not(.no-href):after {
 	font-family: sans-serif;
 }
 
+th {
+	font-family: sans-serif;
+}
+
 /*
 	Don't display hidden elements
  */
@@ -141,7 +145,7 @@ article:not(:last-of-type) {
 	https://github.com/danburzo/percollate/issues/48
  */
 .article__content p + p > img:only-child {
-	text-indent: -2em;
+	margin-left: -2em;
 }
 
 .article__content hr {
@@ -157,6 +161,31 @@ article:not(:last-of-type) {
 	padding-left: 2em;
 	border-left: 3pt solid #000;
 	margin-left: 0;
+}
+
+.article__content table {
+	width: 100%;
+	border-collapse: collapse;
+	page-break-inside: auto;
+	font-size: 0.9em;
+	line-height: 1.44;
+	margin: 1.44em 0;
+}
+
+.article__content th {
+}
+
+.article__content th,
+.article__content td {
+	text-align: left;
+	vertical-align: top;
+	padding: 0.36em 1em 0.36em 0;
+}
+
+.article__content tr {
+	border-bottom: 0.25pt solid #000;
+	page-break-inside: avoid;
+	page-break-after: auto;
 }
 
 /*
