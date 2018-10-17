@@ -73,7 +73,7 @@ async function cleanup(url) {
 		return { ...parsed, url };
 	} catch (error) {
 		spinner.fail(error.message);
-		throw new Error(error);
+		throw error;
 	}
 }
 
