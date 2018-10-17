@@ -4,7 +4,8 @@
 
 -   Fixes indentation of images wrapped in `<p>` tags ([#48](https://github.com/danburzo/percollate/issues/48))
 -   Adds basic styles for tables ([#50](https://github.com/danburzo/percollate/issues/50)), figures, defition terms, et cetera.
--   Adds a better font stack
+-   Adds a better font stack, using CSS variables
+-   Better CLI feedback with [ora](https://github.com/sindresorhus/ora) (thanks [@emersonlaurentino](https://github.com/emersonlaurentino)!)
 
 ### 0.2.11
 

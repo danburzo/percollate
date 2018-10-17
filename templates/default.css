@@ -2,9 +2,8 @@
 	--main-font: Palatino, 'Palatino Linotype', 'Times New Roman', 'Droid Serif',
 		Times, 'Source Serif Pro', serif, 'Apple Color Emoji', 'Segoe UI Emoji',
 		'Segoe UI Symbol';
-	--alt-font: -apple-system, BlinkMacSystemFont, helvetica, 'helvetica neue',
-		ubuntu, roboto, noto, 'segoe ui', arial, sans-serif, 'Apple Color Emoji',
-		'Segoe UI Emoji', 'Segoe UI Symbol';
+	--alt-font: 'helvetica neue', ubuntu, roboto, noto, 'segoe ui', arial,
+		sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
 	--code-font: Menlo, Consolas, monospace;
 }
 
