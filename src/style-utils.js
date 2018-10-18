@@ -3,7 +3,7 @@ const { flatten } = require('./utils');
 const matchSelector = selector => rule =>
 	rule.type === 'rule' && rule.selectors.includes(selector);
 
-module.exports = function(cssAst, selector) {
+const extractCss = function(cssAst, selector) {
 	const ruleDeclarations = cssAst.stylesheet.rules.filter(
 		matchSelector(selector)
 	);
@@ -13,3 +13,5 @@ module.exports = function(cssAst, selector) {
 		.map(d => `${d.property}: ${d.value}`)
 		.join(';');
 };
+
+module.exports = { extractCss };
