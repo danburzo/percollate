@@ -153,3 +153,4 @@ Here are some other projects to check out if you're interested in building books
 -   [HummusJS](https://github.com/galkahana/HummusJS)
 -   [Editoria](https://gitlab.coko.foundation/editoria/editoria) ([website](https://editoria.pub/))
 -   [pagedjs](https://gitlab.pagedmedia.org/tools/pagedjs) ([article](https://www.pagedmedia.org/pagedjs-sneak-peeks/))
+-   [Mercury](https://mercury.postlight.com/)
