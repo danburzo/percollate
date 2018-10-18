@@ -7,7 +7,8 @@
 	"author": "Dan Burzo <danburzo@gmail.com>",
 	"license": "MIT",
 	"scripts": {
-		"test": "mocha ./tests"
+		"test": "mocha ./tests",
+		"coverage": "nyc --reporter=text mocha ./tests"
 	},
 	"dependencies": {
 		"commander": "^2.18.0",
@@ -29,6 +30,7 @@
 		"chai": "^4.2.0",
 		"husky": "^1.0.1",
 		"mocha": "^5.2.0",
+		"nyc": "^13.1.0",
 		"prettier": "^1.14.3",
 		"pretty-quick": "^1.7.0"
 	},
@@ -36,6 +38,12 @@
 		"hooks": {
 			"pre-commit": "pretty-quick --staged"
 		}
+	},
+	"nyc": {
+		"exclude": [
+			"tests",
+			"vendor"
+		]
 	},
 	"prettier": {
 		"bracketSpacing": true,
