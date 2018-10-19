@@ -14,10 +14,10 @@ _Example spread from the generated PDF of [a chapter in Dimensions of Colour](ht
     -   [Available options](#available-options)
 -   [Examples](#examples)
     -   [Basic PDF Generation](#basic-pdf-generation)
-    -   [Custom page size / margins](#custom-page-size-margins)
+    -   [Custom page size / margins](#custom-page-size--margins)
     -   [Using a custom HTML template](#using-a-custom-html-template)
     -   [Using a custom CSS stylesheet](#using-a-custom-css-stylesheet)
-    -   [Customizing the page header / footer](#customizing-the-page-header-footer)
+    -   [Customizing the page header / footer](#customizing-the-page-header--footer)
 -   [How it works](#how-it-works)
 -   [Troubleshooting](#troubleshooting)
 -   [Contributing](#contributing)
@@ -25,7 +25,7 @@ _Example spread from the generated PDF of [a chapter in Dimensions of Colour](ht
 
 ## Installation
 
-> 💡 `percollate` needs Node.js version 8 or later, as it uses new(ish) JavaScript syntax.
+> 💡 `percollate` needs Node.js version 8.6.0 or later, as it uses new(ish) JavaScript syntax. If you get _SyntaxError: Unexpected token_ errors, check your Node version with `node --version`.
 
 You can install `percollate` globally:
 
@@ -66,6 +66,7 @@ The `pdf`, `epub`, and `html` commands have these options:
 | Option         | What it does                                                                                                   |
 | -------------- | -------------------------------------------------------------------------------------------------------------- |
 | `-o, --output` | The path of the resulting bundle; when ommited, we derive the output file name from the title of the web page. |
+| `--individual` | Export each web page as an individual file.                                                                    |
 | `--template`   | Path to a custom HTML template                                                                                 |
 | `--style`      | Path to a custom CSS                                                                                           |
 | `--css`        | Additional CSS styles you can pass from the command-line to override the default/custom stylesheet styles      |
@@ -90,6 +91,12 @@ You can use common Unix commands and keep the list of URLs in a newline-delimite
 
 ```bash
 cat urls.txt | xargs percollate pdf --output some.pdf
+```
+
+To transform several web pages into individual PDF files at once, use the `--individual` flag:
+
+```bash
+percollate pdf --individual --output some.pdf https://example.com/page1 https://example.com/page2
 ```
 
 ### Custom page size / margins
@@ -146,3 +153,4 @@ Here are some other projects to check out if you're interested in building books
 -   [HummusJS](https://github.com/galkahana/HummusJS)
 -   [Editoria](https://gitlab.coko.foundation/editoria/editoria) ([website](https://editoria.pub/))
 -   [pagedjs](https://gitlab.pagedmedia.org/tools/pagedjs) ([article](https://www.pagedmedia.org/pagedjs-sneak-peeks/))
+-   [Mercury](https://mercury.postlight.com/)

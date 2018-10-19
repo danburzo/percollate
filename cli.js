@@ -20,7 +20,8 @@ function with_common_options(cmd) {
 		.option('-o, --output [output]', 'Path for the generated bundle')
 		.option('--template [template]', 'Path to custom HTML template')
 		.option('--style [stylesheet]', 'Path to custom CSS')
-		.option('--css [style]', 'Additional CSS style');
+		.option('--css [style]', 'Additional CSS style')
+		.option('--individual', 'Export each web page as an individual file');
 }
 
 program.version(pkg.version);
@@ -38,4 +39,15 @@ with_common_options(program.command('html [urls...]'))
 	.description('Bundle web pages as a HTML file')
 	.action(html);
 
+// with_common_options(
+// 	program.command('', 'default command', { isDefault: true })
+// ).action(() => {
+// 	program.outputHelp();
+// });
+
 program.parse(process.argv);
+
+// Show help by default when no arguments provided
+if (!program.args.length) {
+	program.outputHelp();
+}

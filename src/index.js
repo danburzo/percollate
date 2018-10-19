@@ -1,15 +1,22 @@
 const pup = require('puppeteer');
 const got = require('got');
+const ora = require('ora');
 const { JSDOM } = require('jsdom');
 const nunjucks = require('nunjucks');
 const tmp = require('tmp');
 const fs = require('fs');
 const css = require('css');
 const slugify = require('slugify');
-const Readability = require('../vendor/readability');
+const Readability = require('./vendor/readability');
 
-const { imagesAtFullSize, wikipediaSpecific } = require('./enhancements');
+const {
+	imagesAtFullSize,
+	wikipediaSpecific,
+	noUselessHref
+} = require('./src/enhancements');
 const { extractCss } = require('./style-utils');
+
+const spinner = ora();
 
 const DEFAULT_STYLESHEET_PATH = '../templates/default.css';
 const DEFAULT_TEMPLATE_PATH = '../templates/default.html';
@@ -21,20 +28,30 @@ const resolve = path =>
 
 const enhancePage = function(dom) {
 	imagesAtFullSize(dom.window.document);
+	noUselessHref(dom.window.document);
 	wikipediaSpecific(dom.window.document);
 };
 
 function createDom({ url, content }) {
-	const dom = new JSDOM(content);
-	if (url) {
-		dom.reconfigure({ url });
-	}
+	const dom = new JSDOM(content, { url });
+
+	// Force relative URL resolution
+	dom.window.document.body.setAttribute(null, null);
+
 	return dom;
+}
+
+/*
+	Some setup
+	----------
+ */
+function configure() {
+	nunjucks.configure({ autoescape: false, noCache: true });
 }
 
 const createDocument = content => createDom({ content }).window.document;
 
-const createPartialDocument = (content, { style } = {}) => {
+const createPartial = (content, { style } = {}) => {
 	const doc = createDocument(content);
 
 	const rootDiv = doc.querySelector('body :first-child');
@@ -65,23 +82,33 @@ function configure() {
 	-----------------------------------
  */
 async function fetchDocument(url, { _fetch } = {}) {
-	console.log(`Fetching: ${url}`);
-	const fetch = _fetch || got;
-	const content = (await fetch(url)).body;
+	try {
+		spinner.start(`Fetching: ${url}`);
+		const fetch = _fetch || got;
+		const content = (await fetch(url)).body;
+		spinner.succeed();
 
-	const dom = createDom({ url, content });
+		spinner.start('Enhancing web page');
+		const dom = createDom({ url, content });
 
-	/* 
-        Run enhancements
-        ----------------
-	*/
-	console.log('Enhancing web page');
-	enhancePage(dom);
+		/* 
+			Run enhancements
+			----------------
+		*/
+		enhancePage(dom);
 
-	// Run through readability and return
-	const parsed = new Readability(dom.window.document).parse();
+		// Run through readability and return
+		const parsed = new Readability(dom.window.document, {
+			classesToPreserve: ['no-href']
+		}).parse();
 
-	return { ...parsed, url };
+		spinner.succeed();
+
+		return { ...parsed, url };
+	} catch (error) {
+		spinner.fail(error.message);
+		throw error;
+	}
 }
 
 /*
@@ -89,9 +116,8 @@ async function fetchDocument(url, { _fetch } = {}) {
 	--------------------------------
  */
 async function bundle(items, options) {
+	spinner.start('Generating temporary HTML file');
 	const tempFilePath = tmp.tmpNameSync({ postfix: '.html' });
-
-	console.log(`Generating temporary HTML file:\nfile://${tempFilePath}`);
 
 	const stylesheet = resolve(options.style || DEFAULT_STYLESHEET_PATH);
 	const style = fs.readFileSync(stylesheet, 'utf8') + (options.css || '');
@@ -108,7 +134,7 @@ async function bundle(items, options) {
 	const cssAst = css.parse(style);
 
 	const headerTemplate = doc.querySelector('.header-template');
-	const header = createPartialDocument(
+	const header = createPartial(
 		headerTemplate ? headerTemplate.innerHTML : '<span></span>',
 		{
 			style: extractCss(cssAst, '.header-template')
@@ -116,7 +142,7 @@ async function bundle(items, options) {
 	);
 
 	const footerTemplate = doc.querySelector('.footer-template');
-	const footer = createPartialDocument(
+	const footer = createPartial(
 		footerTemplate ? footerTemplate.innerHTML : '<span></span>',
 		{
 			style: extractCss(cssAst, '.footer-template')
@@ -124,6 +150,10 @@ async function bundle(items, options) {
 	);
 
 	fs.writeFileSync(tempFilePath, html);
+
+	spinner.succeed(`Temporary HTML file: file://${temp_file}`);
+
+	spinner.start('Saving PDF');
 
 	const browser = await pup.launch({
 		headless: true,
@@ -151,8 +181,6 @@ async function bundle(items, options) {
 			? `${slugify(items[0].title || 'Untitled page')}.pdf`
 			: `percollate-${Date.now()}.pdf`);
 
-	console.log(`Saving PDF: ${output_path}`);
-
 	await page.pdf({
 		path: output_path,
 		preferCSSPageSize: true,
@@ -163,6 +191,8 @@ async function bundle(items, options) {
 	});
 
 	await browser.close();
+
+	spinner.succeed(`Saved PDF: ${output_path}`);
 
 	return {
 		tempFilePath: tempFilePath,

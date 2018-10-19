@@ -1,3 +1,12 @@
+:root {
+	--main-font: Palatino, 'Palatino Linotype', 'Times New Roman', 'Droid Serif',
+		Times, 'Source Serif Pro', serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+		'Segoe UI Symbol';
+	--alt-font: 'helvetica neue', ubuntu, roboto, noto, 'segoe ui', arial,
+		sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+	--code-font: Menlo, Consolas, monospace;
+}
+
 @page {
 	size: A5 portrait;
 	margin: 1cm 1cm 2cm;
@@ -6,7 +15,7 @@
 html {
 	font-size: 13pt;
 	line-height: 1.3;
-	font-family: serif;
+	font-family: var(--main-font);
 }
 
 body {
@@ -22,7 +31,7 @@ h4,
 h5,
 h6 {
 	margin-bottom: 0.5em;
-	font-family: sans-serif;
+	font-family: var(--alt-font);
 	font-weight: bold;
 	page-break-after: avoid;
 	page-break-before: avoid;
@@ -37,7 +46,20 @@ a:not(.no-href):after {
 	font-size: 0.8em;
 	word-break: break-all;
 	word-wrap: break-word;
-	font-family: sans-serif;
+	font-family: var(--alt-font);
+}
+
+th {
+	font-family: var(--alt-font);
+}
+
+code,
+pre {
+	font-size: 0.85em;
+}
+
+pre code {
+	font-size: 1em;
 }
 
 /*
@@ -94,11 +116,22 @@ article:not(:last-of-type) {
 .article__content figure {
 	margin: 1.5em 0;
 	padding: 0;
+	text-align: center;
+}
+
+.article__content figcaption {
+	font-size: 0.8em;
+	font-family: var(--alt-font);
 }
 
 .article__content table,
 .article__content figure {
 	page-break-inside: avoid;
+}
+
+.article__content pre,
+.article__content code {
+	font-family: var(--code-font);
 }
 
 .article__content pre {
@@ -125,8 +158,23 @@ article:not(:last-of-type) {
 	widows: 3;
 }
 
+/*
+	Indent all subsequent paragraphs.
+ */
 .article__content p + p {
 	text-indent: 2em;
+}
+
+/*
+	Fixes the text indent for images
+	that get wrapped in a <p> tag
+	by Readability.
+
+	Reference:
+	https://github.com/danburzo/percollate/issues/48
+ */
+.article__content p + p > img:only-child {
+	margin-left: -2em;
 }
 
 .article__content hr {
@@ -142,6 +190,35 @@ article:not(:last-of-type) {
 	padding-left: 2em;
 	border-left: 3pt solid #000;
 	margin-left: 0;
+}
+
+.article__content table {
+	width: 100%;
+	border-collapse: collapse;
+	page-break-inside: auto;
+	font-size: 0.9em;
+	line-height: 1.44;
+	margin: 1.44em 0;
+}
+
+.article__content th {
+}
+
+.article__content th,
+.article__content td {
+	text-align: left;
+	vertical-align: top;
+	padding: 0.36em 1em 0.36em 0;
+}
+
+.article__content tr {
+	border-bottom: 0.25pt solid #000;
+	page-break-inside: avoid;
+	page-break-after: auto;
+}
+
+.article__content dt {
+	font-weight: bold;
 }
 
 /*

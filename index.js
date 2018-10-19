@@ -4,11 +4,19 @@ const { bundle, fetchDocument, configure } = require('./src');
 	Generate PDF
  */
 async function pdf(urls, options) {
+	if (!urls.length) return;
 	let items = [];
 	for (let url of urls) {
-		items.push(await fetchDocument(url));
+		let item = await cleanup(url);
+		if (options.individual) {
+			await bundle([item], options);
+		} else {
+			items.push(item);
+		}
 	}
-	bundle(items, options);
+	if (!options.individual) {
+		await bundle(items, options);
+	}
 }
 
 /*
@@ -25,4 +33,4 @@ async function html(urls, options) {
 	console.log('TODO', urls, options);
 }
 
-module.exports = { configure, pdf, epub, html };
+module.exports = { bundle, fetchDocument, configure, pdf, epub, html };
