@@ -64,7 +64,7 @@ function configure() {
 	Fetch a web page and clean the HTML
 	-----------------------------------
  */
-async function fetchDocument(url, { _fetch }) {
+async function fetchDocument(url, { _fetch } = {}) {
 	console.log(`Fetching: ${url}`);
 	const fetch = _fetch || got;
 	const content = (await fetch(url)).body;
@@ -80,7 +80,6 @@ async function fetchDocument(url, { _fetch }) {
 
 	// Run through readability and return
 	const parsed = new Readability(dom.window.document).parse();
-	console.log(dom.window.document.innerHTML);
 
 	return { ...parsed, url };
 }
@@ -164,6 +163,11 @@ async function bundle(items, options) {
 	});
 
 	await browser.close();
+
+	return {
+		tempFilePath: tempFilePath,
+		outputPath: output_path
+	};
 }
 
 module.exports = { bundle, fetchDocument, configure };

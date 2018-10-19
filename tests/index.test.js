@@ -1,17 +1,17 @@
 const { expect } = require('chai');
+// const mockFs = require('mock-fs');
+const path = require('path');
+const fs = require('fs');
 
 const { bundle, fetchDocument, configure } = require('../src');
 
 const _fetch = require('./helpers/_fetch');
-
-const expectedToFailError = new Error('Resolved promise, expected to fail');
+const { shouldFail } = require('./helpers/utils');
 
 describe('index', () => {
 	describe('fetchDocument', () => {
 		it('should reject for invalid urls', done => {
-			fetchDocument('example.com', { _fetch })
-				.then(() => done(expectedToFailError))
-				.catch(_ => done());
+			shouldFail(done, fetchDocument('example.com', { _fetch }));
 		});
 
 		it('should get correct title and content for the example document', async () => {
@@ -26,9 +26,42 @@ describe('index', () => {
 		});
 
 		it('should reject if the result is a rejected promise', done => {
-			fetchDocument('http://example.com/error', { _fetch })
-				.then(() => done(expectedToFailError))
-				.catch(e => done());
+			shouldFail(
+				done,
+				fetchDocument('http://example.com/error', { _fetch })
+			);
 		});
+	});
+
+	describe('bundle', () => {
+		beforeEach(() => {
+			// mockFs({
+			// 	'/my-dir': {},
+			// 	'templates': {
+			// 		'default.css': mockFs.file({
+			// 			content: '.my-css { color: red; }'
+			// 		}),
+			// 		'default.html': mockFs.file({
+			// 			content: `<div>
+			// 				{% for item in items %}
+			// 					{{ item.title }}
+			// 				{% endfor %}
+			// 			</div>`,
+			// 		}),
+			// 	}
+			// });
+		});
+
+		afterEach(() => {
+			// mockFs.restore();
+		});
+
+		it('should generate pdf file with the corrent content', async () => {});
+
+		it('should generate pdf file with the corrent number of pages', () => {});
+
+		it('should render styles', () => {});
+
+		it('should render load stylesheet', () => {});
 	});
 });
