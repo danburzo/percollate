@@ -167,11 +167,22 @@ async function bundle(items, options) {
 		or a timestamped file (for the moment) 
 		in case we're bundling many web pages.
 	 */
-	const output_path =
-		options.output ||
-		(items.length === 1
-			? `${slugify(items[0].title || 'Untitled page')}.pdf`
-			: `percollate-${Date.now()}.pdf`);
+	let output_path;
+
+	if (options.individual && options.output) {
+		if (!fs.existsSync(options.output)) {
+			fs.mkdirSync(options.output, { recursive: true });
+		}
+		output_path = `${options.output}/${slugify(
+			items[0].title || 'Untitled page'
+		)}.pdf`;
+	} else {
+		output_path =
+			options.output ||
+			(items.length === 1
+				? `${slugify(items[0].title || 'Untitled page')}.pdf`
+				: `percollate-${Date.now()}.pdf`);
+	}
 
 	await page.pdf({
 		path: output_path,
