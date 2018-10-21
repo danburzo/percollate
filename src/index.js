@@ -51,6 +51,10 @@ function configure() {
 
 const createDocument = content => createDom({ content }).window.document;
 
+/*
+	Creates a partial document
+	--------------------------
+*/
 const createPartial = (content, { style } = {}) => {
 	const doc = createDocument(content);
 
@@ -68,14 +72,6 @@ const createPartial = (content, { style } = {}) => {
 
 	return doc;
 };
-
-/*
-	Some setup
-	----------
- */
-function configure() {
-	nunjucks.configure({ autoescape: false, noCache: true });
-}
 
 /*
 	Fetch a web page and clean the HTML
