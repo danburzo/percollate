@@ -214,3 +214,4 @@ Here are some other projects to check out if you're interested in building books
 -   [pagedjs](https://gitlab.pagedmedia.org/tools/pagedjs) ([article](https://www.pagedmedia.org/pagedjs-sneak-peeks/))
 -   [Mercury](https://mercury.postlight.com/)
 -   [Foliojs](https://github.com/foliojs)
+-   [Magicbook](https://github.com/magicbookproject/magicbook)
