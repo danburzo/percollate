@@ -19,6 +19,7 @@ _Example spread from the generated PDF of [a chapter in Dimensions of Colour](ht
     -   [Using a custom CSS stylesheet](#using-a-custom-css-stylesheet)
     -   [Customizing the page header / footer](#customizing-the-page-header--footer)
 -   [How it works](#how-it-works)
+-   [Limitations](#limitations)
 -   [Troubleshooting](#troubleshooting)
 -   [Contributing](#contributing)
 -   [See also](#see-also)
@@ -143,6 +144,14 @@ percollate pdf --css "a:after { display: none }" http://example.com
 3. Pass the DOM through [`mozilla/readability`](https://github.com/mozilla/readability) to strip unnecessary elements
 4. Apply the [HTML template](./templates/default.html) and the [print stylesheet](./templates/default.css) to the resulting HTML
 5. Use [`puppeteer`](https://github.com/GoogleChrome/puppeteer) to generate a PDF from the page
+
+## Limitations
+
+Percollate inherits the limitations of two of its main components, Readability and Puppeteer (headless Chrome).
+
+The imperative approach Readability takes will not be perfect in each case, especially on HTML pages with atypical markup; you may occasionally notice that it either leaves in superfluous content, or that it strips out parts of the content. You can confirm the problem against [Firefox's Reader View](https://blog.mozilla.org/firefox/reader-view/). In this case, consider [filing an issue on `mozilla/readability`](https://github.com/mozilla/readability/issues).
+
+Using a browser to generate the PDF is a double-edged sword. On the one hand, you get excellent support for web platform features. On the other hand, [print CSS](https://www.smashingmagazine.com/2018/05/print-stylesheets-in-2018/) as defined by W3C specifications is only partially implemented, and it seems unlikely that support will be improved any time soon. However, even with modest print support, I think Chrome is the best (free) tool for the job.
 
 ## Troubleshooting
 
