@@ -244,6 +244,13 @@ article:not(:last-of-type) {
 	margin: 0.65em 0;
 }
 
+.article__content aside {
+	font-family: var(--alt-font);
+	font-size: 0.9em;
+	line-height: 1.44;
+	padding-left: 2em;
+}
+
 /*
 	Page header / footer
 	--------------------
