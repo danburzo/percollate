@@ -88,13 +88,10 @@ function relativeToAbsoluteURIs(doc) {
 		el.setAttribute('src', el.src);
 	});
 
-	Array.from(doc.querySelectorAll('picture source, img')).forEach(el => {
-		if (el.hasAttribute('srcset')) {
-			el.setAttribute(
-				'srcset',
-				absoluteSrcset(el.getAttribute('srcset'))
-			);
-		}
+	Array.from(
+		doc.querySelectorAll('picture source[srcset], img[srcset]')
+	).forEach(el => {
+		el.setAttribute('srcset', absoluteSrcset(el.getAttribute('srcset')));
 	});
 }
 
