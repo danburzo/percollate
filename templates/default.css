@@ -237,6 +237,13 @@ article:not(:last-of-type) {
 	font-weight: bold;
 }
 
+.article__content ol,
+.article__content ul {
+	padding-left: 2em;
+	list-style-position: outside;
+	margin: 0.65em 0;
+}
+
 /*
 	Page header / footer
 	--------------------

@@ -14,6 +14,8 @@ Adds new enhancement, `singleImgToFigure`, that transforms single images into `<
 
 Preserve `anchor` class on hyperlinks, hide them when they're part of a heading. (A common pattern for Markdown to HTML tools).
 
+Align `ol` and `ul` elements to match paragraph indentation.
+
 ### 0.2.12
 
 -   Fixes indentation of images wrapped in `<p>` tags ([#48](https://github.com/danburzo/percollate/issues/48))
