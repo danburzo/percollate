@@ -9,6 +9,7 @@ const fs = require('fs');
 const css = require('css');
 const slugify = require('slugify');
 const Readability = require('./vendor/readability');
+const pkg = require('./package.json');
 
 const spinner = ora();
 
@@ -54,7 +55,11 @@ function configure() {
 async function cleanup(url) {
 	try {
 		spinner.start(`Fetching: ${url}`);
-		const content = (await got(url)).body;
+		const content = (await got(url, {
+			headers: {
+				'user-agent': `percollate/${pkg.version}`
+			}
+		})).body;
 		spinner.succeed();
 
 		spinner.start('Enhancing web page');
