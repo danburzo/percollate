@@ -10,6 +10,7 @@ const css = require('css');
 const slugify = require('slugify');
 const Readability = require('./vendor/readability');
 const pkg = require('./package.json');
+const uuid = require('uuid/v1');
 
 const spinner = ora();
 
@@ -94,7 +95,14 @@ async function cleanup(url) {
 
 		spinner.succeed();
 
-		return { ...parsed, url };
+		const page_id = `percollate-page-${uuid()}`;
+		const page_marker = `<a href='#${page_id}' class='no-href' id='${page_id}'></a>`;
+
+		return {
+			...parsed,
+			page_marker: page_marker,
+			url
+		};
 	} catch (error) {
 		spinner.fail(error.message);
 		throw error;
