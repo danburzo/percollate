@@ -17,9 +17,8 @@ _Example spread from the generated PDF of [a chapter in Dimensions of Colour](ht
 -   [Examples](#examples)
     -   [Basic PDF Generation](#basic-pdf-generation)
     -   [The `--css` option](#the---css-option)
-    -   [Using a custom HTML template](#using-a-custom-html-template)
-    -   [Using a custom CSS stylesheet](#using-a-custom-css-stylesheet)
-    -   [Customizing the page header / footer](#customizing-the-page-header--footer)
+    -   [The `--style` option](#the---style-option)
+    -   [The `--template` option](#the---template-option)
 -   [How it works](#how-it-works)
 -   [Limitations](#limitations)
 -   [Troubleshooting](#troubleshooting)
@@ -119,25 +118,64 @@ Similarly, you can define:
 -   custom margins, e.g. `@page { margin: 0 }`
 -   the base font size: `html { font-size: 10pt }`
 
-#### Remove the appended HREFs from hyperlinks
+#### Remove the appended `href`s from hyperlinks
 
-The idea with percollate is to make PDFs that can be printed without losing where the hyperlinks point to. However, for some link-heavy pages, the appended HREFs can become bothersome. You can remove them using:
+The idea with percollate is to make PDFs that can be printed without losing where the hyperlinks point to. However, for some link-heavy pages, the appended `href`s can become bothersome. You can remove them using:
 
 ```bash
 percollate pdf --css "a:after { display: none }" http://example.com
 ```
 
-### Using a custom HTML template
+### The `--style` option
 
-> ⚠️ TODO add example here
+The `--style` option lets you use your own CSS stylesheet instead of the default one. Here are some common use-cases for this option:
 
-### Using a custom CSS stylesheet
+> ⚠️ TODO add examples here
 
-> ⚠️ TODO add example here
+### The `--template` option
 
-### Customizing the page header / footer
+The `--template` option lets you use a custom HTML template for the PDF. Here are some common use-cases:
 
-> ⚠️ TODO add example here
+#### Customizing the page header / footer
+
+Puppeteer can print some basic information about the page in the PDF. The following CSS class names are available for the header / footer, into which the appropriate content will be injected:
+
+-   `date` — The formatted print date
+-   `title` — The document title
+-   `url` — document location (**Note:** this will print the path of the _temporary html_, not the original web page URL)
+-   `pageNumber` — the current page number
+-   `totalPages` — total pages in the document
+
+> 👉 See the [Chromium source code](https://cs.chromium.org/chromium/src/components/printing/resources/print_header_footer_template_page.html) for details.
+
+You place your header / footer template in a `template` element in your HTML:
+
+```html
+<template class='header-template'>
+	My header
+</template>
+
+<template class='footer-template'>
+	<div class='text center'>
+		<span class='pageNumber'></span>
+	</div>
+</template>
+```
+
+See the [default HTML](./templates/default.html) for example usage.
+
+You can add CSS styles to the header / footer with either the `--css` option or a separate CSS stylesheet (the `--style` option).
+
+> 💡 The header / footer template [do not inherit their styles](https://github.com/GoogleChrome/puppeteer/issues/1853) from the rest of the page (i.e. they are not part of the cascade), so you'll have to write the full CSS you want to apply to them.
+
+An example from the [default stylesheet](./templates/default.css):
+
+```css
+.footer-template {
+	font-size: 10pt;
+	font-weight: bold;
+}
+```
 
 ## How it works
 
@@ -175,3 +213,4 @@ Here are some other projects to check out if you're interested in building books
 -   [Editoria](https://gitlab.coko.foundation/editoria/editoria) ([website](https://editoria.pub/))
 -   [pagedjs](https://gitlab.pagedmedia.org/tools/pagedjs) ([article](https://www.pagedmedia.org/pagedjs-sneak-peeks/))
 -   [Mercury](https://mercury.postlight.com/)
+-   [Foliojs](https://github.com/foliojs)
