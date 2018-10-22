@@ -81,7 +81,15 @@ async function cleanup(url) {
 
 		// Run through readability and return
 		const parsed = new Readability(dom.window.document, {
-			classesToPreserve: ['no-href', 'pcl--figure-like']
+			classesToPreserve: [
+				'no-href',
+
+				/*
+					Placed on some <a> elements
+					as in-page anchors
+				 */
+				'anchor'
+			]
 		}).parse();
 
 		spinner.succeed();

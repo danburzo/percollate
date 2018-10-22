@@ -33,7 +33,6 @@ h6 {
 	font-family: var(--alt-font);
 	font-weight: bold;
 	page-break-after: avoid;
-	page-break-before: avoid;
 }
 
 a {
@@ -46,6 +45,21 @@ a:not(.no-href):after {
 	word-break: break-all;
 	word-wrap: break-word;
 	font-family: var(--alt-font);
+}
+
+/*
+	Going on a limb here,
+	but a.anchor in heading elements
+	is most likely a '#' or '§' anchor
+	we don't want to display in the PDF.
+ */
+h1 a.anchor,
+h2 a.anchor,
+h3 a.anchor,
+h4 a.anchor,
+h5 a.anchor,
+h6 a.anchor {
+	display: none;
 }
 
 th {

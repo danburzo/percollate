@@ -12,6 +12,8 @@ Percollate now emulates a high-resolution display, which in some cases helps get
 
 Adds new enhancement, `singleImgToFigure`, that transforms single images into `<figure>` elements, using the image's `alt` attribute as `<figcaption>`.
 
+Preserve `anchor` class on hyperlinks, hide them when they're part of a heading. (A common pattern for Markdown to HTML tools).
+
 ### 0.2.12
 
 -   Fixes indentation of images wrapped in `<p>` tags ([#48](https://github.com/danburzo/percollate/issues/48))
