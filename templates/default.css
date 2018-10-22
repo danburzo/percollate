@@ -114,8 +114,7 @@ article:not(:last-of-type) {
 	margin: 0 auto;
 }
 
-.article__content figure,
-.pcl--figure-like {
+.article__content figure {
 	display: block;
 	margin: 1.5em 0;
 	padding: 0;

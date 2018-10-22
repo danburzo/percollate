@@ -10,6 +10,8 @@ Made `imagesAtFullSize` ignore Wikipedia image file links ([#42](https://github.
 
 Percollate now emulates a high-resolution display, which in some cases helps get the best quality image available.
 
+Adds new enhancement, `singleImgToFigure`, that transforms single images into `<figure>` elements, using the image's `alt` attribute as `<figcaption>`.
+
 ### 0.2.12
 
 -   Fixes indentation of images wrapped in `<p>` tags ([#48](https://github.com/danburzo/percollate/issues/48))

@@ -23,8 +23,6 @@ function imagesAtFullSize(doc) {
 			img.setAttribute('src', original);
 			anchor.parentNode.replaceChild(img, anchor);
 		}
-
-		anchor.classList.add('pcl--figure-like');
 	});
 
 	/*
@@ -100,9 +98,35 @@ function relativeToAbsoluteURIs(doc) {
 	});
 }
 
+/*
+	Wraps single images into <figure> elements,
+	adding the image's `alt` attribute as <figcaption>
+ */
+function singleImgToFigure(doc) {
+	Array.from(doc.querySelectorAll('img:only-child')).forEach(image => {
+		let fig = doc.createElement('figure');
+		fig.appendChild(image.cloneNode());
+
+		let alt = image.getAttribute('alt');
+		if (alt) {
+			let figcaption = doc.createElement('figcaption');
+			figcaption.textContent = alt;
+			fig.appendChild(figcaption);
+		}
+
+		// Replace paragraph with figure
+		if (image.parentNode.matches('p') && image.parentNode.parentNode) {
+			image.parentNode.parentNode.replaceChild(fig, image.parentNode);
+		} else {
+			image.parentNode.replaceChild(fig, image);
+		}
+	});
+}
+
 module.exports = {
 	imagesAtFullSize,
 	noUselessHref,
 	wikipediaSpecific,
-	relativeToAbsoluteURIs
+	relativeToAbsoluteURIs,
+	singleImgToFigure
 };
