@@ -111,9 +111,13 @@ article:not(:last-of-type) {
 
 .article__content img {
 	max-width: 100%;
+	display: block;
+	margin: 0 auto;
 }
 
-.article__content figure {
+.article__content figure,
+.pcl--figure-like {
+	display: block;
 	margin: 1.5em 0;
 	padding: 0;
 	text-align: center;

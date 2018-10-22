@@ -16,7 +16,8 @@ const spinner = ora();
 const {
 	imagesAtFullSize,
 	wikipediaSpecific,
-	noUselessHref
+	noUselessHref,
+	relativeToAbsoluteURIs
 } = require('./src/enhancements');
 const get_style_attribute_value = require('./src/get-style-attribute-value');
 
@@ -26,9 +27,14 @@ const resolve = path =>
 	});
 
 const enhancePage = function(dom) {
-	imagesAtFullSize(dom.window.document);
-	noUselessHref(dom.window.document);
-	wikipediaSpecific(dom.window.document);
+	[
+		relativeToAbsoluteURIs,
+		imagesAtFullSize,
+		noUselessHref,
+		wikipediaSpecific
+	].forEach(enhancement => {
+		enhancement(dom.window.document);
+	});
 };
 
 function createDom({ url, content }) {
@@ -73,7 +79,7 @@ async function cleanup(url) {
 
 		// Run through readability and return
 		const parsed = new Readability(dom.window.document, {
-			classesToPreserve: ['no-href']
+			classesToPreserve: ['no-href', 'pcl--figure-like']
 		}).parse();
 
 		spinner.succeed();
@@ -160,7 +166,15 @@ async function bundle(items, options) {
 		 */
 		args: options.sandbox
 			? undefined
-			: ['--no-sandbox', '--disable-setuid-sandbox']
+			: ['--no-sandbox', '--disable-setuid-sandbox'],
+		defaultViewport: {
+			// Emulate retina display (@2x)...
+			deviceScaleFactor: 2,
+			// ...but then we need to provide the other
+			// viewport parameters as well
+			width: 1920,
+			height: 1080
+		}
 	});
 	const page = await browser.newPage();
 	await page.goto(`file://${temp_file}`, { waitUntil: 'load' });

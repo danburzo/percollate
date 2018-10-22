@@ -2,7 +2,13 @@
 
 ### Unreleased
 
--   Adds `percollate/${version}` user-agent to prevent some HTTP 405 errors ([#59](https://github.com/danburzo/percollate/issues/59))
+Adds `percollate/${version}` user-agent to prevent some HTTP 405 errors ([#59](https://github.com/danburzo/percollate/issues/59)).
+
+We now perform relative to absolute URI conversion inside Percollate itself rather than rely on Readability ([#33](https://github.com/danburzo/percollate/issues/33), thank you [@ramadis](https://github.com/ramadis), [@tanmayrajani](https://github.com/tanmayrajani) for the help!). This includes the `srcset` attribute, which caused images to be broken on some sites ([#58](https://github.com/danburzo/percollate/issues/58)).
+
+Made `imagesAtFullSize` ignore Wikipedia image file links ([#42](https://github.com/danburzo/percollate/issues/42)).
+
+Percollate now emulates a high-resolution display, which in some cases helps get the best quality image available.
 
 ### 0.2.12
 
