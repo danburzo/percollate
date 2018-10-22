@@ -14,7 +14,7 @@ _Example spread from the generated PDF of [a chapter in Dimensions of Colour](ht
     -   [Available options](#available-options)
 -   [Examples](#examples)
     -   [Basic PDF Generation](#basic-pdf-generation)
-    -   [Custom page size / margins](#custom-page-size--margins)
+    -   [The `--css` option](#the---css-option)
     -   [Using a custom HTML template](#using-a-custom-html-template)
     -   [Using a custom CSS stylesheet](#using-a-custom-css-stylesheet)
     -   [Customizing the page header / footer](#customizing-the-page-header--footer)
@@ -96,23 +96,33 @@ cat urls.txt | xargs percollate pdf --output some.pdf
 To transform several web pages into individual PDF files at once, use the `--individual` flag:
 
 ```bash
-percollate pdf --individual --output some.pdf https://example.com/page1 https://example.com/page2
+percollate pdf --individual https://example.com/page1 https://example.com/page2
 ```
 
-### Custom page size / margins
+### The `--css` option
+
+The `--css` option lets you pass a small snippet of CSS to percollate. Here are some common use-cases:
+
+#### Custom page size / margins
 
 The default page size is A5 (portrait). You can use the `--css` option to override it using [any supported CSS `size`](https://www.w3.org/TR/css3-page/#page-size):
 
 ```bash
-percollate pdf --output some.pdf --css "@page { size: A3 landscape }" http://example.com
+percollate pdf --css "@page { size: A3 landscape }" http://example.com
 ```
 
 Similarly, you can define:
 
--   custom margins: `@page { margin: 0 }`
+-   custom margins, e.g. `@page { margin: 0 }`
 -   the base font size: `html { font-size: 10pt }`
 
-or, for that matter, any other style defined in the default / custom stylesheet.
+#### Remove the appended HREFs from hyperlinks
+
+The idea with percollate is to make PDFs that can be printed without losing where the hyperlinks point to. However, for some link-heavy pages, the appended HREFs can become bothersome. You can remove them using:
+
+```bash
+percollate pdf --css "a:after { display: none }" http://example.com
+```
 
 ### Using a custom HTML template
 
