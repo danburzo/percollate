@@ -1,6 +1,6 @@
 # Percollate Changelog
 
-### Unreleased
+### 0.2.13
 
 Adds `percollate/${version}` user-agent to prevent some HTTP 405 errors ([#59](https://github.com/danburzo/percollate/issues/59)).
 
