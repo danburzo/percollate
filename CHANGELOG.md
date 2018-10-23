@@ -1,5 +1,11 @@
 # Percollate Changelog
 
+### 0.2.14
+
+Fixes bug with the URL class not being globally available in Node < 10. ([#64](https://github.com/danburzo/percollate/pull/64), thanks [@tanmayrajani](https://github.com/tanmayrajani)!).
+
+Adds usage examples to the CLI help output. ([#55](https://github.com/danburzo/percollate/pull/55), thanks [@opw0011](https://github.com/opw0011)!)
+
 ### 0.2.13
 
 Adds `percollate/${version}` user-agent to prevent some HTTP 405 errors ([#59](https://github.com/danburzo/percollate/issues/59)).
