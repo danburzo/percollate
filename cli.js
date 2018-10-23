@@ -45,6 +45,18 @@ with_common_options(program.command('html [urls...]'))
 // 	program.outputHelp();
 // });
 
+program.on('--help', () => {
+	console.log(`
+Examples:
+  Transform single web page to PDF
+    $ percollate pdf --output some.pdf https://example.com
+  Transform several web pages to a single PDF
+    $ percollate pdf --output some.pdf https://example.com/page1 https://example.com/page2
+  Custom page size and font size
+    $ percollate pdf --output some.pdf --css "@page { size: A3 landscape } html { font-size: 18pt }" https://example.com
+`);
+});
+
 program.parse(process.argv);
 
 // Show help by default when no arguments provided
