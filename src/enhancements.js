@@ -1,4 +1,5 @@
 const srcset = require('srcset');
+const URL = require('url').URL;
 
 function imagesAtFullSize(doc) {
 	/*
