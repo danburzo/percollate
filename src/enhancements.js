@@ -1,5 +1,17 @@
 const srcset = require('srcset');
 const URL = require('url').URL;
+const replaceElementType = require('./replace-element-type');
+
+/* 
+	Convert AMP markup to HMTL markup
+	(naive / incomplete implementation)
+*/
+function ampToHtml(doc) {
+	// Convert <amp-img> to <img>
+	Array.from(doc.querySelectorAll('amp-img')).forEach(ampImg => {
+		replaceElementType(ampImg, 'img', doc);
+	});
+}
 
 function imagesAtFullSize(doc) {
 	/*
@@ -122,6 +134,7 @@ function singleImgToFigure(doc) {
 }
 
 module.exports = {
+	ampToHtml,
 	imagesAtFullSize,
 	noUselessHref,
 	wikipediaSpecific,

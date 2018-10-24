@@ -21,7 +21,8 @@ function with_common_options(cmd) {
 		.option('--template [template]', 'Path to custom HTML template')
 		.option('--style [stylesheet]', 'Path to custom CSS')
 		.option('--css [style]', 'Additional CSS style')
-		.option('--individual', 'Export each web page as an individual file');
+		.option('--individual', 'Export each web page as an individual file')
+		.option('--no-amp', "Don't prefer the AMP version of the web page");
 }
 
 program.version(pkg.version);
@@ -48,13 +49,19 @@ with_common_options(program.command('html [urls...]'))
 program.on('--help', () => {
 	console.log(`
 Examples:
-  Transform single web page to PDF
-    $ percollate pdf --output some.pdf https://example.com
-  Transform several web pages to a single PDF
-    $ percollate pdf --output some.pdf https://example.com/page1 https://example.com/page2
-  Custom page size and font size
-    $ percollate pdf --output some.pdf --css "@page { size: A3 landscape } html { font-size: 18pt }" https://example.com
-`);
+
+  Single web page to PDF:
+
+    percollate pdf --output my.pdf https://example.com
+  
+  Several web pages to a single PDF:
+
+    percollate pdf --output my.pdf https://example.com/1 https://example.com/2
+  
+  Custom page size and font size:
+    
+    percollate pdf --output my.pdf --css "@page { size: A3 landscape } html { font-size: 18pt }" https://example.com
+	`);
 });
 
 program.parse(process.argv);
