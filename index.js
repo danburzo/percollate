@@ -5,7 +5,8 @@ const ora = require('ora');
 const { JSDOM } = require('jsdom');
 const nunjucks = require('nunjucks');
 const tmp = require('tmp');
-const fs = require('fs');
+const fs = require('fs-extra');
+const path = require('path');
 const css = require('css');
 const slugify = require('slugify');
 const Readability = require('./vendor/readability');
@@ -168,20 +169,27 @@ async function bundle(items, options) {
 		in case we're bundling many web pages.
 	 */
 	let output_path;
+	const file_path_present = !!options.output;
+	const file_name_present =
+		file_path_present && /.pdf$/i.test(options.output);
 
-	if (options.individual && options.output) {
-		if (!fs.existsSync(options.output)) {
-			fs.mkdirSync(options.output, { recursive: true });
+	if (file_path_present) {
+		if (file_name_present) {
+			fs.ensureDirSync(path.dirname(options.output));
+			output_path = `${options.output.replace(/\.pdf$/i, '')}-${slugify(
+				items[0].title || 'Untitled page'
+			)}.pdf`;
+		} else {
+			fs.ensureDirSync(options.output);
+			output_path = `${options.output.replace(/\/$/, '')}/${slugify(
+				items[0].title || 'Untitled page'
+			)}.pdf`;
 		}
-		output_path = `${options.output}/${slugify(
-			items[0].title || 'Untitled page'
-		)}.pdf`;
 	} else {
 		output_path =
-			options.output ||
-			(items.length === 1
+			items.length === 1
 				? `${slugify(items[0].title || 'Untitled page')}.pdf`
-				: `percollate-${Date.now()}.pdf`);
+				: `percollate-${Date.now()}.pdf`;
 	}
 
 	await page.pdf({
