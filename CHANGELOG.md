@@ -4,6 +4,8 @@
 
 Prefer the AMP version of an article, if available. [Details here](https://github.com/danburzo/percollate/pull/70).
 
+Support for lazy-loaded images. ([#71](https://github.com/danburzo/percollate/issues/71))
+
 ### 0.2.14
 
 Fixes bug with the URL class not being globally available in Node < 10. ([#64](https://github.com/danburzo/percollate/pull/64), thanks [@tanmayrajani](https://github.com/tanmayrajani)!).

@@ -15,6 +15,7 @@ const spinner = ora();
 
 const {
 	ampToHtml,
+	fixLazyLoadedImages,
 	imagesAtFullSize,
 	wikipediaSpecific,
 	noUselessHref,
@@ -29,8 +30,10 @@ const resolve = path =>
 	});
 
 const enhancePage = function(dom) {
+	// Note: the order of the enhancements matters!
 	[
 		ampToHtml,
+		fixLazyLoadedImages,
 		relativeToAbsoluteURIs,
 		imagesAtFullSize,
 		singleImgToFigure,
