@@ -30,6 +30,10 @@ function with_common_options(cmd) {
 			'--negative [negative]',
 			'CSS selectors to mark elements as negative in Readability'
 		)
+		.option(
+			'--only [only]',
+			'Restrict the export to one or more CSS selectors'
+		)
 		.option('--no-amp', "Don't prefer the AMP version of the web page");
 }
 

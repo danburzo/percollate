@@ -69,13 +69,13 @@ function configure() {
 	Readability.prototype.REGEXPS.positive = new RegExp(
 		`${
 			Readability.prototype.REGEXPS.positive.source
-		}|pcl--readability-positive`,
+		}|pcl\-\-readability\-positive`,
 		'i'
 	);
 	Readability.prototype.REGEXPS.negative = new RegExp(
 		`${
 			Readability.prototype.REGEXPS.negative.source
-		}|pcl--readability-negative`,
+		}|pcl\-\-readability\-negative`,
 		'i'
 	);
 }
@@ -103,20 +103,31 @@ async function cleanup(url, options) {
 			return cleanup(amp.href);
 		}
 
+		const doc = dom.window.document;
+
+		if (options.only) {
+			const to_include = doc.querySelectorAll(options.only);
+			doc.body.innerHTML = '<article></article>';
+			to_include.forEach(el => {
+				// el.classList.add('pcl--readability-positive');
+				doc.body.firstChild.appendChild(el);
+			});
+		}
+
 		/*
 			Apply the `positive`/`negative` classes
 		 */
 
 		if (options.positive) {
-			dom.window.document
-				.querySelectorAll(options.positive)
-				.forEach(el => el.classList.add('pcl--readability-positive'));
+			doc.querySelectorAll(options.positive).forEach(el =>
+				el.classList.add('pcl--readability-positive')
+			);
 		}
 
 		if (options.negative) {
-			dom.window.document
-				.querySelectorAll(options.negative)
-				.forEach(el => el.classList.add('pcl--readability-negative'));
+			doc.querySelectorAll(options.negative).forEach(el =>
+				el.classList.add('pcl--readability-negative')
+			);
 		}
 
 		/* 
