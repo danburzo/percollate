@@ -217,9 +217,9 @@ async function bundle(cmd, items, options) {
 
 		spinner.succeed(`Saved PDF: ${output_path}`);
 	} else if (cmd === 'epub') {
-		spinner.error('EPUB command not implemented yet.');
+		spinner.succeed('EPUB command not implemented yet.');
 	} else if (cmd === 'html') {
-		spinner.error('HTML command not implemented yet.');
+		spinner.succeed('HTML command not implemented yet.');
 	}
 }
 
