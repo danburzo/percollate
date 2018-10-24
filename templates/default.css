@@ -255,6 +255,20 @@ article:not(:last-of-type) {
 }
 
 /*
+	Percollate-specific classes
+	---------------------------
+ */
+
+/*
+	In case Readability fails to remove
+	content we've marked as negative,
+	we hide it ourselves.
+ */
+.pcl--readability-negative {
+	display: none;
+}
+
+/*
 	Page header / footer
 	--------------------
 

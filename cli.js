@@ -22,6 +22,14 @@ function with_common_options(cmd) {
 		.option('--style [stylesheet]', 'Path to custom CSS')
 		.option('--css [style]', 'Additional CSS style')
 		.option('--individual', 'Export each web page as an individual file')
+		.option(
+			'--positive [positive]',
+			'CSS selectors to mark elements as positive in Readability'
+		)
+		.option(
+			'--negative [negative]',
+			'CSS selectors to mark elements as negative in Readability'
+		)
 		.option('--no-amp', "Don't prefer the AMP version of the web page");
 }
 

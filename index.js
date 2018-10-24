@@ -59,6 +59,25 @@ function createDom({ url, content }) {
  */
 function configure() {
 	nunjucks.configure({ autoescape: false, noCache: true });
+
+	/*
+		Override Readability's regular expressions
+		to include our positive/negative CSS selectors.
+
+		Note: this may change in Readability at some point.
+	 */
+	Readability.prototype.REGEXPS.positive = new RegExp(
+		`${
+			Readability.prototype.REGEXPS.positive.source
+		}|pcl--readability-positive`,
+		'i'
+	);
+	Readability.prototype.REGEXPS.negative = new RegExp(
+		`${
+			Readability.prototype.REGEXPS.negative.source
+		}|pcl--readability-negative`,
+		'i'
+	);
 }
 
 /*
@@ -84,6 +103,22 @@ async function cleanup(url, options) {
 			return cleanup(amp.href);
 		}
 
+		/*
+			Apply the `positive`/`negative` classes
+		 */
+
+		if (options.positive) {
+			dom.window.document
+				.querySelectorAll(options.positive)
+				.forEach(el => el.classList.add('pcl--readability-positive'));
+		}
+
+		if (options.negative) {
+			dom.window.document
+				.querySelectorAll(options.negative)
+				.forEach(el => el.classList.add('pcl--readability-negative'));
+		}
+
 		/* 
 			Run enhancements
 			----------------
@@ -99,7 +134,9 @@ async function cleanup(url, options) {
 					Placed on some <a> elements
 					as in-page anchors
 				 */
-				'anchor'
+				'anchor',
+				'pcl--readability-positive',
+				'pcl--readability-negative'
 			]
 		}).parse();
 
