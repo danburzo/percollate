@@ -10,13 +10,13 @@ const css = require('css');
 const slugify = require('slugify');
 const Readability = require('./vendor/readability');
 const pkg = require('./package.json');
-var Epub = require('epub-gen');
+let Epub = require('epub-gen');
 
 const spinner = ora();
 
-let cmd = 'pdf'; // default command
-
 const {
+	ampToHtml,
+	fixLazyLoadedImages,
 	imagesAtFullSize,
 	wikipediaSpecific,
 	noUselessHref,
@@ -31,7 +31,10 @@ const resolve = path =>
 	});
 
 const enhancePage = function(dom) {
+	// Note: the order of the enhancements matters!
 	[
+		ampToHtml,
+		fixLazyLoadedImages,
 		relativeToAbsoluteURIs,
 		imagesAtFullSize,
 		singleImgToFigure,
@@ -63,7 +66,7 @@ function configure() {
 	Fetch a web page and clean the HTML
 	-----------------------------------
  */
-async function cleanup(url) {
+async function cleanup(url, options) {
 	try {
 		spinner.start(`Fetching: ${url}`);
 		const content = (await got(url, {
@@ -76,7 +79,13 @@ async function cleanup(url) {
 		spinner.start('Enhancing web page');
 		const dom = createDom({ url, content });
 
-		/* 
+		const amp = dom.window.document.querySelector('link[rel=amphtml]');
+		if (amp && options.amp) {
+			spinner.succeed('Found AMP version');
+			return cleanup(amp.href);
+		}
+
+		/*
 			Run enhancements
 			----------------
 		*/
@@ -112,12 +121,6 @@ async function bundle(items, options) {
 	spinner.start('Generating temporary HTML file');
 	const temp_file = tmp.tmpNameSync({ postfix: '.html' });
 
-	// let stylesheet;
-	// if(options == null){
-	// 	stylesheet = resolve('./templates/default.css');
-	// } else {
-	// 	stylesheet = resolve(options.style);
-	// }
 	const stylesheet = resolve(options.style || './templates/default.css');
 	const style = fs.readFileSync(stylesheet, 'utf8') + (options.css || '');
 
@@ -175,7 +178,8 @@ async function bundle(items, options) {
 
 	spinner.succeed(`Temporary HTML file: file://${temp_file}`);
 
-	spinner.start(`Staging temporary HTML file: file://${temp_file}`);
+	spinner.start('Saving PDF');
+
 	const browser = await pup.launch({
 		headless: true,
 		/*
@@ -197,9 +201,120 @@ async function bundle(items, options) {
 	const page = await browser.newPage();
 	await page.goto(`file://${temp_file}`, { waitUntil: 'load' });
 
-	spinner.succeed(`Loaded temporary HTML file: file://${temp_file}`);
+	/*
+		When no output path is present,
+		produce the file name from the web page title
+		(if a single page was sent as argument),
+		or a timestamped file (for the moment)
+		in case we're bundling many web pages.
+	 */
+	const output_path =
+		options.output ||
+		(items.length === 1
+			? `${slugify(items[0].title || 'Untitled page')}.pdf`
+			: `percollate-${Date.now()}.pdf`);
 
-	spinner.start(`Setting output file name.`);
+	await page.pdf({
+		path: output_path,
+		preferCSSPageSize: true,
+		displayHeaderFooter: true,
+		headerTemplate: header.body.innerHTML,
+		footerTemplate: footer.body.innerHTML,
+		printBackground: true
+	});
+
+	await browser.close();
+
+	spinner.succeed(`Saved PDF: ${output_path}`);
+}
+
+/*
+	Bundle the HTML files into a EPUB
+	--------------------------------
+ */
+async function bundleEpub(items, options) {
+	spinner.start('Generating temporary HTML file');
+	const temp_file = tmp.tmpNameSync({ postfix: '.html' });
+
+	const stylesheet = resolve(options.style || './templates/default.css');
+	const style = fs.readFileSync(stylesheet, 'utf8') + (options.css || '');
+
+	const html = nunjucks.renderString(
+		fs.readFileSync(
+			resolve(options.template || './templates/default.html'),
+			'utf8'
+		),
+		{
+			items,
+			style,
+			stylesheet // deprecated
+		}
+	);
+
+	const doc = new JSDOM(html).window.document;
+	const headerTemplate = doc.querySelector('.header-template');
+	const footerTemplate = doc.querySelector('.footer-template');
+	const header = new JSDOM(
+		headerTemplate ? headerTemplate.innerHTML : '<span></span>'
+	).window.document;
+	const footer = new JSDOM(
+		footerTemplate ? footerTemplate.innerHTML : '<span></span>'
+	).window.document;
+
+	const css_ast = css.parse(style);
+
+	const header_style = get_style_attribute_value(css_ast, '.header-template');
+	const header_div = header.querySelector('body :first-child');
+
+	if (header_div && header_style) {
+		header_div.setAttribute(
+			'style',
+			`
+				${header_style};
+				${header_div.getAttribute('style') || ''}
+			`
+		);
+	}
+
+	const footer_style = get_style_attribute_value(css_ast, '.footer-template');
+	const footer_div = footer.querySelector('body :first-child');
+
+	if (footer_div && footer_style) {
+		footer_div.setAttribute(
+			'style',
+			`
+				${footer_style};
+				${footer_div.getAttribute('style') || ''}
+			`
+		);
+	}
+
+	fs.writeFileSync(temp_file, html);
+
+	spinner.succeed(`Temporary HTML file: file://${temp_file}`);
+
+	spinner.start('Saving EPUB');
+
+	const browser = await pup.launch({
+		headless: true,
+		/*
+			Allow running with no sandbox
+			See: https://github.com/danburzo/percollate/issues/26
+		 */
+		args: options.sandbox
+			? undefined
+			: ['--no-sandbox', '--disable-setuid-sandbox'],
+		defaultViewport: {
+			// Emulate retina display (@2x)...
+			deviceScaleFactor: 2,
+			// ...but then we need to provide the other
+			// viewport parameters as well
+			width: 1920,
+			height: 1080
+		}
+	});
+	const page = await browser.newPage();
+	await page.goto(`file://${temp_file}`, { waitUntil: 'load' });
 
 	/*
 		When no output path is present,
@@ -211,88 +326,152 @@ async function bundle(items, options) {
 	const output_path =
 		options.output ||
 		(items.length === 1
-			? `${slugify(items[0].title || 'Untitled page')}.${cmd}`
-			: `percollate-${Date.now()}.${cmd}`);
-	spinner.succeed(`Set output file name to: ${output_path}`);
+			? `${slugify(items[0].title || 'Untitled page')}.epub`
+			: `percollate-${Date.now()}.epub`);
 
-	// TODO At this point the command needs to be evaluate and another framework launched to create epub files
-	if (cmd === 'pdf') {
-		spinner.start('Saving PDF');
+	let bodyHTML = await page.evaluate(() => document.body.innerHTML);
 
-		// const browser = await pup.launch({
-		// 	headless: true,
-		// 	/*
-		// 		Allow running with no sandbox
-		// 		See: https://github.com/danburzo/percollate/issues/26
-		// 	 */
-		// 	args: options.sandbox
-		// 		? undefined
-		// 		: ['--no-sandbox', '--disable-setuid-sandbox'],
-		// 	defaultViewport: {
-		// 		// Emulate retina display (@2x)...
-		// 		deviceScaleFactor: 2,
-		// 		// ...but then we need to provide the other
-		// 		// viewport parameters as well
-		// 		width: 1920,
-		// 		height: 1080
-		// 	}
-		// });
-		// const page = await browser.newPage();
-		// await page.goto(`file://${temp_file}`, { waitUntil: 'load' });
-
-		await page.pdf({
-			path: output_path,
-			preferCSSPageSize: true,
-			displayHeaderFooter: true,
-			headerTemplate: header.body.innerHTML,
-			footerTemplate: footer.body.innerHTML,
-			printBackground: true
-		});
-
-		spinner.succeed(`Saved PDF: ${output_path}`);
-	} else if (cmd === 'epub') {
-		spinner.start('Saving EPUB');
-
-		let bodyHTML = await page.evaluate(() => document.body.innerHTML);
-
-		let option = {
-			title: items[0].title,
-			content: [
-				{
-					data: bodyHTML
-				}
-			]
-		};
-
-		new Epub(option, output_path);
-
-		spinner.succeed(`Saved EPUB: ${output_path}`);
-	} else if (cmd === 'html') {
-		// spinner.succeed('HTML command not implemented yet.');
-		spinner.start('Saving HTML');
-
-		let bodyHTML = await page.evaluate(() => document.body.innerHTML);
-
-		fs.writeFile(output_path, bodyHTML, function(err) {
-			if (err) {
-				return console.log(err);
+	let option = {
+		title: items[0].title,
+		content: [
+			{
+				data: bodyHTML
 			}
-		});
+		]
+	};
 
-		spinner.succeed(`Saved HTML: ${output_path}`);
-	}
+	new Epub(option, output_path);
 
-	spinner.start('Closing staging browser.');
 	await browser.close();
-	spinner.succeed('Staging browser closed.');
-	spinner.succeed('All done.');
+
+	spinner.succeed(`Saved EPUB: ${output_path}`);
 }
 
-async function generateOutput(urls, options) {
+/*
+	Bundle the HTML files into a HTML
+	--------------------------------
+ */
+async function bundleHtml(items, options) {
+	spinner.start('Generating temporary HTML file');
+	const temp_file = tmp.tmpNameSync({ postfix: '.html' });
+
+	const stylesheet = resolve(options.style || './templates/default.css');
+	const style = fs.readFileSync(stylesheet, 'utf8') + (options.css || '');
+
+	const html = nunjucks.renderString(
+		fs.readFileSync(
+			resolve(options.template || './templates/default.html'),
+			'utf8'
+		),
+		{
+			items,
+			style,
+			stylesheet // deprecated
+		}
+	);
+
+	const doc = new JSDOM(html).window.document;
+	const headerTemplate = doc.querySelector('.header-template');
+	const footerTemplate = doc.querySelector('.footer-template');
+	const header = new JSDOM(
+		headerTemplate ? headerTemplate.innerHTML : '<span></span>'
+	).window.document;
+	const footer = new JSDOM(
+		footerTemplate ? footerTemplate.innerHTML : '<span></span>'
+	).window.document;
+
+	const css_ast = css.parse(style);
+
+	const header_style = get_style_attribute_value(css_ast, '.header-template');
+	const header_div = header.querySelector('body :first-child');
+
+	if (header_div && header_style) {
+		header_div.setAttribute(
+			'style',
+			`
+				${header_style};
+				${header_div.getAttribute('style') || ''}
+			`
+		);
+	}
+
+	const footer_style = get_style_attribute_value(css_ast, '.footer-template');
+	const footer_div = footer.querySelector('body :first-child');
+
+	if (footer_div && footer_style) {
+		footer_div.setAttribute(
+			'style',
+			`
+				${footer_style};
+				${footer_div.getAttribute('style') || ''}
+			`
+		);
+	}
+
+	fs.writeFileSync(temp_file, html);
+
+	spinner.succeed(`Temporary HTML file: file://${temp_file}`);
+
+	spinner.start('Saving HTML');
+
+	const browser = await pup.launch({
+		headless: true,
+		/*
+			Allow running with no sandbox
+			See: https://github.com/danburzo/percollate/issues/26
+		 */
+		args: options.sandbox
+			? undefined
+			: ['--no-sandbox', '--disable-setuid-sandbox'],
+		defaultViewport: {
+			// Emulate retina display (@2x)...
+			deviceScaleFactor: 2,
+			// ...but then we need to provide the other
+			// viewport parameters as well
+			width: 1920,
+			height: 1080
+		}
+	});
+	const page = await browser.newPage();
+	await page.goto(`file://${temp_file}`, { waitUntil: 'load' });
+
+	/*
+		When no output path is present,
+		produce the file name from the web page title
+		(if a single page was sent as argument),
+		or a timestamped file (for the moment)
+		in case we're bundling many web pages.
+	 */
+	const output_path =
+		options.output ||
+		(items.length === 1
+			? `${slugify(items[0].title || 'Untitled page')}.html`
+			: `percollate-${Date.now()}.html`);
+
+	// TODO
+	let bodyHTML = await page.evaluate(() => document.body.innerHTML);
+
+	fs.writeFile('output_path', bodyHTML, function(err) {
+		if (err) {
+			return console.log(err);
+		}
+
+		// console.log("The file was saved!");
+	});
+
+	await browser.close();
+
+	spinner.succeed(`Saved HTML: ${output_path}`);
+}
+
+/*
+	Generate PDF
+ */
+async function pdf(urls, options) {
 	if (!urls.length) return;
 	let items = [];
 	for (let url of urls) {
-		let item = await cleanup(url);
+		let item = await cleanup(url, options);
 		if (options.individual) {
 			await bundle([item], options);
 		} else {
@@ -305,35 +484,23 @@ async function generateOutput(urls, options) {
 }
 
 /*
-	Generate PDF
- */
-async function pdf(urls, options) {
-	cmd = 'pdf';
-	console.log('Generating PDF output');
-	await generateOutput(urls, options);
-	// if (!urls.length) return;
-	// let items = [];
-	// for (let url of urls) {
-	// 	let item = await cleanup(url);
-	// 	if (options.individual) {
-	// 		await bundle([item], options);
-	// 	} else {
-	// 		items.push(item);
-	// 	}
-	// }
-	// if (!options.individual) {
-	// 	await bundle(items, options);
-	// }
-}
-
-/*
 	Generate EPUB
  */
 async function epub(urls, options) {
 	// console.log('TODO', urls, options);
-	cmd = 'epub';
-	console.log('Generating EPUB output');
-	await generateOutput(urls, options);
+	if (!urls.length) return;
+	let items = [];
+	for (let url of urls) {
+		let item = await cleanup(url, options);
+		if (options.individual) {
+			await bundleEpub([item], options);
+		} else {
+			items.push(item);
+		}
+	}
+	if (!options.individual) {
+		await bundle(items, options);
+	}
 }
 
 /*
@@ -341,9 +508,19 @@ async function epub(urls, options) {
  */
 async function html(urls, options) {
 	// console.log('TODO', urls, options);
-	cmd = 'html';
-	console.log('Generating HTML output');
-	await generateOutput(urls, options);
+	if (!urls.length) return;
+	let items = [];
+	for (let url of urls) {
+		let item = await cleanup(url, options);
+		if (options.individual) {
+			await bundleHtml([item], options);
+		} else {
+			items.push(item);
+		}
+	}
+	if (!options.individual) {
+		await bundle(items, options);
+	}
 }
 
 module.exports = { configure, pdf, epub, html };
