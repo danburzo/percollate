@@ -85,7 +85,7 @@ async function cleanup(url, options) {
 			return cleanup(amp.href);
 		}
 
-		/*
+		/* 
 			Run enhancements
 			----------------
 		*/

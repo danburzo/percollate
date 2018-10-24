@@ -72,6 +72,7 @@ The `pdf`, `epub`, and `html` commands have these options:
 | `--template`   | Path to a custom HTML template                                                                                 |
 | `--style`      | Path to a custom CSS                                                                                           |
 | `--css`        | Additional CSS styles you can pass from the command-line to override the default/custom stylesheet styles      |
+| `--no-amp`     | Don't prefer the AMP version of the web page                                                                   |
 
 ## Examples
 
@@ -180,10 +181,11 @@ An example from the [default stylesheet](./templates/default.css):
 ## How it works
 
 1. Fetch the page(s) using [`got`](https://github.com/sindresorhus/got)
-2. [Enhance](./src/enhancements.js) the DOM using [`jsdom`](https://github.com/jsdom/jsdom)
-3. Pass the DOM through [`mozilla/readability`](https://github.com/mozilla/readability) to strip unnecessary elements
-4. Apply the [HTML template](./templates/default.html) and the [print stylesheet](./templates/default.css) to the resulting HTML
-5. Use [`puppeteer`](https://github.com/GoogleChrome/puppeteer) to generate a PDF from the page
+2. If an AMP version of the page exists, use that instead (disable with `--no-amp` flag)
+3. [Enhance](./src/enhancements.js) the DOM using [`jsdom`](https://github.com/jsdom/jsdom)
+4. Pass the DOM through [`mozilla/readability`](https://github.com/mozilla/readability) to strip unnecessary elements
+5. Apply the [HTML template](./templates/default.html) and the [print stylesheet](./templates/default.css) to the resulting HTML
+6. Use [`puppeteer`](https://github.com/GoogleChrome/puppeteer) to generate a PDF from the page
 
 ## Limitations
 
