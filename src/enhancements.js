@@ -1,19 +1,15 @@
 const srcset = require('srcset');
 const URL = require('url').URL;
+const replaceElementType = require('./replace-element-type');
 
 /* 
 	Convert AMP markup to HMTL markup
-	(naive implementation)
+	(naive / incomplete implementation)
 */
 function ampToHtml(doc) {
+	// Convert <amp-img> to <img>
 	Array.from(doc.querySelectorAll('amp-img')).forEach(ampImg => {
-		if (ampImg.parentNode) {
-			let img = doc.createElement('img');
-			for (let attr of ampImg.attributes) {
-				img.setAttribute(attr.name, attr.value);
-			}
-			ampImg.parentNode.replaceChild(img, ampImg);
-		}
+		replaceElementType(ampImg, 'img', doc);
 	});
 }
 
