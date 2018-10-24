@@ -14,6 +14,7 @@ const pkg = require('./package.json');
 const spinner = ora();
 
 const {
+	ampToHtml,
 	imagesAtFullSize,
 	wikipediaSpecific,
 	noUselessHref,
@@ -29,6 +30,7 @@ const resolve = path =>
 
 const enhancePage = function(dom) {
 	[
+		ampToHtml,
 		relativeToAbsoluteURIs,
 		imagesAtFullSize,
 		singleImgToFigure,
@@ -60,7 +62,7 @@ function configure() {
 	Fetch a web page and clean the HTML
 	-----------------------------------
  */
-async function cleanup(url) {
+async function cleanup(url, options) {
 	try {
 		spinner.start(`Fetching: ${url}`);
 		const content = (await got(url, {
@@ -72,6 +74,12 @@ async function cleanup(url) {
 
 		spinner.start('Enhancing web page');
 		const dom = createDom({ url, content });
+
+		const amp = dom.window.document.querySelector('link[rel=amphtml]');
+		if (amp && options.amp) {
+			spinner.succeed('Found AMP version');
+			return cleanup(amp.href);
+		}
 
 		/* 
 			Run enhancements
@@ -223,7 +231,7 @@ async function pdf(urls, options) {
 	if (!urls.length) return;
 	let items = [];
 	for (let url of urls) {
-		let item = await cleanup(url);
+		let item = await cleanup(url, options);
 		if (options.individual) {
 			await bundle([item], options);
 		} else {

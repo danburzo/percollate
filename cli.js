@@ -21,7 +21,8 @@ function with_common_options(cmd) {
 		.option('--template [template]', 'Path to custom HTML template')
 		.option('--style [stylesheet]', 'Path to custom CSS')
 		.option('--css [style]', 'Additional CSS style')
-		.option('--individual', 'Export each web page as an individual file');
+		.option('--individual', 'Export each web page as an individual file')
+		.option('--no-amp', "Don't use the AMP version when available");
 }
 
 program.version(pkg.version);

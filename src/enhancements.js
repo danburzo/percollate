@@ -1,6 +1,22 @@
 const srcset = require('srcset');
 const URL = require('url').URL;
 
+/* 
+	Convert AMP markup to HMTL markup
+	(naive implementation)
+*/
+function ampToHtml(doc) {
+	Array.from(doc.querySelectorAll('amp-img')).forEach(ampImg => {
+		if (ampImg.parentNode) {
+			let img = doc.createElement('img');
+			for (let attr of ampImg.attributes) {
+				img.setAttribute(attr.name, attr.value);
+			}
+			ampImg.parentNode.replaceChild(img, ampImg);
+		}
+	});
+}
+
 function imagesAtFullSize(doc) {
 	/*
 		Replace:
@@ -122,6 +138,7 @@ function singleImgToFigure(doc) {
 }
 
 module.exports = {
+	ampToHtml,
 	imagesAtFullSize,
 	noUselessHref,
 	wikipediaSpecific,
