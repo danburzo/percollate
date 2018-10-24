@@ -10,6 +10,7 @@ const css = require('css');
 const slugify = require('slugify');
 const Readability = require('./vendor/readability');
 const pkg = require('./package.json');
+const gullible = require('./gullible');
 
 const spinner = ora();
 
@@ -136,6 +137,8 @@ async function cleanup(url, options) {
 		*/
 		enhancePage(dom);
 
+		let content_el = gullible(dom.window);
+
 		// Run through readability and return
 		const parsed = new Readability(dom.window.document, {
 			classesToPreserve: [
@@ -153,7 +156,11 @@ async function cleanup(url, options) {
 
 		spinner.succeed();
 
-		return { ...parsed, url };
+		return {
+			...parsed,
+			content: content_el ? content_el.innerHTML : parsed.content,
+			url
+		};
 	} catch (error) {
 		spinner.fail(error.message);
 		throw error;
