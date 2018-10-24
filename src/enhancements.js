@@ -77,17 +77,23 @@ function wikipediaSpecific(doc) {
 }
 
 /* 
-	Mark some links as not needing their HREF appended:
-	- links whose text content is the HREF
-	- in-page anchors
+	Mark some links as not needing their HREF appended.
 */
 function noUselessHref(doc) {
 	Array.from(doc.querySelectorAll('a'))
 		.filter(function(el) {
-			return (
-				(el.getAttribute('href') || '').match(/^\#/) ||
-				el.getAttribute('href') === el.textContent.trim()
-			);
+			let href = el.getAttribute('href') || '';
+
+			// in-page anchors
+			if (href.match(/^\#/)) {
+				return true;
+			}
+
+			let textContent = el.textContent.trim();
+
+			// links whose text content is the HREF
+			// or which don't have any content.
+			return !textContent || textContent === href;
 		})
 		.forEach(el => el.classList.add('no-href'));
 }
