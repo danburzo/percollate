@@ -10,8 +10,11 @@ const css = require('css');
 const slugify = require('slugify');
 const Readability = require('./vendor/readability');
 const pkg = require('./package.json');
+var Epub = require('epub-gen');
 
 const spinner = ora();
+
+let cmd = 'pdf'; // default command
 
 const {
 	imagesAtFullSize,
@@ -105,10 +108,16 @@ async function cleanup(url) {
 	Bundle the HTML files into a PDF
 	--------------------------------
  */
-async function bundle(cmd, items, options) {
+async function bundle(items, options) {
 	spinner.start('Generating temporary HTML file');
 	const temp_file = tmp.tmpNameSync({ postfix: '.html' });
 
+	// let stylesheet;
+	// if(options == null){
+	// 	stylesheet = resolve('./templates/default.css');
+	// } else {
+	// 	stylesheet = resolve(options.style);
+	// }
 	const stylesheet = resolve(options.style || './templates/default.css');
 	const style = fs.readFileSync(stylesheet, 'utf8') + (options.css || '');
 
@@ -166,43 +175,70 @@ async function bundle(cmd, items, options) {
 
 	spinner.succeed(`Temporary HTML file: file://${temp_file}`);
 
+	spinner.start(`Staging temporary HTML file: file://${temp_file}`);
+	const browser = await pup.launch({
+		headless: true,
+		/*
+			Allow running with no sandbox
+			See: https://github.com/danburzo/percollate/issues/26
+		 */
+		args: options.sandbox
+			? undefined
+			: ['--no-sandbox', '--disable-setuid-sandbox'],
+		defaultViewport: {
+			// Emulate retina display (@2x)...
+			deviceScaleFactor: 2,
+			// ...but then we need to provide the other
+			// viewport parameters as well
+			width: 1920,
+			height: 1080
+		}
+	});
+	const page = await browser.newPage();
+	await page.goto(`file://${temp_file}`, { waitUntil: 'load' });
+
+	spinner.succeed(`Loaded temporary HTML file: file://${temp_file}`);
+
+	spinner.start(`Setting output file name.`);
+
+	/*
+		When no output path is present,
+		produce the file name from the web page title
+		(if a single page was sent as argument),
+		or a timestamped file (for the moment)
+		in case we're bundling many web pages.
+	 */
+	const output_path =
+		options.output ||
+		(items.length === 1
+			? `${slugify(items[0].title || 'Untitled page')}.${cmd}`
+			: `percollate-${Date.now()}.${cmd}`);
+	spinner.succeed(`Set output file name to: ${output_path}`);
+
 	// TODO At this point the command needs to be evaluate and another framework launched to create epub files
 	if (cmd === 'pdf') {
 		spinner.start('Saving PDF');
 
-		const browser = await pup.launch({
-			headless: true,
-			/*
-				Allow running with no sandbox
-				See: https://github.com/danburzo/percollate/issues/26
-			 */
-			args: options.sandbox
-				? undefined
-				: ['--no-sandbox', '--disable-setuid-sandbox'],
-			defaultViewport: {
-				// Emulate retina display (@2x)...
-				deviceScaleFactor: 2,
-				// ...but then we need to provide the other
-				// viewport parameters as well
-				width: 1920,
-				height: 1080
-			}
-		});
-		const page = await browser.newPage();
-		await page.goto(`file://${temp_file}`, { waitUntil: 'load' });
-
-		/*
-			When no output path is present,
-			produce the file name from the web page title
-			(if a single page was sent as argument),
-			or a timestamped file (for the moment)
-			in case we're bundling many web pages.
-		 */
-		const output_path =
-			options.output ||
-			(items.length === 1
-				? `${slugify(items[0].title || 'Untitled page')}.pdf`
-				: `percollate-${Date.now()}.pdf`);
+		// const browser = await pup.launch({
+		// 	headless: true,
+		// 	/*
+		// 		Allow running with no sandbox
+		// 		See: https://github.com/danburzo/percollate/issues/26
+		// 	 */
+		// 	args: options.sandbox
+		// 		? undefined
+		// 		: ['--no-sandbox', '--disable-setuid-sandbox'],
+		// 	defaultViewport: {
+		// 		// Emulate retina display (@2x)...
+		// 		deviceScaleFactor: 2,
+		// 		// ...but then we need to provide the other
+		// 		// viewport parameters as well
+		// 		width: 1920,
+		// 		height: 1080
+		// 	}
+		// });
+		// const page = await browser.newPage();
+		// await page.goto(`file://${temp_file}`, { waitUntil: 'load' });
 
 		await page.pdf({
 			path: output_path,
@@ -213,23 +249,52 @@ async function bundle(cmd, items, options) {
 			printBackground: true
 		});
 
-		await browser.close();
-
 		spinner.succeed(`Saved PDF: ${output_path}`);
 	} else if (cmd === 'epub') {
-		spinner.succeed('EPUB command not implemented yet.');
+		spinner.start('Saving EPUB');
+
+		let bodyHTML = await page.evaluate(() => document.body.innerHTML);
+
+		let option = {
+			title: items[0].title,
+			content: [
+				{
+					data: bodyHTML
+				}
+			]
+		};
+
+		new Epub(option, output_path);
+
+		spinner.succeed(`Saved EPUB: ${output_path}`);
 	} else if (cmd === 'html') {
-		spinner.succeed('HTML command not implemented yet.');
+		// spinner.succeed('HTML command not implemented yet.');
+		spinner.start('Saving HTML');
+
+		let bodyHTML = await page.evaluate(() => document.body.innerHTML);
+
+		fs.writeFile(output_path, bodyHTML, function(err) {
+			if (err) {
+				return console.log(err);
+			}
+		});
+
+		spinner.succeed(`Saved HTML: ${output_path}`);
 	}
+
+	spinner.start('Closing staging browser.');
+	await browser.close();
+	spinner.succeed('Staging browser closed.');
+	spinner.succeed('All done.');
 }
 
-async function generateOutput(cmd, urls, options) {
+async function generateOutput(urls, options) {
 	if (!urls.length) return;
 	let items = [];
 	for (let url of urls) {
 		let item = await cleanup(url);
 		if (options.individual) {
-			await bundle(cmd, [item], options);
+			await bundle([item], options);
 		} else {
 			items.push(item);
 		}
@@ -243,8 +308,9 @@ async function generateOutput(cmd, urls, options) {
 	Generate PDF
  */
 async function pdf(urls, options) {
+	cmd = 'pdf';
 	console.log('Generating PDF output');
-	await generateOutput('pdf', urls, options);
+	await generateOutput(urls, options);
 	// if (!urls.length) return;
 	// let items = [];
 	// for (let url of urls) {
@@ -265,8 +331,9 @@ async function pdf(urls, options) {
  */
 async function epub(urls, options) {
 	// console.log('TODO', urls, options);
+	cmd = 'epub';
 	console.log('Generating EPUB output');
-	await generateOutput('epub', urls, options);
+	await generateOutput(urls, options);
 }
 
 /*
@@ -274,8 +341,9 @@ async function epub(urls, options) {
  */
 async function html(urls, options) {
 	// console.log('TODO', urls, options);
+	cmd = 'html';
 	console.log('Generating HTML output');
-	await generateOutput('html', urls, options);
+	await generateOutput(urls, options);
 }
 
 module.exports = { configure, pdf, epub, html };
