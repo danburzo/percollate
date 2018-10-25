@@ -451,7 +451,7 @@ async function bundleHtml(items, options) {
 	// TODO
 	let bodyHTML = await page.evaluate(() => document.body.innerHTML);
 
-	fs.writeFile('output_path', bodyHTML, function(err) {
+	fs.writeFile(output_path, bodyHTML, function(err) {
 		if (err) {
 			return console.log(err);
 		}
