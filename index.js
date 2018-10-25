@@ -499,7 +499,7 @@ async function epub(urls, options) {
 		}
 	}
 	if (!options.individual) {
-		await bundle(items, options);
+		await bundleEpub(items, options);
 	}
 }
 
@@ -519,7 +519,7 @@ async function html(urls, options) {
 		}
 	}
 	if (!options.individual) {
-		await bundle(items, options);
+		await bundleHtml(items, options);
 	}
 }
 
