@@ -198,6 +198,13 @@ async function bundle(items, options) {
 		}
 	});
 	const page = await browser.newPage();
+
+	/*
+		Increase the navigation timeout to 2 minutes
+		See: https://github.com/danburzo/percollate/issues/80
+	 */
+	page.setDefaultNavigationTimeout(120 * 1000);
+
 	await page.goto(`file://${temp_file}`, { waitUntil: 'load' });
 
 	/*

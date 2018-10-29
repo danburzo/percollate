@@ -6,6 +6,8 @@ Prefer the AMP version of an article, if available. [Details here](https://githu
 
 Support for lazy-loaded images. ([#71](https://github.com/danburzo/percollate/issues/71))
 
+Increased Puppeteer navigation timeout to 2 minutes. ([#80](https://github.com/danburzo/percollate/issues/80), thanks [@butu5](https://github.com/butu5)!)
+
 ### 0.2.14
 
 Fixes bug with the URL class not being globally available in Node < 10. ([#64](https://github.com/danburzo/percollate/pull/64), thanks [@tanmayrajani](https://github.com/tanmayrajani)!).
