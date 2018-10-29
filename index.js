@@ -177,8 +177,6 @@ async function bundle(items, options) {
 
 	spinner.succeed(`Temporary HTML file: file://${temp_file}`);
 
-	spinner.start('Saving PDF');
-
 	const browser = await pup.launch({
 		headless: true,
 		/*
@@ -204,6 +202,10 @@ async function bundle(items, options) {
 		See: https://github.com/danburzo/percollate/issues/80
 	 */
 	page.setDefaultNavigationTimeout(120 * 1000);
+
+	page.on('response', response => {
+		spinner.succeed(`Fetched: ${response.url()}`);
+	});
 
 	await page.goto(`file://${temp_file}`, { waitUntil: 'load' });
 
