@@ -164,7 +164,11 @@ The `--style` option lets you use your own CSS stylesheet instead of the default
 
 ### The `--template` option
 
-The `--template` option lets you use a custom HTML template for the PDF. Here are some common use-cases:
+The `--template` option lets you use a custom HTML template for the PDF.
+
+> 💡 The HTML template is parsed with [nunjucks](https://mozilla.github.io/nunjucks/), which is a close JavaScript relative of Twig for PHP, Jinja2 for Python and L for Ruby.
+
+Here are some common use-cases:
 
 #### Customizing the page header / footer
 
