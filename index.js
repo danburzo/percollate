@@ -81,7 +81,7 @@ async function cleanup(url, options) {
 		const amp = dom.window.document.querySelector('link[rel=amphtml]');
 		if (amp && options.amp) {
 			spinner.succeed('Found AMP version');
-			return cleanup(amp.href);
+			return cleanup(amp.href, options);
 		}
 
 		/* 
@@ -104,8 +104,11 @@ async function cleanup(url, options) {
 		}).parse();
 
 		spinner.succeed();
-
-		return { ...parsed, url };
+		const _id = Math.random()
+			.toString(36)
+			.replace(/[^a-z]+/g, '')
+			.substr(2, 10);
+		return { ...parsed, _id, url };
 	} catch (error) {
 		spinner.fail(error.message);
 		throw error;
@@ -122,6 +125,7 @@ async function bundle(items, options) {
 
 	const stylesheet = resolve(options.style || './templates/default.css');
 	const style = fs.readFileSync(stylesheet, 'utf8') + (options.css || '');
+	const generateToc = options.toc;
 
 	const html = nunjucks.renderString(
 		fs.readFileSync(
@@ -131,7 +135,8 @@ async function bundle(items, options) {
 		{
 			items,
 			style,
-			stylesheet // deprecated
+			stylesheet, // deprecated
+			generateToc
 		}
 	);
 
