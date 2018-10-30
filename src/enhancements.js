@@ -39,15 +39,29 @@ function imagesAtFullSize(doc) {
 		With:
 			<img src='original-size.png'/>
 	 */
+	let include_pattern = /\.(png|jpg|jpeg|gif|svg)$/i;
+	let exclude_patterns = [
+		/*
+			Exclude Wikipedia links to image file pages
+		*/
+		/wiki\/File\:/,
+
+		/* 
+			Exclude images embedded in Markdown files
+			hosted on github.com.
+			See: https://github.com/danburzo/percollate/issues/84
+		*/
+		/github\.com/
+	];
+
 	Array.from(doc.querySelectorAll('a > img:only-child')).forEach(img => {
 		let anchor = img.parentNode;
 		let original = anchor.href;
 
 		// only replace if the HREF matches an image file
-		// and exclude wikipedia links to image file pages
 		if (
-			original.match(/\.(png|jpg|jpeg|gif|svg)$/i) &&
-			!original.match(/wiki\/File\:/)
+			include_pattern.test(original) &&
+			!exclude_patterns.some(pattern => pattern.test(original))
 		) {
 			img.setAttribute('src', original);
 			anchor.parentNode.replaceChild(img, anchor);
