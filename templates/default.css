@@ -84,7 +84,12 @@ pre code {
 	display: none;
 }
 
-nav.toc {
+/*
+	Table of Contents page
+	----------------------------------------------------
+ */
+
+.toc {
 	page-break-after: always;
 }
 

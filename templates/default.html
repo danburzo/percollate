@@ -10,19 +10,21 @@
 </head>
 <body>
 
-	{% if generateToc %}
-	<nav class="toc">
-		<h1>Items</h1>
-		<ol>
+	{% if options.use_toc %}
+	<nav class='toc'>
+		<h1 class='toc__title'>Table of Contents</h1>
+		<ol class='toc__list'>
 			{% for item in items %}
-			<li class="toc__line"><a href="#{{ item._id }}">{{ item.title }}</a></li>
+			<li class='toc__list-item'>
+				<a href="#{{ item.id }}" class='no-href'>{{ item.title }}</a>
+			</li>
 			{% endfor %}
 		</ol>
 	</nav>
 	{% endif %}
 
 	{% for item in items %}
-	<article id="{{ item._id }}" class='article'>
+	<article id='{{ item.id }}' class='article'>
 		<header class='article__header'>
 			<h1 class='article__title'>
 				{{ item.title }}

@@ -10,6 +10,7 @@ const css = require('css');
 const slugify = require('slugify');
 const Readability = require('./vendor/readability');
 const pkg = require('./package.json');
+const uuid = require('uuid/v1');
 
 const spinner = ora();
 
@@ -108,11 +109,7 @@ async function cleanup(url, options) {
 		}).parse();
 
 		spinner.succeed();
-		const _id = Math.random()
-			.toString(36)
-			.replace(/[^a-z]+/g, '')
-			.substr(2, 10);
-		return { ...parsed, _id, url };
+		return { ...parsed, id: `percollate-page-${uuid()}`, url };
 	} catch (error) {
 		spinner.fail(error.message);
 		throw error;
@@ -129,7 +126,7 @@ async function bundle(items, options) {
 
 	const stylesheet = resolve(options.style || './templates/default.css');
 	const style = fs.readFileSync(stylesheet, 'utf8') + (options.css || '');
-	const generateToc = options.toc;
+	const use_toc = options.toc && items.length > 1;
 
 	const html = nunjucks.renderString(
 		fs.readFileSync(
@@ -140,7 +137,9 @@ async function bundle(items, options) {
 			items,
 			style,
 			stylesheet, // deprecated
-			generateToc
+			options: {
+				use_toc
+			}
 		}
 	);
 
