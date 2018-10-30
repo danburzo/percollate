@@ -10,6 +10,8 @@ Increased Puppeteer navigation timeout to 2 minutes. ([#80](https://github.com/d
 
 Fixed URL encoding before fetching it. ([#83](https://github.com/danburzo/percollate/pull/83), thanks [@ncsing](https://github.com/ncsing)!)
 
+Generate a Table of Contents page ([#81](https://github.com/danburzo/percollate/pull/81), thanks [@guybedo](https://github.com/guybedo)!) when using the `--toc` option.
+
 ### 0.2.14
 
 Fixes bug with the URL class not being globally available in Node < 10. ([#64](https://github.com/danburzo/percollate/pull/64), thanks [@tanmayrajani](https://github.com/tanmayrajani)!).
