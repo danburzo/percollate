@@ -73,6 +73,7 @@ The `pdf`, `epub`, and `html` commands have these options:
 | `--style`      | Path to a custom CSS                                                                                           |
 | `--css`        | Additional CSS styles you can pass from the command-line to override the default/custom stylesheet styles      |
 | `--no-amp`     | Don't prefer the AMP version of the web page                                                                   |
+| `--debug`      | Print more detailed information                                                                                |
 
 ## Examples
 

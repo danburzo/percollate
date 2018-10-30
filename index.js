@@ -207,9 +207,11 @@ async function bundle(items, options) {
 	 */
 	page.setDefaultNavigationTimeout(120 * 1000);
 
-	page.on('response', response => {
-		spinner.succeed(`Fetched: ${response.url()}`);
-	});
+	if (options.debug) {
+		page.on('response', response => {
+			spinner.succeed(`Fetched: ${response.url()}`);
+		});
+	}
 
 	await page.goto(`file://${temp_file}`, { waitUntil: 'load' });
 
