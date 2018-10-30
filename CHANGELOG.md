@@ -6,7 +6,9 @@ Prefer the AMP version of an article, if available. [Details here](https://githu
 
 Support for lazy-loaded images. ([#71](https://github.com/danburzo/percollate/issues/71))
 
-Increased Puppeteer navigation timeout to 2 minutes. ([#80](https://github.com/danburzo/percollate/issues/80), thanks [@butu5](https://github.com/butu5)!)
+Increased Puppeteer navigation timeout to 2 minutes. ([#80](https://github.com/danburzo/percollate/issues/80), thanks [@butu5](https://github.com/butu5)!). Also added a `--debug` flag to print more information about the process.
+
+Fixed URL encoding before fetching it. ([#83](https://github.com/danburzo/percollate/pull/83), thanks [@ncsing](https://github.com/ncsing)!)
 
 ### 0.2.14
 
