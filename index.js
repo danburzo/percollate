@@ -68,7 +68,7 @@ function configure() {
 async function cleanup(url, options) {
 	try {
 		spinner.start(`Fetching: ${url}`);
-		const content = (await got(url, {
+		const content = (await got(encodeURI(url), {
 			headers: {
 				'user-agent': `percollate/${pkg.version}`
 			}
