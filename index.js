@@ -68,7 +68,11 @@ function configure() {
 async function cleanup(url, options) {
 	try {
 		spinner.start(`Fetching: ${url}`);
-		const content = (await got(url, {
+		/*
+			Must ensure that the URL is properly encoded.
+			See: https://github.com/danburzo/percollate/pull/83
+		 */
+		const content = (await got(encodeURI(decodeURI(url)), {
 			headers: {
 				'user-agent': `percollate/${pkg.version}`
 			}
@@ -182,8 +186,6 @@ async function bundle(items, options) {
 
 	spinner.succeed(`Temporary HTML file: file://${temp_file}`);
 
-	spinner.start('Saving PDF');
-
 	const browser = await pup.launch({
 		headless: true,
 		/*
@@ -203,6 +205,19 @@ async function bundle(items, options) {
 		}
 	});
 	const page = await browser.newPage();
+
+	/*
+		Increase the navigation timeout to 2 minutes
+		See: https://github.com/danburzo/percollate/issues/80
+	 */
+	page.setDefaultNavigationTimeout(120 * 1000);
+
+	if (options.debug) {
+		page.on('response', response => {
+			spinner.succeed(`Fetched: ${response.url()}`);
+		});
+	}
+
 	await page.goto(`file://${temp_file}`, { waitUntil: 'load' });
 
 	/*
