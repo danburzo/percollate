@@ -68,7 +68,11 @@ function configure() {
 async function cleanup(url, options) {
 	try {
 		spinner.start(`Fetching: ${url}`);
-		const content = (await got(encodeURI(url), {
+		/*
+			Must ensure that the URL is properly encoded.
+			See: https://github.com/danburzo/percollate/pull/83
+		 */
+		const content = (await got(encodeURI(decodeURI(url)), {
 			headers: {
 				'user-agent': `percollate/${pkg.version}`
 			}
