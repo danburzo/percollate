@@ -73,6 +73,8 @@ The `pdf`, `epub`, and `html` commands have these options:
 | `--style`      | Path to a custom CSS                                                                                           |
 | `--css`        | Additional CSS styles you can pass from the command-line to override the default/custom stylesheet styles      |
 | `--no-amp`     | Don't prefer the AMP version of the web page                                                                   |
+| `--debug`      | Print more detailed information                                                                                |
+| `--toc`        | Include a Table of Contents page                                                                               |
 
 ## Examples
 
@@ -119,6 +121,35 @@ Similarly, you can define:
 -   custom margins, e.g. `@page { margin: 0 }`
 -   the base font size: `html { font-size: 10pt }`
 
+#### Changing the font stacks
+
+The default stylesheet includes CSS variables for the fonts used in the PDF:
+
+```css
+:root {
+	--main-font: Palatino, 'Palatino Linotype', 'Times New Roman',
+		'Droid Serif', Times, 'Source Serif Pro', serif, 'Apple Color Emoji',
+		'Segoe UI Emoji', 'Segoe UI Symbol';
+	--alt-font: 'helvetica neue', ubuntu, roboto, noto, 'segoe ui', arial,
+		sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+	--code-font: Menlo, Consolas, monospace;
+}
+```
+
+| CSS variable  | What it does                          |
+| ------------- | ------------------------------------- |
+| `--main-font` | The font stack used for body text     |
+| `--alt-font`  | Used in headings, captions, et cetera |
+| `--code-font` | Used for code snippets                |
+
+To override them, use the `--css` option:
+
+```bash
+percollate pdf --css ":root { --main-font: 'PT Serif';  --alt-font: Roboto; }" http://example.com
+```
+
+> 💡 To work correctly, you must have the fonts installed on your machine. Custom web fonts currently require you to use a custom CSS stylesheet / HTML template.
+
 #### Remove the appended `href`s from hyperlinks
 
 The idea with percollate is to make PDFs that can be printed without losing where the hyperlinks point to. However, for some link-heavy pages, the appended `href`s can become bothersome. You can remove them using:
@@ -135,7 +166,11 @@ The `--style` option lets you use your own CSS stylesheet instead of the default
 
 ### The `--template` option
 
-The `--template` option lets you use a custom HTML template for the PDF. Here are some common use-cases:
+The `--template` option lets you use a custom HTML template for the PDF.
+
+> 💡 The HTML template is parsed with [nunjucks](https://mozilla.github.io/nunjucks/), which is a close JavaScript relative of Twig for PHP, Jinja2 for Python and L for Ruby.
+
+Here are some common use-cases:
 
 #### Customizing the page header / footer
 

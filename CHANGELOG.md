@@ -1,10 +1,16 @@
 # Percollate Changelog
 
-### Unreleased
+### 0.3.0
 
 Prefer the AMP version of an article, if available. [Details here](https://github.com/danburzo/percollate/pull/70).
 
 Support for lazy-loaded images. ([#71](https://github.com/danburzo/percollate/issues/71))
+
+Increased Puppeteer navigation timeout to 2 minutes. ([#80](https://github.com/danburzo/percollate/issues/80), thanks [@butu5](https://github.com/butu5)!). Also added a `--debug` flag to print more information about the process.
+
+Fixed URL encoding before fetching it. ([#83](https://github.com/danburzo/percollate/pull/83), thanks [@ncsing](https://github.com/ncsing)!)
+
+Generate a Table of Contents page ([#81](https://github.com/danburzo/percollate/pull/81), thanks [@guybedo](https://github.com/guybedo)!) when using the `--toc` option.
 
 ### 0.2.14
 

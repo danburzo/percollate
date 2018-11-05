@@ -10,6 +10,7 @@ const css = require('css');
 const slugify = require('slugify');
 const Readability = require('./vendor/readability');
 const pkg = require('./package.json');
+const uuid = require('uuid/v1');
 let Epub = require('epub-gen');
 
 const spinner = ora();
@@ -69,7 +70,11 @@ function configure() {
 async function cleanup(url, options) {
 	try {
 		spinner.start(`Fetching: ${url}`);
-		const content = (await got(url, {
+		/*
+			Must ensure that the URL is properly encoded.
+			See: https://github.com/danburzo/percollate/pull/83
+		 */
+		const content = (await got(encodeURI(decodeURI(url)), {
 			headers: {
 				'user-agent': `percollate/${pkg.version}`
 			}
@@ -82,7 +87,7 @@ async function cleanup(url, options) {
 		const amp = dom.window.document.querySelector('link[rel=amphtml]');
 		if (amp && options.amp) {
 			spinner.succeed('Found AMP version');
-			return cleanup(amp.href);
+			return cleanup(amp.href, options);
 		}
 
 		/* 
@@ -105,8 +110,7 @@ async function cleanup(url, options) {
 		}).parse();
 
 		spinner.succeed();
-
-		return { ...parsed, url };
+		return { ...parsed, id: `percollate-page-${uuid()}`, url };
 	} catch (error) {
 		spinner.fail(error.message);
 		throw error;
@@ -123,6 +127,7 @@ async function bundle(items, options) {
 
 	const stylesheet = resolve(options.style || './templates/default.css');
 	const style = fs.readFileSync(stylesheet, 'utf8') + (options.css || '');
+	const use_toc = options.toc && items.length > 1;
 
 	const html = nunjucks.renderString(
 		fs.readFileSync(
@@ -132,7 +137,10 @@ async function bundle(items, options) {
 		{
 			items,
 			style,
-			stylesheet // deprecated
+			stylesheet, // deprecated
+			options: {
+				use_toc
+			}
 		}
 	);
 
@@ -178,8 +186,6 @@ async function bundle(items, options) {
 
 	spinner.succeed(`Temporary HTML file: file://${temp_file}`);
 
-	spinner.start('Saving PDF');
-
 	const browser = await pup.launch({
 		headless: true,
 		/*
@@ -199,6 +205,19 @@ async function bundle(items, options) {
 		}
 	});
 	const page = await browser.newPage();
+
+	/*
+		Increase the navigation timeout to 2 minutes
+		See: https://github.com/danburzo/percollate/issues/80
+	 */
+	page.setDefaultNavigationTimeout(120 * 1000);
+
+	if (options.debug) {
+		page.on('response', response => {
+			spinner.succeed(`Fetched: ${response.url()}`);
+		});
+	}
+
 	await page.goto(`file://${temp_file}`, { waitUntil: 'load' });
 
 	/*

@@ -85,6 +85,15 @@ pre code {
 }
 
 /*
+	Table of Contents page
+	----------------------------------------------------
+ */
+
+.toc {
+	page-break-after: always;
+}
+
+/*
 	Article formatting
 	----------------------------------------------------
  */
@@ -141,6 +150,10 @@ article:not(:last-of-type) {
 	font-family: var(--alt-font);
 	margin: 0.81em 0;
 	line-height: 1.625;
+}
+
+.article__content figure blockquote {
+	text-align: left;
 }
 
 .article__content table,

@@ -22,7 +22,9 @@ function with_common_options(cmd) {
 		.option('--style [stylesheet]', 'Path to custom CSS')
 		.option('--css [style]', 'Additional CSS style')
 		.option('--individual', 'Export each web page as an individual file')
-		.option('--no-amp', "Don't prefer the AMP version of the web page");
+		.option('--no-amp', "Don't prefer the AMP version of the web page")
+		.option('--toc', 'Generate a Table of Contents')
+		.option('--debug', 'Print more detailed information');
 }
 
 program.version(pkg.version);

@@ -5,12 +5,26 @@
 	<title>🌐 Percollate</title>
 
 	<style type='text/css'>
-		{{ style }}
+		{{style }}
 	</style>
 </head>
 <body>
+
+	{% if options.use_toc %}
+	<nav class='toc'>
+		<h1 class='toc__title'>Table of Contents</h1>
+		<ol class='toc__list'>
+			{% for item in items %}
+			<li class='toc__list-item'>
+				<a href="#{{ item.id }}" class='no-href'>{{ item.title }}</a>
+			</li>
+			{% endfor %}
+		</ol>
+	</nav>
+	{% endif %}
+
 	{% for item in items %}
-	<article class='article'>
+	<article id='{{ item.id }}' class='article'>
 		<header class='article__header'>
 			<h1 class='article__title'>
 				{{ item.title }}
