@@ -76,7 +76,8 @@ async function cleanup(url, options) {
 		const content = (await got(encodeURI(decodeURI(url)), {
 			headers: {
 				'user-agent': `percollate/${pkg.version}`
-			}
+			},
+			decompress: options.decompress
 		})).body;
 		spinner.succeed();
 
