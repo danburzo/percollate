@@ -90,7 +90,7 @@ async function cleanup(url, options) {
 			return cleanup(amp.href, options);
 		}
 
-		/* 
+		/*
 			Run enhancements
 			----------------
 		*/
@@ -253,7 +253,6 @@ async function bundle(items, options) {
  */
 async function bundleEpub(items, options) {
 	spinner.start('Generating temporary HTML file');
-	const temp_file = tmp.tmpNameSync({ postfix: '.html' });
 
 	const stylesheet = resolve(options.style || './templates/default.css');
 	const style = fs.readFileSync(stylesheet, 'utf8') + (options.css || '');
@@ -308,32 +307,7 @@ async function bundleEpub(items, options) {
 		);
 	}
 
-	fs.writeFileSync(temp_file, html);
-
-	spinner.succeed(`Temporary HTML file: file://${temp_file}`);
-
 	spinner.start('Saving EPUB');
-
-	const browser = await pup.launch({
-		headless: true,
-		/*
-			Allow running with no sandbox
-			See: https://github.com/danburzo/percollate/issues/26
-		 */
-		args: options.sandbox
-			? undefined
-			: ['--no-sandbox', '--disable-setuid-sandbox'],
-		defaultViewport: {
-			// Emulate retina display (@2x)...
-			deviceScaleFactor: 2,
-			// ...but then we need to provide the other
-			// viewport parameters as well
-			width: 1920,
-			height: 1080
-		}
-	});
-	const page = await browser.newPage();
-	await page.goto(`file://${temp_file}`, { waitUntil: 'load' });
 
 	/*
 		When no output path is present,
@@ -348,20 +322,16 @@ async function bundleEpub(items, options) {
 			? `${slugify(items[0].title || 'Untitled page')}.epub`
 			: `percollate-${Date.now()}.epub`);
 
-	let bodyHTML = await page.evaluate(() => document.body.innerHTML);
-
 	let option = {
 		title: items[0].title,
 		content: [
 			{
-				data: bodyHTML
+				data: html
 			}
 		]
 	};
 
 	new Epub(option, output_path);
-
-	await browser.close();
 
 	spinner.succeed(`Saved EPUB: ${output_path}`);
 }
