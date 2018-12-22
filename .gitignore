@@ -61,5 +61,5 @@ typings/
 .next
 
 .DS_Store
-.npmrc
+.package-lock.json
 .idea/
