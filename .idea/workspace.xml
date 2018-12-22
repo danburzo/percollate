@@ -2,10 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ac72fbc0-d83b-40c7-85e8-1be65e444299" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.npmrc" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/index.js" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -30,6 +26,18 @@
           <entry key="PLAIN_TEXT" value="3" />
         </counts>
       </usages-collector>
+      <usages-collector id="statistics.file.extensions.edit">
+        <counts>
+          <entry key="js" value="6" />
+          <entry key="txt" value="74" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.types.edit">
+        <counts>
+          <entry key="JavaScript" value="6" />
+          <entry key="PLAIN_TEXT" value="74" />
+        </counts>
+      </usages-collector>
     </session>
   </component>
   <component name="FileEditorManager">
@@ -37,8 +45,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/index.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-175">
-              <caret line="314" column="33" selection-start-line="314" selection-start-column="33" selection-end-line="314" selection-end-column="33" />
+            <state relative-caret-position="1365">
+              <caret line="328" column="26" selection-start-line="328" selection-start-column="26" selection-end-line="328" selection-end-column="26" />
             </state>
           </provider>
         </entry>
@@ -206,10 +214,25 @@
       <workItem from="1540454296714" duration="15000" />
       <workItem from="1540454317277" duration="703000" />
     </task>
+    <task id="LOCAL-00001" summary="Cleanup files&#10;update gitignore">
+      <created>1545506021991</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1545506021991</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Remove run puppeteer on epubgen">
+      <created>1545506062833</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1545506062833</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="15141000" />
+    <option name="totallyTimeSpent" value="15403000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="35" width="2048" height="1117" extended-state="6" />
@@ -223,9 +246,9 @@
       <window_info content_ui="combo" id="Project" order="5" visible="true" weight="0.21256281" />
       <window_info id="Structure" order="6" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Database Changes" order="0" show_stripe_button="false" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="1" visible="true" weight="0.28121722" />
+      <window_info anchor="bottom" id="Terminal" order="1" weight="0.28121722" />
       <window_info anchor="bottom" id="Event Log" order="2" side_tool="true" />
-      <window_info anchor="bottom" id="Version Control" order="3" weight="0.32948583" />
+      <window_info active="true" anchor="bottom" id="Version Control" order="3" visible="true" weight="0.32948583" />
       <window_info anchor="bottom" id="Message" order="4" />
       <window_info anchor="bottom" id="Find" order="5" weight="0.32961932" />
       <window_info anchor="bottom" id="Run" order="6" />
@@ -250,6 +273,11 @@
   </component>
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Cleanup files&#10;update gitignore" />
+    <MESSAGE value="Remove run puppeteer on epubgen" />
+    <option name="LAST_COMMIT_MESSAGE" value="Remove run puppeteer on epubgen" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/src/get-style-attribute-value.js">
@@ -300,8 +328,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/index.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-175">
-          <caret line="314" column="33" selection-start-line="314" selection-start-column="33" selection-end-line="314" selection-end-column="33" />
+        <state relative-caret-position="1365">
+          <caret line="328" column="26" selection-start-line="328" selection-start-column="26" selection-end-line="328" selection-end-column="26" />
         </state>
       </provider>
     </entry>
