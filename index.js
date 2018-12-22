@@ -252,8 +252,6 @@ async function bundle(items, options) {
 	--------------------------------
  */
 async function bundleEpub(items, options) {
-	spinner.start('Generating temporary HTML file');
-
 	const stylesheet = resolve(options.style || './templates/default.css');
 	const style = fs.readFileSync(stylesheet, 'utf8') + (options.css || '');
 
