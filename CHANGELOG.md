@@ -1,5 +1,11 @@
 # Percollate Changelog
 
+### 0.4.0
+
+Enhancement: expand `<details>` elements.
+
+Chore: upgrade dependencies to their latest version.
+
 ### 0.3.0
 
 Prefer the AMP version of an article, if available. [Details here](https://github.com/danburzo/percollate/pull/70).
