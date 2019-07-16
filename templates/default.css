@@ -13,7 +13,7 @@
 }
 
 html {
-	font-size: 13pt;
+	font-size: 12pt;
 	line-height: 1.3;
 	font-family: var(--main-font);
 	-webkit-print-color-adjust: exact;
@@ -265,6 +265,16 @@ article:not(:last-of-type) {
 	font-size: 0.9em;
 	line-height: 1.44;
 	padding-left: 2em;
+}
+
+.article__content details {
+	margin: 0.65em 0;
+}
+
+.article__content details > summary {
+	font-weight: bold;
+	font-size: 0.9em;
+	font-family: var(--alt-font);
 }
 
 /*

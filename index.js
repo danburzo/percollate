@@ -22,7 +22,8 @@ const {
 	wikipediaSpecific,
 	noUselessHref,
 	relativeToAbsoluteURIs,
-	singleImgToFigure
+	singleImgToFigure,
+	expandDetailsElements
 } = require('./src/enhancements');
 const get_style_attribute_value = require('./src/get-style-attribute-value');
 
@@ -40,6 +41,7 @@ const enhancePage = function(dom) {
 		imagesAtFullSize,
 		singleImgToFigure,
 		noUselessHref,
+		expandDetailsElements,
 		wikipediaSpecific
 	].forEach(enhancement => {
 		enhancement(dom.window.document);

@@ -169,6 +169,15 @@ function singleImgToFigure(doc) {
 	});
 }
 
+/*
+	Expands <details> elements
+*/
+function expandDetailsElements(doc) {
+	Array.from(doc.querySelectorAll('details')).forEach(el =>
+		el.setAttribute('open', true)
+	);
+}
+
 module.exports = {
 	ampToHtml,
 	fixLazyLoadedImages,
@@ -176,5 +185,6 @@ module.exports = {
 	noUselessHref,
 	wikipediaSpecific,
 	relativeToAbsoluteURIs,
-	singleImgToFigure
+	singleImgToFigure,
+	expandDetailsElements
 };
