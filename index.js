@@ -443,7 +443,6 @@ async function pdf(urls, options) {
 	Generate EPUB
  */
 async function epub(urls, options) {
-	// console.log('TODO', urls, options);
 	if (!urls.length) return;
 	let items = [];
 	for (let url of urls) {
@@ -463,7 +462,6 @@ async function epub(urls, options) {
 	Generate HTML
  */
 async function html(urls, options) {
-	// console.log('TODO', urls, options);
 	if (!urls.length) return;
 	let items = [];
 	for (let url of urls) {
