@@ -1,6 +1,6 @@
 {
 	"name": "percollate-fork",
-	"version": "0.4.0",
+	"version": "0.5.0",
 	"description": "A command-line tool to grab web pages as PDF",
 	"main": "index.js",
 	"repository": "yashha/percollate",
