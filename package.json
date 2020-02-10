@@ -9,6 +9,7 @@
 	"dependencies": {
 		"commander": "^2.20.0",
 		"css": "^2.2.4",
+		"epub-gen": "0.1.0",
 		"got": "^9.6.0",
 		"jsdom": "^15.1.1",
 		"nunjucks": "^3.2.0",

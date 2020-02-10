@@ -55,11 +55,11 @@ yarn global upgrade --latest percollate
 
 ### Available commands
 
-| Command           | What it does                                                             |
-| ----------------- | ------------------------------------------------------------------------ |
-| `percollate pdf`  | Bundles one or more web pages into a PDF                                 |
-| `percollate epub` | _Not implemented [yet](https://github.com/danburzo/percollate/issues/8)_ |
-| `percollate html` | _Not implemented [yet](https://github.com/danburzo/percollate/issues/7)_ |
+| Command           | What it does                                   |
+| ----------------- | ---------------------------------------------- |
+| `percollate pdf`  | Bundles one or more web pages into a PDF       |
+| `percollate epub` | Bundles one or more web pages into an EPUB     |
+| `percollate html` | Bundles one or more web pages into a HTML file |
 
 ### Available options
 
@@ -187,13 +187,13 @@ Puppeteer can print some basic information about the page in the PDF. The follow
 You place your header / footer template in a `template` element in your HTML:
 
 ```html
-<template class='header-template'>
+<template class="header-template">
 	My header
 </template>
 
-<template class='footer-template'>
-	<div class='text center'>
-		<span class='pageNumber'></span>
+<template class="footer-template">
+	<div class="text center">
+		<span class="pageNumber"></span>
 	</div>
 </template>
 ```
