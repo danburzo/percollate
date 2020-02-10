@@ -192,7 +192,9 @@ You place your header / footer template in a `template` element in your HTML:
 </template>
 
 <template class="footer-template">
-	<div class="text center"><span class="pageNumber"></span></div>
+	<div class="text center">
+		<span class="pageNumber"></span>
+	</div>
 </template>
 ```
 
