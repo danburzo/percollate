@@ -76,11 +76,13 @@ async function cleanup(url, options) {
 			Must ensure that the URL is properly encoded.
 			See: https://github.com/danburzo/percollate/pull/83
 		 */
-		const content = (await got(encodeURI(decodeURI(url)), {
-			headers: {
-				'user-agent': `percollate/${pkg.version}`
-			}
-		})).body;
+		const content = (
+			await got(encodeURI(decodeURI(url)), {
+				headers: {
+					'user-agent': `percollate/${pkg.version}`
+				}
+			})
+		).body;
 		spinner.succeed();
 
 		spinner.start('Enhancing web page');
@@ -269,44 +271,6 @@ async function bundleEpub(items, options) {
 		}
 	);
 
-	const doc = new JSDOM(html).window.document;
-	const headerTemplate = doc.querySelector('.header-template');
-	const footerTemplate = doc.querySelector('.footer-template');
-	const header = new JSDOM(
-		headerTemplate ? headerTemplate.innerHTML : '<span></span>'
-	).window.document;
-	const footer = new JSDOM(
-		footerTemplate ? footerTemplate.innerHTML : '<span></span>'
-	).window.document;
-
-	const css_ast = css.parse(style);
-
-	const header_style = get_style_attribute_value(css_ast, '.header-template');
-	const header_div = header.querySelector('body :first-child');
-
-	if (header_div && header_style) {
-		header_div.setAttribute(
-			'style',
-			`
-				${header_style};
-				${header_div.getAttribute('style') || ''}
-			`
-		);
-	}
-
-	const footer_style = get_style_attribute_value(css_ast, '.footer-template');
-	const footer_div = footer.querySelector('body :first-child');
-
-	if (footer_div && footer_style) {
-		footer_div.setAttribute(
-			'style',
-			`
-				${footer_style};
-				${footer_div.getAttribute('style') || ''}
-			`
-		);
-	}
-
 	spinner.start('Saving EPUB');
 
 	/*
@@ -355,44 +319,6 @@ async function bundleHtml(items, options) {
 			stylesheet // deprecated
 		}
 	);
-
-	const doc = new JSDOM(html).window.document;
-	const headerTemplate = doc.querySelector('.header-template');
-	const footerTemplate = doc.querySelector('.footer-template');
-	const header = new JSDOM(
-		headerTemplate ? headerTemplate.innerHTML : '<span></span>'
-	).window.document;
-	const footer = new JSDOM(
-		footerTemplate ? footerTemplate.innerHTML : '<span></span>'
-	).window.document;
-
-	const css_ast = css.parse(style);
-
-	const header_style = get_style_attribute_value(css_ast, '.header-template');
-	const header_div = header.querySelector('body :first-child');
-
-	if (header_div && header_style) {
-		header_div.setAttribute(
-			'style',
-			`
-				${header_style};
-				${header_div.getAttribute('style') || ''}
-			`
-		);
-	}
-
-	const footer_style = get_style_attribute_value(css_ast, '.footer-template');
-	const footer_div = footer.querySelector('body :first-child');
-
-	if (footer_div && footer_style) {
-		footer_div.setAttribute(
-			'style',
-			`
-				${footer_style};
-				${footer_div.getAttribute('style') || ''}
-			`
-		);
-	}
 
 	spinner.start('Saving HTML');
 
