@@ -1,6 +1,6 @@
 # percollate fork
 
-<a href="https://www.npmjs.org/package/percollate"><img src="https://img.shields.io/npm/v/percollate.svg?style=flat" alt="npm version"></a>
+<a href="https://www.npmjs.org/package/percollate-fork"><img src="https://img.shields.io/npm/v/percollate-fork.svg?style=flat" alt="npm version"></a>
 
 This is a fork of https://github.com/danburzo/percollate
 
