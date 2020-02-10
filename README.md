@@ -1,6 +1,8 @@
-# percollate
+# percollate fork
 
 <a href="https://www.npmjs.org/package/percollate"><img src="https://img.shields.io/npm/v/percollate.svg?style=flat" alt="npm version"></a>
+
+This is a fork of https://github.com/danburzo/percollate
 
 Percollate is a command-line tool to turn web pages into beautifully formatted PDFs. See [How it works](#how-it-works).
 
