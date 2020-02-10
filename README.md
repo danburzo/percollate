@@ -55,11 +55,11 @@ yarn global upgrade --latest percollate
 
 ### Available commands
 
-| Command           | What it does                                     |
-| ----------------- | ------------------------------------------------ |
-| `percollate pdf`  | Bundles one or more web pages into a PDF         |
-| `percollate epub` | Bundles one or more web pages into an EPUB       |
-| `percollate html` | Bundles one or more web pages into a HTML file\_ |
+| Command           | What it does                                   |
+| ----------------- | ---------------------------------------------- |
+| `percollate pdf`  | Bundles one or more web pages into a PDF       |
+| `percollate epub` | Bundles one or more web pages into an EPUB     |
+| `percollate html` | Bundles one or more web pages into a HTML file |
 
 ### Available options
 
