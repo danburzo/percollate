@@ -65,7 +65,6 @@ typings/
 .project
 .settings
 
-.package-lock.json
 .idea/
 
 # test PDFs
