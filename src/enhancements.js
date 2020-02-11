@@ -164,7 +164,7 @@ function singleImgToFigure(doc) {
 		if (image.parentNode.matches('p') && image.parentNode.parentNode) {
 			image.parentNode.parentNode.replaceChild(fig, image.parentNode);
 		} else {
-			image.parentNode.replaceChild(fig, image);
+			// image.parentNode.replaceChild(fig, image);
 		}
 	});
 }
