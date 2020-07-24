@@ -105,6 +105,14 @@ To transform several web pages into individual PDF files at once, use the `--ind
 percollate pdf --individual https://example.com/page1 https://example.com/page2
 ```
 
+If you'd like to fetch the HTML with an external command, you can use `-` as an operand, which stands for `stdin` (the standard input).
+
+```bash
+curl https://example.com/page1 | percollate pdf --url=https://example.com/page1 -
+```
+
+Notice we're using the `url` option to tell percollate the source of our (now-anonymous) HTML it gets on stdin, so that relative URLs on links and images resolve correctly.
+
 ### The `--css` option
 
 The `--css` option lets you pass a small snippet of CSS to percollate. Here are some common use-cases:
