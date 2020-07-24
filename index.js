@@ -105,7 +105,7 @@ function fetchContent(url) {
 	}
 }
 
-async function cleanup(url, options, preferred_url) {
+async function cleanup(url, options) {
 	try {
 		out.write(`Fetching: ${url}`);
 
@@ -114,8 +114,8 @@ async function cleanup(url, options, preferred_url) {
 		out.write(' ✓\n');
 
 		const final_url =
-			preferred_url !== undefined
-				? preferred_url
+			options.preferred_url !== undefined
+				? options.preferred_url
 				: url === '-'
 				? undefined
 				: url;
@@ -149,7 +149,10 @@ async function cleanup(url, options, preferred_url) {
 					as in-page anchors
 				 */
 				'anchor'
-			]
+			],
+			serializer: options.xhtml
+				? new dom.XMLSerializer().serializeToString
+				: undefined
 		}).parse();
 
 		out.write(' ✓\n');
@@ -394,7 +397,7 @@ async function bundleHtml(items, options) {
 	out.write(`Saved HTML: ${output_path}\n`);
 }
 
-async function generate(urls, options, fn) {
+async function generate(urls, options, fn, fn_options) {
 	if (!configured) {
 		configure();
 	}
@@ -403,20 +406,19 @@ async function generate(urls, options, fn) {
 
 	if (options.individual) {
 		for (let i = 0; i < urls.length; i++) {
-			let item = await cleanup(
-				urls[i],
-				options,
-				options.url ? options.url[i] : undefined
-			);
+			let item = await cleanup(urls[i], {
+				...options,
+				...(fn_options || {}),
+				preferred_url: options.url ? options.url[i] : undefined
+			});
 			await fn([item], options);
 		}
 	} else {
 		for (let i = 0; i < urls.length; i++) {
-			let item = await cleanup(
-				urls[i],
-				options,
-				options.url ? options.url[i] : undefined
-			);
+			let item = await cleanup(urls[i], {
+				...options,
+				preferred_url: options.url ? options.url[i] : undefined
+			});
 			items.push(item);
 		}
 		await fn(items, options);
@@ -434,7 +436,9 @@ async function pdf(urls, options) {
 	Generate EPUB
  */
 async function epub(urls, options) {
-	generate(urls, options, bundleEpub);
+	generate(urls, options, bundleEpub, {
+		xhtml: true
+	});
 }
 
 /*
