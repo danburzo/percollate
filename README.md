@@ -65,16 +65,17 @@ yarn global upgrade --latest percollate
 
 The `pdf`, `epub`, and `html` commands have these options:
 
-| Option         | What it does                                                                                                   |
-| -------------- | -------------------------------------------------------------------------------------------------------------- |
-| `-o, --output` | The path of the resulting bundle; when ommited, we derive the output file name from the title of the web page. |
-| `--individual` | Export each web page as an individual file.                                                                    |
-| `--template`   | Path to a custom HTML template                                                                                 |
-| `--style`      | Path to a custom CSS                                                                                           |
-| `--css`        | Additional CSS styles you can pass from the command-line to override the default/custom stylesheet styles      |
-| `--no-amp`     | Don't prefer the AMP version of the web page                                                                   |
-| `--debug`      | Print more detailed information                                                                                |
-| `--toc`        | Include a Table of Contents page                                                                               |
+| Option         | What it does                                                                                                                                                                                    |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `-o, --output` | The path of the resulting bundle; when ommited, we derive the output file name from the title of the web page.                                                                                  |
+| `-u, --url`    | When reading HTML from stdin (from an external command) using the `-` operand, the `--url` option specifies the page's base URL so that relative paths (links, images, etc.) resolve correctly. |
+| `--individual` | Export each web page as an individual file.                                                                                                                                                     |
+| `--template`   | Path to a custom HTML template                                                                                                                                                                  |
+| `--style`      | Path to a custom CSS                                                                                                                                                                            |
+| `--css`        | Additional CSS styles you can pass from the command-line to override the default/custom stylesheet styles                                                                                       |
+| `--no-amp`     | Don't prefer the AMP version of the web page                                                                                                                                                    |
+| `--debug`      | Print more detailed information                                                                                                                                                                 |
+| `--toc`        | Include a Table of Contents page                                                                                                                                                                |
 
 ## Examples
 
@@ -103,6 +104,14 @@ To transform several web pages into individual PDF files at once, use the `--ind
 ```bash
 percollate pdf --individual https://example.com/page1 https://example.com/page2
 ```
+
+If you'd like to fetch the HTML with an external command, you can use `-` as an operand, which stands for `stdin` (the standard input).
+
+```bash
+curl https://example.com/page1 | percollate pdf --url=https://example.com/page1 -
+```
+
+Notice we're using the `url` option to tell percollate the source of our (now-anonymous) HTML it gets on stdin, so that relative URLs on links and images resolve correctly.
 
 ### The `--css` option
 
@@ -187,13 +196,13 @@ Puppeteer can print some basic information about the page in the PDF. The follow
 You place your header / footer template in a `template` element in your HTML:
 
 ```html
-<template class='header-template'>
+<template class="header-template">
 	My header
 </template>
 
-<template class='footer-template'>
-	<div class='text center'>
-		<span class='pageNumber'></span>
+<template class="footer-template">
+	<div class="text center">
+		<span class="pageNumber"></span>
 	</div>
 </template>
 ```
