@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 const pup = require('puppeteer');
 const got = require('got');
-const ora = require('ora');
 const { JSDOM } = require('jsdom');
 const nunjucks = require('nunjucks');
 const tmp = require('tmp');
@@ -11,8 +10,6 @@ const slugify = require('slugify');
 const Readability = require('./vendor/readability');
 const pkg = require('./package.json');
 const uuid = require('uuid/v1');
-
-const spinner = ora();
 
 const {
 	ampToHtml,
@@ -26,12 +23,14 @@ const {
 } = require('./src/enhancements');
 const get_style_attribute_value = require('./src/get-style-attribute-value');
 
+const out = process.stdout;
+
 const resolve = path =>
 	require.resolve(path, {
 		paths: [process.cwd(), __dirname]
 	});
 
-const enhancePage = function(dom) {
+const enhancePage = function (dom) {
 	// Note: the order of the enhancements matters!
 	[
 		ampToHtml,
@@ -70,26 +69,29 @@ function configure() {
  */
 async function cleanup(url, options) {
 	try {
-		spinner.start(`Fetching: ${url}`);
+		out.write(`Fetching: ${url}`);
 		/*
 			Must ensure that the URL is properly encoded.
 			See: https://github.com/danburzo/percollate/pull/83
 		 */
-		const content = (await got(encodeURI(decodeURI(url)), {
-			headers: {
-				'user-agent': `percollate/${pkg.version}`
-			}
-		})).body;
-		spinner.succeed();
+		const content = (
+			await got(encodeURI(decodeURI(url)), {
+				headers: {
+					'user-agent': `percollate/${pkg.version}`
+				}
+			})
+		).body;
+		out.write(' ✓\n');
 
-		spinner.start('Enhancing web page');
 		const dom = createDom({ url, content });
 
 		const amp = dom.window.document.querySelector('link[rel=amphtml]');
 		if (amp && options.amp) {
-			spinner.succeed('Found AMP version');
+			out.write('\nFound AMP version (use `--no-amp` to ignore)\n');
 			return cleanup(amp.href, options);
 		}
+
+		out.write('Enhancing web page...');
 
 		/* 
 			Run enhancements
@@ -110,10 +112,10 @@ async function cleanup(url, options) {
 			]
 		}).parse();
 
-		spinner.succeed();
+		out.write(' ✓\n');
 		return { ...parsed, id: `percollate-page-${uuid()}`, url };
 	} catch (error) {
-		spinner.fail(error.message);
+		console.error(error.message);
 		throw error;
 	}
 }
@@ -123,7 +125,7 @@ async function cleanup(url, options) {
 	--------------------------------
  */
 async function bundle(items, options) {
-	spinner.start('Generating temporary HTML file');
+	out.write('Generating temporary HTML file... ');
 	const temp_file = tmp.tmpNameSync({ postfix: '.html' });
 
 	const stylesheet = resolve(options.style || './templates/default.css');
@@ -185,7 +187,8 @@ async function bundle(items, options) {
 
 	fs.writeFileSync(temp_file, html);
 
-	spinner.succeed(`Temporary HTML file: file://${temp_file}`);
+	out.write('✓\n');
+	out.write(`Temporary HTML file: file://${temp_file}\n`);
 
 	const browser = await pup.launch({
 		headless: true,
@@ -215,7 +218,7 @@ async function bundle(items, options) {
 
 	if (options.debug) {
 		page.on('response', response => {
-			spinner.succeed(`Fetched: ${response.url()}`);
+			out.write(`Fetched: ${response.url()}\n`);
 		});
 	}
 
@@ -245,7 +248,7 @@ async function bundle(items, options) {
 
 	await browser.close();
 
-	spinner.succeed(`Saved PDF: ${output_path}`);
+	out.write(`Saved PDF: ${output_path}\n`);
 }
 
 /*
