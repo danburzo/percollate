@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package xmlns="http://www.idpf.org/2007/opf" version="3.0" unique-identifier="uid">
+	
+	<metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
+		<dc:identifier id="uid">urn:uuid:{{ uuid }}</dc:identifier>
+		<dc:title>{{ title }}</dc:title>
+		<dc:date>{{ date }}</dc:date>
+		<meta property="dcterms:modified">{{ date }}</meta>
+		<dc:language>{{ lang | default('en-US')}}</dc:language>
+		{% if cover %}
+			<meta name="cover" content="{{ cover.id }}" />
+		{% endif %}
+	</metadata>
+
+	<manifest>
+		{% for item in items %}
+			<item id="{{item.id}}" href="{{item.id}}.xhtml" media-type="application/xhtml+xml" />
+		{% endfor %}
+		{% for res in remoteResources %}
+			<item id="{{res.id}}" href="{{res.href}}" media-type="{{res.mimetype}}" />
+		{% endfor %}
+		{% for asset in assets %}
+			<item id="{{asset.id}}" href="{{item.href}}" media-type="{{item.mimetype}}" />
+		{% endfor %}
+		{% if cover %}
+			<item id="{{cover.id}}" href="{{cover.href}}" media-type="{{cover.mimetype}}" />
+		{% endif %}
+		<item id="nav" href="nav.xhtml" properties="nav" media-type="application/xhtml+xml" />
+		<item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml" />
+	</manifest>
+	
+	<spine toc="ncx">
+		{% for item in items %}
+			<itemref idref="{{item.id}}" />
+		{% endfor %}
+	</spine>
+
+	<guide>
+		<reference type="toc" title="{{ title }}" href="nav.xhtml" />
+	</guide>
+</package>

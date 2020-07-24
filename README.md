@@ -2,7 +2,7 @@
 
 <a href="https://www.npmjs.org/package/percollate"><img src="https://img.shields.io/npm/v/percollate.svg?style=flat" alt="npm version"></a>
 
-Percollate is a command-line tool to turn web pages into beautifully formatted PDFs. See [How it works](#how-it-works).
+Percollate is a command-line tool to turn web pages into beautifully formatted PDF, EPUB or HTML files. See [How it works](#how-it-works).
 
 <img alt="Example Output" src="https://raw.githubusercontent.com/danburzo/percollate/master/img/dimensions-of-colour.png">
 
@@ -55,11 +55,11 @@ yarn global upgrade --latest percollate
 
 ### Available commands
 
-| Command           | What it does                                                             |
-| ----------------- | ------------------------------------------------------------------------ |
-| `percollate pdf`  | Bundles one or more web pages into a PDF                                 |
-| `percollate epub` | _Not implemented [yet](https://github.com/danburzo/percollate/issues/8)_ |
-| `percollate html` | _Not implemented [yet](https://github.com/danburzo/percollate/issues/7)_ |
+| Command           | What it does                                   |
+| ----------------- | ---------------------------------------------- |
+| `percollate pdf`  | Bundles one or more web pages into a PDF       |
+| `percollate epub` | Bundles one or more web pages into an EPUB     |
+| `percollate html` | Bundles one or more web pages into a HTML file |
 
 ### Available options
 

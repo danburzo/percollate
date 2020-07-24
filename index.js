@@ -1,15 +1,19 @@
 #!/usr/bin/env node
 const pup = require('puppeteer');
+const archiver = require('archiver');
 const got = require('got');
 const { JSDOM } = require('jsdom');
 const nunjucks = require('nunjucks');
 const tmp = require('tmp');
-const fs = require('fs');
+const fs = require('fs').promises;
+const _fs = require('fs');
+const path = require('path');
 const css = require('css');
 const slugify = require('slugify');
 const Readability = require('./vendor/readability');
 const pkg = require('./package.json');
 const uuid = require('uuid/v1');
+const mimetype = require('mimetype');
 
 const {
 	ampToHtml,
@@ -21,14 +25,12 @@ const {
 	singleImgToFigure,
 	expandDetailsElements
 } = require('./src/enhancements');
+const mapRemoteResources = require('./src/remote-resources');
 const get_style_attribute_value = require('./src/get-style-attribute-value');
 
 const out = process.stdout;
 
-const resolve = path =>
-	require.resolve(path, {
-		paths: [process.cwd(), __dirname]
-	});
+const resolve = require('./src/util/resolve');
 
 const enhancePage = function (dom) {
 	// Note: the order of the enhancements matters!
@@ -105,7 +107,7 @@ function fetchContent(url) {
 	}
 }
 
-async function cleanup(url, options, preferred_url) {
+async function cleanup(url, options) {
 	try {
 		out.write(`Fetching: ${url}`);
 
@@ -114,8 +116,8 @@ async function cleanup(url, options, preferred_url) {
 		out.write(' ✓\n');
 
 		const final_url =
-			preferred_url !== undefined
-				? preferred_url
+			options.preferred_url !== undefined
+				? options.preferred_url
 				: url === '-'
 				? undefined
 				: url;
@@ -139,8 +141,13 @@ async function cleanup(url, options, preferred_url) {
 		*/
 		enhancePage(dom);
 
+		let remoteResources;
+		if (options.mapRemoteResources) {
+			remoteResources = mapRemoteResources(dom.window.document);
+		}
+
 		// Run through readability and return
-		const parsed = new Readability(dom.window.document, {
+		const R = new Readability(dom.window.document, {
 			classesToPreserve: [
 				'no-href',
 
@@ -149,14 +156,26 @@ async function cleanup(url, options, preferred_url) {
 					as in-page anchors
 				 */
 				'anchor'
-			]
-		}).parse();
+			],
+			serializer: options.xhtml
+				? el => new dom.window.XMLSerializer().serializeToString(el)
+				: undefined
+		});
+
+		// TODO: find better solution to prevent Readability from
+		// making img srcs relative.
+		if (options.mapRemoteResources) {
+			R._fixRelativeUris = () => {};
+		}
+
+		const parsed = R.parse();
 
 		out.write(' ✓\n');
 		return {
 			...parsed,
 			id: `percollate-page-${uuid()}`,
-			url: final_url
+			url: final_url,
+			remoteResources
 		};
 	} catch (error) {
 		console.error(error.message);
@@ -168,16 +187,16 @@ async function cleanup(url, options, preferred_url) {
 	Bundle the HTML files into a PDF
 	--------------------------------
  */
-async function bundle(items, options) {
+async function bundlePdf(items, options) {
 	out.write('Generating temporary HTML file... ');
 	const temp_file = tmp.tmpNameSync({ postfix: '.html' });
 
 	const stylesheet = resolve(options.style || './templates/default.css');
-	const style = fs.readFileSync(stylesheet, 'utf8') + (options.css || '');
+	const style = (await fs.readFile(stylesheet, 'utf8')) + (options.css || '');
 	const use_toc = options.toc && items.length > 1;
 
 	const html = nunjucks.renderString(
-		fs.readFileSync(
+		await fs.readFile(
 			resolve(options.template || './templates/default.html'),
 			'utf8'
 		),
@@ -229,7 +248,7 @@ async function bundle(items, options) {
 		);
 	}
 
-	fs.writeFileSync(temp_file, html);
+	await fs.writeFile(temp_file, html);
 
 	out.write('✓\n');
 	out.write(`Temporary HTML file: file://${temp_file}\n`);
@@ -271,8 +290,8 @@ async function bundle(items, options) {
 	/*
 		When no output path is present,
 		produce the file name from the web page title
-		(if a single page was sent as argument), 
-		or a timestamped file (for the moment) 
+		(if a single page was sent as argument),
+		or a timestamped file (for the moment)
 		in case we're bundling many web pages.
 	 */
 	const output_path =
@@ -296,9 +315,105 @@ async function bundle(items, options) {
 }
 
 /*
-	Generate PDF
+	Bundle the HTML files into a EPUB
+	---------------------------------
  */
-async function pdf(urls, options) {
+async function bundleEpub(items, options) {
+	const stylesheet = resolve(options.style || './templates/default.css');
+	const style = (await fs.readFile(stylesheet, 'utf8')) + (options.css || '');
+	const use_toc = options.toc && items.length > 1;
+
+	const html = nunjucks.renderString(
+		await fs.readFile(
+			resolve(options.template || './templates/default.html'),
+			'utf8'
+		),
+		{
+			items,
+			style,
+			stylesheet, // deprecated
+			options: {
+				use_toc
+			}
+		}
+	);
+
+	out.write('Saving EPUB...\n');
+
+	/*
+		When no output path is present,
+		produce the file name from the web page title
+		(if a single page was sent as argument),
+		or a timestamped file (for the moment)
+		in case we're bundling many web pages.
+	 */
+
+	const now = Date.now();
+
+	const output_path =
+		options.output ||
+		(items.length === 1
+			? `${slugify(items[0].title || 'Untitled page')}.epub`
+			: `percollate-${now}.epub`);
+
+	epubgen(
+		{
+			title: items.length === 1 ? items[0].title : `percollate-${now}`,
+			date: epubDate(new Date(now)),
+			uuid: uuid(),
+			items
+		},
+		output_path
+	);
+
+	out.write(`Saved EPUB: ${output_path}\n`);
+}
+
+/*
+	Bundle the HTML files into a HTML
+	--------------------------------
+ */
+async function bundleHtml(items, options) {
+	const stylesheet = resolve(options.style || './templates/default.css');
+	const style = (await fs.readFile(stylesheet, 'utf8')) + (options.css || '');
+	const use_toc = options.toc && items.length > 1;
+
+	const html = nunjucks.renderString(
+		await fs.readFile(
+			resolve(options.template || './templates/default.html'),
+			'utf8'
+		),
+		{
+			items,
+			style,
+			stylesheet, // deprecated
+			options: {
+				use_toc
+			}
+		}
+	);
+
+	out.write('Saving HTML...\n');
+
+	/*
+		When no output path is present,
+		produce the file name from the web page title
+		(if a single page was sent as argument),
+		or a timestamped file (for the moment)
+		in case we're bundling many web pages.
+	 */
+	const output_path =
+		options.output ||
+		(items.length === 1
+			? `${slugify(items[0].title || 'Untitled page')}.html`
+			: `percollate-${Date.now()}.html`);
+
+	await fs.writeFile(output_path, html);
+
+	out.write(`Saved HTML: ${output_path}\n`);
+}
+
+async function generate(urls, options, fn, fn_options) {
 	if (!configured) {
 		configure();
 	}
@@ -307,44 +422,158 @@ async function pdf(urls, options) {
 
 	if (options.individual) {
 		for (let i = 0; i < urls.length; i++) {
-			let item = await cleanup(
-				urls[i],
-				options,
-				options.url ? options.url[i] : undefined
-			);
-			await bundle([item], options);
+			let item = await cleanup(urls[i], {
+				...options,
+				...(fn_options || {}),
+				preferred_url: options.url ? options.url[i] : undefined
+			});
+			await fn([item], options);
 		}
 	} else {
 		for (let i = 0; i < urls.length; i++) {
-			let item = await cleanup(
-				urls[i],
-				options,
-				options.url ? options.url[i] : undefined
-			);
+			let item = await cleanup(urls[i], {
+				...options,
+				...(fn_options || {}),
+				preferred_url: options.url ? options.url[i] : undefined
+			});
 			items.push(item);
 		}
-		await bundle(items, options);
+		await fn(items, options);
 	}
+}
+
+/*
+	Generate PDF
+ */
+async function pdf(urls, options) {
+	generate(urls, options, bundlePdf);
 }
 
 /*
 	Generate EPUB
  */
 async function epub(urls, options) {
-	if (!configured) {
-		configure();
-	}
-	throw new Error('Function not implemented yet.');
+	generate(urls, options, bundleEpub, {
+		xhtml: true,
+		mapRemoteResources: true
+	});
 }
 
 /*
 	Generate HTML
  */
 async function html(urls, options) {
-	if (!configured) {
-		configure();
-	}
-	throw new Error('Function not implemented yet.');
+	generate(urls, options, bundleHtml);
 }
 
-module.exports = { configure, pdf, epub, html };
+/*
+	Produce an EPUB file
+	--------------------
+
+	Reference: 
+
+		https://www.ibm.com/developerworks/xml/tutorials/x-epubtut/index.html
+ */
+
+async function epubgen(data, output_path) {
+	const template_base = path.join(__dirname, './templates/epub/');
+
+	const output = _fs.createWriteStream(output_path);
+	const archive = archiver('zip', {
+		store: true
+	});
+
+	output
+		.on('close', () => {
+			out.write(archive.pointer() + ' total bytes');
+			out.write(
+				'archiver has been finalized and the output file descriptor has closed.'
+			);
+		})
+		.on('end', () => {
+			out.write('Data has been drained');
+		});
+
+	archive
+		.on('warning', err => {
+			throw err;
+		})
+		.on('error', err => {
+			throw err;
+		})
+		.pipe(output);
+
+	// mimetype file must be first
+	archive.append('application/epub+zip', { name: 'mimetype' });
+
+	// static files from META-INF
+	archive.directory(path.join(template_base, 'META-INF'), 'META-INF');
+
+	const contentTemplate = await fs.readFile(
+		path.join(template_base, 'OEBPS/content.xhtml'),
+		'utf8'
+	);
+	const navTemplate = await fs.readFile(
+		path.join(template_base, 'OEBPS/nav.xhtml'),
+		'utf8'
+	);
+	const tocTemplate = await fs.readFile(
+		path.join(template_base, 'OEBPS/toc.ncx'),
+		'utf8'
+	);
+	const opfTemplate = await fs.readFile(
+		path.join(template_base, 'OEBPS/content.opf'),
+		'utf8'
+	);
+
+	let remoteResources = [];
+	data.items.forEach((item, idx) => {
+		remoteResources = remoteResources.concat(item.remoteResources || []);
+		let item_content = nunjucks.renderString(contentTemplate, {
+			...data,
+			item
+		});
+		archive.append(item_content, { name: `OEBPS/${item.id}.xhtml` });
+	});
+
+	for (let i = 0; i < remoteResources.length; i++) {
+		let entry = remoteResources[i];
+		let buff = await got(entry[0]).buffer();
+		archive.append(buff, { name: `OEBPS/${entry[1]}` });
+	}
+
+	const nav = nunjucks.renderString(navTemplate, data);
+	const opf = nunjucks.renderString(opfTemplate, {
+		...data,
+		remoteResources: remoteResources.map(entry => ({
+			id: entry[1].replace(/[^a-z0-9]/gi, ''),
+			href: entry[1],
+			mimetype: mimetype.lookup(entry[1])
+		}))
+	});
+
+	const toc = nunjucks.renderString(tocTemplate, data);
+
+	archive.append(nav, { name: 'OEBPS/nav.xhtml' });
+	archive.append(opf, { name: 'OEBPS/content.opf' });
+	archive.append(toc, { name: 'OEBPS/toc.ncx' });
+
+	archive.finalize();
+}
+
+function epubDate(d) {
+	const pad = num => (num < 10 ? '0' + num : num);
+	return `${pad(d.getUTCFullYear())}-${pad(d.getUTCMonth() + 1)}-${pad(
+		d.getUTCDate()
+	)}T${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(
+		d.getUTCSeconds()
+	)}Z`;
+}
+
+module.exports = {
+	configure,
+	pdf,
+	epub,
+	epubgen,
+	html
+};

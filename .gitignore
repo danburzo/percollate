@@ -61,7 +61,7 @@ typings/
 .next
 
 .DS_Store
-.idea
+.idea/
 .project
 .settings
 
