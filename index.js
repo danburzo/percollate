@@ -316,7 +316,7 @@ async function bundleEpub(items, options) {
 		}
 	);
 
-	spinner.start('Saving EPUB');
+	out('Saving EPUB...\n');
 
 	/*
 		When no output path is present,
@@ -342,7 +342,7 @@ async function bundleEpub(items, options) {
 
 	new Epub(option, output_path);
 
-	spinner.succeed(`Saved EPUB: ${output_path}`);
+	out(`Saved EPUB: ${output_path}\n`);
 }
 
 /*
@@ -365,7 +365,7 @@ async function bundleHtml(items, options) {
 		}
 	);
 
-	spinner.start('Saving HTML');
+	out('Saving HTML...\n');
 
 	/*
 		When no output path is present,
@@ -380,7 +380,7 @@ async function bundleHtml(items, options) {
 			? `${slugify(items[0].title || 'Untitled page')}.html`
 			: `percollate-${Date.now()}.html`);
 
-	fs.writeFile(output_path, html, function(err) {
+	fs.writeFile(output_path, html, function (err) {
 		if (err) {
 			return console.log(err);
 		}
@@ -388,7 +388,7 @@ async function bundleHtml(items, options) {
 		// console.log("The file was saved!");
 	});
 
-	spinner.succeed(`Saved HTML: ${output_path}`);
+	out(`Saved HTML: ${output_path}\n`);
 }
 
 /*
