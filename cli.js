@@ -16,8 +16,14 @@ configure();
  */
 
 const available_commands = new Set(['pdf', 'epub', 'html']);
-
-let opts_with_optarg = new Set(['o', 'output', 'template', 'style', 'css']);
+let opts_with_optarg = new Set(['output', 'template', 'style', 'css', 'url']);
+let opts_with_arr = new Set(['url']);
+let aliases = {
+	o: 'output',
+	u: 'url',
+	h: 'help',
+	V: 'version'
+};
 
 let opts = {};
 let command;
@@ -25,16 +31,40 @@ let operands = [];
 
 opsh(process.argv.slice(2), {
 	option(option, value) {
+		if (aliases[option]) {
+			option = aliases[option];
+		}
 		if (!command) {
 			outputHelp();
 			return false;
 		}
 		let m = option.match(/^no-(.+)$/);
-		opts[m ? m[1] : option] = value !== undefined ? value : !m;
+
+		if (m) {
+			opts[m[1]] = value !== undefined ? value : false;
+		} else {
+			if (opts_with_arr.has(option)) {
+				if (!opts[option]) {
+					opts[option] = [];
+				}
+				if (value !== undefined) {
+					opts[option].push(value);
+				}
+			} else {
+				opts[option] = value !== undefined ? value : true;
+			}
+		}
 	},
 	operand(operand, opt) {
+		if (aliases[opt]) {
+			opt = aliases[opt];
+		}
 		if (opts_with_optarg.has(opt)) {
-			opts[opt] = operand;
+			if (opts_with_arr.has(opt)) {
+				opts[opt].push(operand);
+			} else {
+				opts[opt] = operand;
+			}
 		} else {
 			if (!command) {
 				if (available_commands.has(operand)) {
@@ -50,11 +80,11 @@ opsh(process.argv.slice(2), {
 	}
 });
 
-if (opts.V || opts.version) {
+if (opts.version) {
 	outputVersion();
 }
 
-if (opts.h || opts.help) {
+if (opts.help) {
 	outputHelp();
 }
 
@@ -105,26 +135,39 @@ Commmon options:
 
   -h, --help         Output usage information.
   -V, --version      Output program version.
+  --debug            Print more detailed information.
 
   -o <output>,       Path for the generated bundle.
   --output=<path>  
   --template=<path>  Path to a custom HTML template.
   --style=<path>     Path to a custom CSS file.
   --css=<style>      Additional inline CSS style.
+  -u, --url=<url>    Sets the base URL when HTML is provided on stdin.
+                     Multiple URL options can be specified.
   --individual       Export each web page as an individual file.
   --no-amp           Don't prefer the AMP version of the web page.
   --toc              Generate a Table of Contents.
-  --debug            Print more detailed information.
 
 PDF options: 
 
   --no-sandbox       Passed to Puppeteer.
+
+Operands:
+
+  percollate accepts one or more URLs.
+  
+  Use the hyphen character ('-') to specify 
+  that the HTML should be read from stdin.
 
 Examples:
 
   Single web page to PDF:
 
     percollate pdf --output my.pdf https://example.com
+
+  Single web page read from stdin to PDF:
+
+    curl https://example.com | percollate pdf -o my.pdf -u https://example.com -
   
   Several web pages to a single PDF:
 

@@ -67,28 +67,64 @@ function configure() {
 	Fetch a web page and clean the HTML
 	-----------------------------------
  */
-async function cleanup(url, options) {
-	try {
-		out.write(`Fetching: ${url}`);
+
+function fetchContent(url) {
+	if (url === '-') {
+		// Read from stdin
+		return new Promise((fulfill, reject) => {
+			let content = '';
+			process.stdin
+				.setEncoding('utf8')
+				.on('readable', () => {
+					let chunk;
+					while ((chunk = process.stdin.read()) !== null) {
+						content += chunk;
+					}
+				})
+				.on('end', () => {
+					fulfill(content);
+				})
+				.on('error', () => {
+					reject(error);
+				});
+		});
+	} else {
 		/*
 			Must ensure that the URL is properly encoded.
 			See: https://github.com/danburzo/percollate/pull/83
 		 */
-		const content = (
-			await got(encodeURI(decodeURI(url)), {
-				headers: {
-					'user-agent': `percollate/${pkg.version}`
-				}
-			})
-		).body;
+		return got(encodeURI(decodeURI(url)), {
+			headers: {
+				'user-agent': `percollate/${pkg.version}`
+			}
+		}).then(result => result.body);
+	}
+}
+
+async function cleanup(url, options, preferred_url) {
+	try {
+		out.write(`Fetching: ${url}`);
+
+		const content = await fetchContent(url);
+
 		out.write(' ✓\n');
 
-		const dom = createDom({ url, content });
+		const final_url =
+			preferred_url !== undefined
+				? preferred_url
+				: url === '-'
+				? undefined
+				: url;
+
+		const dom = createDom({
+			url: final_url,
+			content
+		});
 
 		const amp = dom.window.document.querySelector('link[rel=amphtml]');
 		if (amp && options.amp) {
 			out.write('\nFound AMP version (use `--no-amp` to ignore)\n');
-			return cleanup(amp.href, options);
+			return cleanup(amp.href, options, amp.href);
 		}
 
 		out.write('Enhancing web page...');
@@ -113,7 +149,11 @@ async function cleanup(url, options) {
 		}).parse();
 
 		out.write(' ✓\n');
-		return { ...parsed, id: `percollate-page-${uuid()}`, url };
+		return {
+			...parsed,
+			id: `percollate-page-${uuid()}`,
+			url: final_url
+		};
 	} catch (error) {
 		console.error(error.message);
 		throw error;
@@ -257,15 +297,25 @@ async function bundle(items, options) {
 async function pdf(urls, options) {
 	if (!urls.length) return;
 	let items = [];
-	for (let url of urls) {
-		let item = await cleanup(url, options);
-		if (options.individual) {
+
+	if (options.individual) {
+		for (let i = 0; i < urls.length; i++) {
+			let item = await cleanup(
+				urls[i],
+				options,
+				options.url ? options.url[i] : undefined
+			);
 			await bundle([item], options);
-		} else {
+		}
+	} else {
+		for (let i = 0; i < urls.length; i++) {
+			let item = await cleanup(
+				urls[i],
+				options,
+				options.url ? options.url[i] : undefined
+			);
 			items.push(item);
 		}
-	}
-	if (!options.individual) {
 		await bundle(items, options);
 	}
 }
