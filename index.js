@@ -1,14 +1,16 @@
 #!/usr/bin/env node
 const pup = require('puppeteer');
+const archiver = require('archiver');
 const got = require('got');
 const { JSDOM } = require('jsdom');
 const nunjucks = require('nunjucks');
 const tmp = require('tmp');
 const fs = require('fs').promises;
+const _fs = require('fs');
+const path = require('path');
 const css = require('css');
 const slugify = require('slugify');
 const Readability = require('./vendor/readability');
-const epub = require('./src/epub');
 const pkg = require('./package.json');
 const uuid = require('uuid/v1');
 
@@ -26,10 +28,7 @@ const get_style_attribute_value = require('./src/get-style-attribute-value');
 
 const out = process.stdout;
 
-const resolve = path =>
-	require.resolve(path, {
-		paths: [process.cwd(), __dirname]
-	});
+const resolve = require('./src/util/resolve');
 
 const enhancePage = function (dom) {
 	// Note: the order of the enhancements matters!
@@ -329,13 +328,24 @@ async function bundleEpub(items, options) {
 		or a timestamped file (for the moment)
 		in case we're bundling many web pages.
 	 */
+
+	const now = Date.now();
+
 	const output_path =
 		options.output ||
 		(items.length === 1
 			? `${slugify(items[0].title || 'Untitled page')}.epub`
-			: `percollate-${Date.now()}.epub`);
+			: `percollate-${now}.epub`);
 
-	epub(items, output_path);
+	epubgen(
+		{
+			title: items.length === 1 ? items[0].title : `percollate-${now}`,
+			date: new Date(now).toISOString(),
+			uuid: uuid(),
+			items
+		},
+		output_path
+	);
 
 	out.write(`Saved EPUB: ${output_path}\n`);
 }
@@ -434,9 +444,89 @@ async function html(urls, options) {
 	generate(urls, options, bundleHtml);
 }
 
+/*
+	Produce an EPUB file
+	--------------------
+
+	Reference: 
+
+		https://www.ibm.com/developerworks/xml/tutorials/x-epubtut/index.html
+ */
+
+async function epubgen(data, output_path) {
+	const template_base = path.join(__dirname, './templates/epub/');
+
+	const output = _fs.createWriteStream(output_path);
+	const archive = archiver('zip', {
+		store: true
+	});
+
+	output
+		.on('close', () => {
+			out.write(archive.pointer() + ' total bytes');
+			out.write(
+				'archiver has been finalized and the output file descriptor has closed.'
+			);
+		})
+		.on('end', () => {
+			out.write('Data has been drained');
+		});
+
+	archive
+		.on('warning', err => {
+			throw err;
+		})
+		.on('error', err => {
+			throw err;
+		})
+		.pipe(output);
+
+	// mimetype file must be first
+	archive.append('application/epub+zip', { name: 'mimetype' });
+
+	// static files from META-INF
+	archive.directory(path.join(template_base, 'META-INF'), 'META-INF');
+
+	const contentTemplate = await fs.readFile(
+		path.join(template_base, 'OEBPS/content.xhtml'),
+		'utf8'
+	);
+	const navTemplate = await fs.readFile(
+		path.join(template_base, 'OEBPS/nav.xhtml'),
+		'utf8'
+	);
+	const tocTemplate = await fs.readFile(
+		path.join(template_base, 'OEBPS/toc.ncx'),
+		'utf8'
+	);
+	const opfTemplate = await fs.readFile(
+		path.join(template_base, 'OEBPS/content.opf'),
+		'utf8'
+	);
+
+	data.items.forEach((item, idx) => {
+		let item_content = nunjucks.renderString(contentTemplate, {
+			...data,
+			item
+		});
+		archive.append(item_content, { name: `OEBPS/${item.id}.xhtml` });
+	});
+
+	const nav = nunjucks.renderString(navTemplate, data);
+	const opf = nunjucks.renderString(opfTemplate, data);
+	const toc = nunjucks.renderString(tocTemplate, data);
+
+	archive.append(nav, { name: 'OEBPS/nav.xhtml' });
+	archive.append(opf, { name: 'OEBPS/content.opf' });
+	archive.append(toc, { name: 'OEBPS/toc.ncx' });
+
+	archive.finalize();
+}
+
 module.exports = {
 	configure,
 	pdf,
 	epub,
+	epubgen,
 	html
 };

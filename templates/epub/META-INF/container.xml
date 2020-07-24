@@ -2,7 +2,7 @@
 <container xmlns="urn:oasis:names:tc:opendocument:xmlns:container" version="1.0">
 	<rootfiles>
 		<rootfile 
-			full-path="BOOK/book.opf" 
+			full-path="OEBPS/content.opf" 
 			media-type="application/oebps-package+xml"
 		/>
 	</rootfiles>

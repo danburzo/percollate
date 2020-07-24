@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package xmlns="http://www.idpf.org/2007/opf" version="3.0" unique-identifier="uid">
+	
+	<metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
+		<dc:identifier id="uid">{{ uuid }}</dc:identifier>
+		<dc:title>{{ title }}</dc:title>
+		<dc:date>{{ date }}</dc:date>
+		<meta name="cover" content="cover-image" />
+	</metadata>
+
+	<manifest>
+		{% for item in items %}
+			<item id="{{item.id}}" href="{{item.id}}.xhtml" media-type="application/xhtml+xml" />
+		{% endfor %}
+		<item id="nav" href="nav.xhtml" properties="nav" media-type="application/xhtml+xml" />
+		<item id="css" href="epub.css" media-type="text/css" />
+		<item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml" />
+	</manifest>
+	
+	<spine toc="ncx">
+		{% for item in items %}
+			<itemref idref="{{item.id}}" />
+		{% endfor %}
+	</spine>
+
+	<guide>
+		<reference type="toc" title="{{ title }}" href="nav.xhtml" />
+	</guide>
+</package>
