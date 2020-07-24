@@ -343,7 +343,7 @@ async function bundleEpub(items, options) {
 	epubgen(
 		{
 			title: items.length === 1 ? items[0].title : `percollate-${now}`,
-			date: new Date(now).toISOString(),
+			date: epubDate(new Date(now)),
 			uuid: uuid(),
 			items
 		},
@@ -526,6 +526,15 @@ async function epubgen(data, output_path) {
 	archive.append(toc, { name: 'OEBPS/toc.ncx' });
 
 	archive.finalize();
+}
+
+function epubDate(d) {
+	const pad = num => (num < 10 ? '0' + num : num);
+	return `${pad(d.getUTCFullYear())}-${pad(d.getUTCMonth() + 1)}-${pad(
+		d.getUTCDate()
+	)}T${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(
+		d.getUTCSeconds()
+	)}Z`;
 }
 
 module.exports = {

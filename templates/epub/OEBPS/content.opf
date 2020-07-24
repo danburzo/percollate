@@ -23,7 +23,6 @@
 			<item id="{{cover.id}}" href="{{cover.href}}" media-type="{{cover.mimetype}}"/>
 		{% endif %}
 		<item id="nav" href="nav.xhtml" properties="nav" media-type="application/xhtml+xml" />
-		<item id="css" href="epub.css" media-type="text/css" />
 		<item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml" />
 	</manifest>
 	
