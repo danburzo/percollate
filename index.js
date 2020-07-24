@@ -4,7 +4,7 @@ const got = require('got');
 const { JSDOM } = require('jsdom');
 const nunjucks = require('nunjucks');
 const tmp = require('tmp');
-const fs = require('fs');
+const fs = require('fs').promises;
 const css = require('css');
 const slugify = require('slugify');
 const Readability = require('./vendor/readability');
@@ -169,16 +169,16 @@ async function cleanup(url, options, preferred_url) {
 	Bundle the HTML files into a PDF
 	--------------------------------
  */
-async function bundle(items, options) {
+async function bundlePdf(items, options) {
 	out.write('Generating temporary HTML file... ');
 	const temp_file = tmp.tmpNameSync({ postfix: '.html' });
 
 	const stylesheet = resolve(options.style || './templates/default.css');
-	const style = fs.readFileSync(stylesheet, 'utf8') + (options.css || '');
+	const style = (await fs.readFile(stylesheet, 'utf8')) + (options.css || '');
 	const use_toc = options.toc && items.length > 1;
 
 	const html = nunjucks.renderString(
-		fs.readFileSync(
+		await fs.readFile(
 			resolve(options.template || './templates/default.html'),
 			'utf8'
 		),
@@ -230,7 +230,7 @@ async function bundle(items, options) {
 		);
 	}
 
-	fs.writeFileSync(temp_file, html);
+	await fs.writeFile(temp_file, html);
 
 	out.write('✓\n');
 	out.write(`Temporary HTML file: file://${temp_file}\n`);
@@ -298,25 +298,29 @@ async function bundle(items, options) {
 
 /*
 	Bundle the HTML files into a EPUB
-	--------------------------------
+	---------------------------------
  */
 async function bundleEpub(items, options) {
 	const stylesheet = resolve(options.style || './templates/default.css');
-	const style = fs.readFileSync(stylesheet, 'utf8') + (options.css || '');
+	const style = (await fs.readFile(stylesheet, 'utf8')) + (options.css || '');
+	const use_toc = options.toc && items.length > 1;
 
 	const html = nunjucks.renderString(
-		fs.readFileSync(
+		await fs.readFile(
 			resolve(options.template || './templates/default.html'),
 			'utf8'
 		),
 		{
 			items,
 			style,
-			stylesheet // deprecated
+			stylesheet, // deprecated
+			options: {
+				use_toc
+			}
 		}
 	);
 
-	out('Saving EPUB...\n');
+	out.write('Saving EPUB...\n');
 
 	/*
 		When no output path is present,
@@ -342,7 +346,7 @@ async function bundleEpub(items, options) {
 
 	new Epub(option, output_path);
 
-	out(`Saved EPUB: ${output_path}\n`);
+	out.write(`Saved EPUB: ${output_path}\n`);
 }
 
 /*
@@ -351,21 +355,25 @@ async function bundleEpub(items, options) {
  */
 async function bundleHtml(items, options) {
 	const stylesheet = resolve(options.style || './templates/default.css');
-	const style = fs.readFileSync(stylesheet, 'utf8') + (options.css || '');
+	const style = (await fs.readFile(stylesheet, 'utf8')) + (options.css || '');
+	const use_toc = options.toc && items.length > 1;
 
 	const html = nunjucks.renderString(
-		fs.readFileSync(
+		await fs.readFile(
 			resolve(options.template || './templates/default.html'),
 			'utf8'
 		),
 		{
 			items,
 			style,
-			stylesheet // deprecated
+			stylesheet, // deprecated
+			options: {
+				use_toc
+			}
 		}
 	);
 
-	out('Saving HTML...\n');
+	out.write('Saving HTML...\n');
 
 	/*
 		When no output path is present,
@@ -380,21 +388,12 @@ async function bundleHtml(items, options) {
 			? `${slugify(items[0].title || 'Untitled page')}.html`
 			: `percollate-${Date.now()}.html`);
 
-	fs.writeFile(output_path, html, function (err) {
-		if (err) {
-			return console.log(err);
-		}
+	await fs.writeFile(output_path, html);
 
-		// console.log("The file was saved!");
-	});
-
-	out(`Saved HTML: ${output_path}\n`);
+	out.write(`Saved HTML: ${output_path}\n`);
 }
 
-/*
-	Generate PDF
- */
-async function pdf(urls, options) {
+async function generate(urls, options, fn) {
 	if (!configured) {
 		configure();
 	}
@@ -408,7 +407,7 @@ async function pdf(urls, options) {
 				options,
 				options.url ? options.url[i] : undefined
 			);
-			await bundle([item], options);
+			await fn([item], options);
 		}
 	} else {
 		for (let i = 0; i < urls.length; i++) {
@@ -419,52 +418,34 @@ async function pdf(urls, options) {
 			);
 			items.push(item);
 		}
-		await bundle(items, options);
+		await fn(items, options);
 	}
+}
+
+/*
+	Generate PDF
+ */
+async function pdf(urls, options) {
+	generate(urls, options, bundlePdf);
 }
 
 /*
 	Generate EPUB
  */
 async function epub(urls, options) {
-	if (!configured) {
-		configure();
-	}
-	if (!urls.length) return;
-	let items = [];
-	for (let url of urls) {
-		let item = await cleanup(url, options);
-		if (options.individual) {
-			await bundleEpub([item], options);
-		} else {
-			items.push(item);
-		}
-	}
-	if (!options.individual) {
-		await bundleEpub(items, options);
-	}
+	generate(urls, options, bundleEpub);
 }
 
 /*
 	Generate HTML
  */
 async function html(urls, options) {
-	if (!configured) {
-		configure();
-	}
-	if (!urls.length) return;
-	let items = [];
-	for (let url of urls) {
-		let item = await cleanup(url, options);
-		if (options.individual) {
-			await bundleHtml([item], options);
-		} else {
-			items.push(item);
-		}
-	}
-	if (!options.individual) {
-		await bundleHtml(items, options);
-	}
+	generate(urls, options, bundleHtml);
 }
 
-module.exports = { configure, pdf, epub, html };
+module.exports = {
+	configure,
+	pdf,
+	epub,
+	html
+};
