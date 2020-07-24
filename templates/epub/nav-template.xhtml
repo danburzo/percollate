@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:epub="http://www.idpf.org/2007/ops"
+	xml:lang="en"
+	lang="en"
+>
+	<head>
+		<meta charset="utf-8" />
+		<link rel="stylesheet" type="text/css" href="epub.css" />
+		<title>{{ title }}</title>
+	</head>
+	<body>
+		<nav epub:type="toc" id="toc">
+			<ol>
+				{{ epub_nav_items_html }}
+			</ol>
+		</nav>
+		<nav epub:type="landmarks">
+			<ol>
+				<li>
+					<a
+						epub:type="frontmatter"
+						href="{{slug}}-content.xhtml#frontmatter"
+					>
+						frontmatter
+					</a>
+				</li>
+
+				<li>
+					<a
+						epub:type="bodymatter"
+						href="{{slug}}-content.xhtml#bodymatter"
+					>
+						bodymatter
+					</a>
+				</li>
+			</ol>
+		</nav>
+	</body>
+</html>

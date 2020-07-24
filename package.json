@@ -8,7 +8,6 @@
 	"license": "MIT",
 	"dependencies": {
 		"css": "^3.0.0",
-		"epub-gen": "0.1.0",
 		"got": "^11.5.1",
 		"jsdom": "^16.3.0",
 		"nunjucks": "^3.2.2",

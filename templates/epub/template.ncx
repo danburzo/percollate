@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ncx xmlns:ncx="http://www.daisy.org/z3986/2005/ncx/" xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1" xml:lang="en">
+    <head>
+        <meta name="dtb:uid" content="npm.percollate.{{slug}}"/>
+    </head>
+    <docTitle>
+        <text>{{ title }}</text>
+    </docTitle>
+    <navMap>
+        {{ epub_nav_items_ncx }}
+    </navMap>
+</ncx>

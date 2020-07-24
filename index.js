@@ -8,9 +8,9 @@ const fs = require('fs').promises;
 const css = require('css');
 const slugify = require('slugify');
 const Readability = require('./vendor/readability');
+const epub = require('./src/epub');
 const pkg = require('./package.json');
 const uuid = require('uuid/v1');
-let Epub = require('epub-gen');
 
 const {
 	ampToHtml,
@@ -335,16 +335,7 @@ async function bundleEpub(items, options) {
 			? `${slugify(items[0].title || 'Untitled page')}.epub`
 			: `percollate-${Date.now()}.epub`);
 
-	let option = {
-		title: items[0].title,
-		content: [
-			{
-				data: html
-			}
-		]
-	};
-
-	new Epub(option, output_path);
+	epub(items, output_path);
 
 	out.write(`Saved EPUB: ${output_path}\n`);
 }
