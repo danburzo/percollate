@@ -59,8 +59,12 @@ function createDom({ url, content }) {
 	Some setup
 	----------
  */
+let configured = false;
 function configure() {
-	nunjucks.configure({ autoescape: false, noCache: true });
+	if (!configured) {
+		nunjucks.configure({ autoescape: false, noCache: true });
+		configured = true;
+	}
 }
 
 /*
@@ -295,6 +299,9 @@ async function bundle(items, options) {
 	Generate PDF
  */
 async function pdf(urls, options) {
+	if (!configured) {
+		configure();
+	}
 	if (!urls.length) return;
 	let items = [];
 
@@ -324,14 +331,20 @@ async function pdf(urls, options) {
 	Generate EPUB
  */
 async function epub(urls, options) {
-	console.log('TODO', urls, options);
+	if (!configured) {
+		configure();
+	}
+	throw new Error('Function not implemented yet.');
 }
 
 /*
 	Generate HTML
  */
 async function html(urls, options) {
-	console.log('TODO', urls, options);
+	if (!configured) {
+		configure();
+	}
+	throw new Error('Function not implemented yet.');
 }
 
 module.exports = { configure, pdf, epub, html };

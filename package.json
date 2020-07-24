@@ -26,7 +26,11 @@
 	"devDependencies": {
 		"husky": "^4.2.5",
 		"prettier": "^2.0.5",
-		"pretty-quick": "^2.0.1"
+		"pretty-quick": "^2.0.1",
+		"tape": "^5.0.1"
+	},
+	"scripts": {
+		"test": "tape test/**/*.test.js"
 	},
 	"husky": {
 		"hooks": {

@@ -1,84 +1,16 @@
 #!/usr/bin/env node
-const opsh = require('opsh');
 const pkg = require('./package.json');
+const cliopts = require('./cli-opts');
 
-const { configure, pdf, epub, html } = require('.');
+const { configure, pdf, epub, html } = require('./index');
+
+const { command, opts, operands } = cliopts(process.argv.slice(2));
 
 /*
 	Some setup
 	----------
  */
 configure();
-
-/*
-	Command-Line Interface definition
-	---------------------------------
- */
-
-const available_commands = new Set(['pdf', 'epub', 'html']);
-let opts_with_optarg = new Set(['output', 'template', 'style', 'css', 'url']);
-let opts_with_arr = new Set(['url']);
-let aliases = {
-	o: 'output',
-	u: 'url',
-	h: 'help',
-	V: 'version'
-};
-
-let opts = {};
-let command;
-let operands = [];
-
-opsh(process.argv.slice(2), {
-	option(option, value) {
-		if (aliases[option]) {
-			option = aliases[option];
-		}
-		if (!command) {
-			outputHelp();
-			return false;
-		}
-		let m = option.match(/^no-(.+)$/);
-
-		if (m) {
-			opts[m[1]] = value !== undefined ? value : false;
-		} else {
-			if (opts_with_arr.has(option)) {
-				if (!opts[option]) {
-					opts[option] = [];
-				}
-				if (value !== undefined) {
-					opts[option].push(value);
-				}
-			} else {
-				opts[option] = value !== undefined ? value : true;
-			}
-		}
-	},
-	operand(operand, opt) {
-		if (aliases[opt]) {
-			opt = aliases[opt];
-		}
-		if (opts_with_optarg.has(opt)) {
-			if (opts_with_arr.has(opt)) {
-				opts[opt].push(operand);
-			} else {
-				opts[opt] = operand;
-			}
-		} else {
-			if (!command) {
-				if (available_commands.has(operand)) {
-					command = operand;
-				} else {
-					outputHelp();
-					return false;
-				}
-			} else {
-				operands.push(operand);
-			}
-		}
-	}
-});
 
 if (opts.version) {
 	outputVersion();
