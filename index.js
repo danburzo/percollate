@@ -10,6 +10,7 @@ const slugify = require('slugify');
 const Readability = require('./vendor/readability');
 const pkg = require('./package.json');
 const uuid = require('uuid/v1');
+let Epub = require('epub-gen');
 
 const {
 	ampToHtml,
@@ -271,8 +272,8 @@ async function bundle(items, options) {
 	/*
 		When no output path is present,
 		produce the file name from the web page title
-		(if a single page was sent as argument), 
-		or a timestamped file (for the moment) 
+		(if a single page was sent as argument),
+		or a timestamped file (for the moment)
 		in case we're bundling many web pages.
 	 */
 	const output_path =
@@ -293,6 +294,101 @@ async function bundle(items, options) {
 	await browser.close();
 
 	out.write(`Saved PDF: ${output_path}\n`);
+}
+
+/*
+	Bundle the HTML files into a EPUB
+	--------------------------------
+ */
+async function bundleEpub(items, options) {
+	const stylesheet = resolve(options.style || './templates/default.css');
+	const style = fs.readFileSync(stylesheet, 'utf8') + (options.css || '');
+
+	const html = nunjucks.renderString(
+		fs.readFileSync(
+			resolve(options.template || './templates/default.html'),
+			'utf8'
+		),
+		{
+			items,
+			style,
+			stylesheet // deprecated
+		}
+	);
+
+	spinner.start('Saving EPUB');
+
+	/*
+		When no output path is present,
+		produce the file name from the web page title
+		(if a single page was sent as argument),
+		or a timestamped file (for the moment)
+		in case we're bundling many web pages.
+	 */
+	const output_path =
+		options.output ||
+		(items.length === 1
+			? `${slugify(items[0].title || 'Untitled page')}.epub`
+			: `percollate-${Date.now()}.epub`);
+
+	let option = {
+		title: items[0].title,
+		content: [
+			{
+				data: html
+			}
+		]
+	};
+
+	new Epub(option, output_path);
+
+	spinner.succeed(`Saved EPUB: ${output_path}`);
+}
+
+/*
+	Bundle the HTML files into a HTML
+	--------------------------------
+ */
+async function bundleHtml(items, options) {
+	const stylesheet = resolve(options.style || './templates/default.css');
+	const style = fs.readFileSync(stylesheet, 'utf8') + (options.css || '');
+
+	const html = nunjucks.renderString(
+		fs.readFileSync(
+			resolve(options.template || './templates/default.html'),
+			'utf8'
+		),
+		{
+			items,
+			style,
+			stylesheet // deprecated
+		}
+	);
+
+	spinner.start('Saving HTML');
+
+	/*
+		When no output path is present,
+		produce the file name from the web page title
+		(if a single page was sent as argument),
+		or a timestamped file (for the moment)
+		in case we're bundling many web pages.
+	 */
+	const output_path =
+		options.output ||
+		(items.length === 1
+			? `${slugify(items[0].title || 'Untitled page')}.html`
+			: `percollate-${Date.now()}.html`);
+
+	fs.writeFile(output_path, html, function(err) {
+		if (err) {
+			return console.log(err);
+		}
+
+		// console.log("The file was saved!");
+	});
+
+	spinner.succeed(`Saved HTML: ${output_path}`);
 }
 
 /*
@@ -334,7 +430,19 @@ async function epub(urls, options) {
 	if (!configured) {
 		configure();
 	}
-	throw new Error('Function not implemented yet.');
+	if (!urls.length) return;
+	let items = [];
+	for (let url of urls) {
+		let item = await cleanup(url, options);
+		if (options.individual) {
+			await bundleEpub([item], options);
+		} else {
+			items.push(item);
+		}
+	}
+	if (!options.individual) {
+		await bundleEpub(items, options);
+	}
 }
 
 /*
@@ -344,7 +452,19 @@ async function html(urls, options) {
 	if (!configured) {
 		configure();
 	}
-	throw new Error('Function not implemented yet.');
+	if (!urls.length) return;
+	let items = [];
+	for (let url of urls) {
+		let item = await cleanup(url, options);
+		if (options.individual) {
+			await bundleHtml([item], options);
+		} else {
+			items.push(item);
+		}
+	}
+	if (!options.individual) {
+		await bundleHtml(items, options);
+	}
 }
 
 module.exports = { configure, pdf, epub, html };

@@ -65,5 +65,7 @@ typings/
 .project
 .settings
 
+.idea/
+
 # test PDFs
 *.pdf
