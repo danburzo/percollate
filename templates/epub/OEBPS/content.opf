@@ -16,11 +16,14 @@
 		{% for item in items %}
 			<item id="{{item.id}}" href="{{item.id}}.xhtml" media-type="application/xhtml+xml" />
 		{% endfor %}
+		{% for res in remoteResources %}
+			<item id="{{res.id}}" href="{{res.href}}" media-type="{{res.mimetype}}" />
+		{% endfor %}
 		{% for asset in assets %}
-			<item id="{{asset.id}}" href="{{item.href}}" media-type="{{item.mimetype}}"/>
+			<item id="{{asset.id}}" href="{{item.href}}" media-type="{{item.mimetype}}" />
 		{% endfor %}
 		{% if cover %}
-			<item id="{{cover.id}}" href="{{cover.href}}" media-type="{{cover.mimetype}}"/>
+			<item id="{{cover.id}}" href="{{cover.href}}" media-type="{{cover.mimetype}}" />
 		{% endif %}
 		<item id="nav" href="nav.xhtml" properties="nav" media-type="application/xhtml+xml" />
 		<item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml" />

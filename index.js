@@ -13,6 +13,7 @@ const slugify = require('slugify');
 const Readability = require('./vendor/readability');
 const pkg = require('./package.json');
 const uuid = require('uuid/v1');
+const mimetype = require('mimetype');
 
 const {
 	ampToHtml,
@@ -24,6 +25,7 @@ const {
 	singleImgToFigure,
 	expandDetailsElements
 } = require('./src/enhancements');
+const mapRemoteResources = require('./src/remote-resources');
 const get_style_attribute_value = require('./src/get-style-attribute-value');
 
 const out = process.stdout;
@@ -139,8 +141,13 @@ async function cleanup(url, options) {
 		*/
 		enhancePage(dom);
 
+		let remoteResources;
+		if (options.mapRemoteResources) {
+			remoteResources = mapRemoteResources(dom.window.document);
+		}
+
 		// Run through readability and return
-		const parsed = new Readability(dom.window.document, {
+		const R = new Readability(dom.window.document, {
 			classesToPreserve: [
 				'no-href',
 
@@ -153,13 +160,22 @@ async function cleanup(url, options) {
 			serializer: options.xhtml
 				? el => new dom.window.XMLSerializer().serializeToString(el)
 				: undefined
-		}).parse();
+		});
+
+		// TODO: find better solution to prevent Readability from
+		// making img srcs relative.
+		if (options.mapRemoteResources) {
+			R._fixRelativeUris = () => {};
+		}
+
+		const parsed = R.parse();
 
 		out.write(' ✓\n');
 		return {
 			...parsed,
 			id: `percollate-page-${uuid()}`,
-			url: final_url
+			url: final_url,
+			remoteResources
 		};
 	} catch (error) {
 		console.error(error.message);
@@ -438,7 +454,8 @@ async function pdf(urls, options) {
  */
 async function epub(urls, options) {
 	generate(urls, options, bundleEpub, {
-		xhtml: true
+		xhtml: true,
+		mapRemoteResources: true
 	});
 }
 
@@ -509,7 +526,9 @@ async function epubgen(data, output_path) {
 		'utf8'
 	);
 
+	let remoteResources = [];
 	data.items.forEach((item, idx) => {
+		remoteResources = remoteResources.concat(item.remoteResources || []);
 		let item_content = nunjucks.renderString(contentTemplate, {
 			...data,
 			item
@@ -517,8 +536,22 @@ async function epubgen(data, output_path) {
 		archive.append(item_content, { name: `OEBPS/${item.id}.xhtml` });
 	});
 
+	for (let i = 0; i < remoteResources.length; i++) {
+		let entry = remoteResources[i];
+		let buff = await got(entry[0]).buffer();
+		archive.append(buff, { name: `OEBPS/${entry[1]}` });
+	}
+
 	const nav = nunjucks.renderString(navTemplate, data);
-	const opf = nunjucks.renderString(opfTemplate, data);
+	const opf = nunjucks.renderString(opfTemplate, {
+		...data,
+		remoteResources: remoteResources.map(entry => ({
+			id: entry[1].replace(/[^a-z0-9]/gi, ''),
+			href: entry[1],
+			mimetype: mimetype.lookup(entry[1])
+		}))
+	});
+
 	const toc = nunjucks.renderString(tocTemplate, data);
 
 	archive.append(nav, { name: 'OEBPS/nav.xhtml' });
