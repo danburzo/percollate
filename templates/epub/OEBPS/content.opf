@@ -2,16 +2,26 @@
 <package xmlns="http://www.idpf.org/2007/opf" version="3.0" unique-identifier="uid">
 	
 	<metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
-		<dc:identifier id="uid">{{ uuid }}</dc:identifier>
+		<dc:identifier id="uid">urn:uuid:{{ uuid }}</dc:identifier>
 		<dc:title>{{ title }}</dc:title>
 		<dc:date>{{ date }}</dc:date>
-		<meta name="cover" content="cover-image" />
+		<meta property="dcterms:modified">{{ date }}</meta>
+		<dc:language>{{ lang | default('en-US')}}</dc:language>
+		{% if cover %}
+			<meta name="cover" content="{{ cover.id }}" />
+		{% endif %}
 	</metadata>
 
 	<manifest>
 		{% for item in items %}
 			<item id="{{item.id}}" href="{{item.id}}.xhtml" media-type="application/xhtml+xml" />
 		{% endfor %}
+		{% for asset in assets %}
+			<item id="{{asset.id}}" href="{{item.href}}" media-type="{{item.mimetype}}"/>
+		{% endfor %}
+		{% if cover %}
+			<item id="{{cover.id}}" href="{{cover.href}}" media-type="{{cover.mimetype}}"/>
+		{% endif %}
 		<item id="nav" href="nav.xhtml" properties="nav" media-type="application/xhtml+xml" />
 		<item id="css" href="epub.css" media-type="text/css" />
 		<item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml" />

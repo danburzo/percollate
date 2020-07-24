@@ -25,6 +25,7 @@
 		"node": ">= 8.6.0"
 	},
 	"devDependencies": {
+		"epubchecker": "^4.2.2",
 		"husky": "^4.2.5",
 		"prettier": "^2.0.5",
 		"pretty-quick": "^2.0.1",

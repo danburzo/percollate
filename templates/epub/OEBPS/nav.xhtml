@@ -12,29 +12,10 @@
 		<nav epub:type="toc" id="toc">
 			<ol>
 				{% for item in items %}
-				<!-- TODO -->
+				<li>
+					<a href="{{item.id}}.xhtml">{{ item.title }}</a>
+				</li>
 				{% endfor %}
-			</ol>
-		</nav>
-		<nav epub:type="landmarks">
-			<ol>
-				<li>
-					<a
-						epub:type="frontmatter"
-						href="{{slug}}-content.xhtml#frontmatter"
-					>
-						frontmatter
-					</a>
-				</li>
-
-				<li>
-					<a
-						epub:type="bodymatter"
-						href="{{slug}}-content.xhtml#bodymatter"
-					>
-						bodymatter
-					</a>
-				</li>
 			</ol>
 		</nav>
 	</body>

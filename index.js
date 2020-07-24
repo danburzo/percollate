@@ -151,7 +151,7 @@ async function cleanup(url, options) {
 				'anchor'
 			],
 			serializer: options.xhtml
-				? new dom.XMLSerializer().serializeToString
+				? el => new dom.window.XMLSerializer().serializeToString(el)
 				: undefined
 		}).parse();
 
@@ -417,6 +417,7 @@ async function generate(urls, options, fn, fn_options) {
 		for (let i = 0; i < urls.length; i++) {
 			let item = await cleanup(urls[i], {
 				...options,
+				...(fn_options || {}),
 				preferred_url: options.url ? options.url[i] : undefined
 			});
 			items.push(item);

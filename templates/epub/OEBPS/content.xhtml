@@ -1,21 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<html
-	xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:epub="http://www.idpf.org/2007/ops"
->
+<html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<meta charset="utf-8" />
 		<title>{{ item.title }}</title>
 		<link rel="stylesheet" type="text/css" href="epub.css" />
 	</head>
 	<body>
-		<section epub:type="frontmatter" id="frontmatter">
-			<section epub:type="titlepage" id="titlepage">
-				{{ item.title }}
-			</section>
-		</section>
-		<section epub:type="bodymatter" id="bodymatter">
+		<header class="article__header">
+			<h1 class="article__title">{{ item.title }}</h1>
+			{% if item.byline %}
+			<p class="article__byline">By <span>{{ item.byline }}</span></p>
+			{% endif %}
+			<p class="article__url">
+				Source:
+				<a class="no-href" href="{{item.url}}">{{item.url}}</a>
+			</p>
+		</header>
+		<div class="article__content">
 			{{ item.content }}
-		</section>
+		</div>
 	</body>
 </html>
