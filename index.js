@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 const pup = require('puppeteer');
 const got = require('got');
-const ora = require('ora');
 const { JSDOM } = require('jsdom');
 const nunjucks = require('nunjucks');
 const tmp = require('tmp');
@@ -12,8 +11,6 @@ const Readability = require('./vendor/readability');
 const pkg = require('./package.json');
 const uuid = require('uuid/v1');
 let Epub = require('epub-gen');
-
-const spinner = ora();
 
 const {
 	ampToHtml,
@@ -27,12 +24,14 @@ const {
 } = require('./src/enhancements');
 const get_style_attribute_value = require('./src/get-style-attribute-value');
 
+const out = process.stdout;
+
 const resolve = path =>
 	require.resolve(path, {
 		paths: [process.cwd(), __dirname]
 	});
 
-const enhancePage = function(dom) {
+const enhancePage = function (dom) {
 	// Note: the order of the enhancements matters!
 	[
 		ampToHtml,
@@ -61,40 +60,81 @@ function createDom({ url, content }) {
 	Some setup
 	----------
  */
+let configured = false;
 function configure() {
-	nunjucks.configure({ autoescape: false, noCache: true });
+	if (!configured) {
+		nunjucks.configure({ autoescape: false, noCache: true });
+		configured = true;
+	}
 }
 
 /*
 	Fetch a web page and clean the HTML
 	-----------------------------------
  */
-async function cleanup(url, options) {
-	try {
-		spinner.start(`Fetching: ${url}`);
+
+function fetchContent(url) {
+	if (url === '-') {
+		// Read from stdin
+		return new Promise((fulfill, reject) => {
+			let content = '';
+			process.stdin
+				.setEncoding('utf8')
+				.on('readable', () => {
+					let chunk;
+					while ((chunk = process.stdin.read()) !== null) {
+						content += chunk;
+					}
+				})
+				.on('end', () => {
+					fulfill(content);
+				})
+				.on('error', () => {
+					reject(error);
+				});
+		});
+	} else {
 		/*
 			Must ensure that the URL is properly encoded.
 			See: https://github.com/danburzo/percollate/pull/83
 		 */
-		const content = (
-			await got(encodeURI(decodeURI(url)), {
-				headers: {
-					'user-agent': `percollate/${pkg.version}`
-				}
-			})
-		).body;
-		spinner.succeed();
+		return got(encodeURI(decodeURI(url)), {
+			headers: {
+				'user-agent': `percollate/${pkg.version}`
+			}
+		}).then(result => result.body);
+	}
+}
 
-		spinner.start('Enhancing web page');
-		const dom = createDom({ url, content });
+async function cleanup(url, options, preferred_url) {
+	try {
+		out.write(`Fetching: ${url}`);
+
+		const content = await fetchContent(url);
+
+		out.write(' ✓\n');
+
+		const final_url =
+			preferred_url !== undefined
+				? preferred_url
+				: url === '-'
+				? undefined
+				: url;
+
+		const dom = createDom({
+			url: final_url,
+			content
+		});
 
 		const amp = dom.window.document.querySelector('link[rel=amphtml]');
 		if (amp && options.amp) {
-			spinner.succeed('Found AMP version');
-			return cleanup(amp.href, options);
+			out.write('\nFound AMP version (use `--no-amp` to ignore)\n');
+			return cleanup(amp.href, options, amp.href);
 		}
 
-		/*
+		out.write('Enhancing web page...');
+
+		/* 
 			Run enhancements
 			----------------
 		*/
@@ -113,10 +153,14 @@ async function cleanup(url, options) {
 			]
 		}).parse();
 
-		spinner.succeed();
-		return { ...parsed, id: `percollate-page-${uuid()}`, url };
+		out.write(' ✓\n');
+		return {
+			...parsed,
+			id: `percollate-page-${uuid()}`,
+			url: final_url
+		};
 	} catch (error) {
-		spinner.fail(error.message);
+		console.error(error.message);
 		throw error;
 	}
 }
@@ -126,7 +170,7 @@ async function cleanup(url, options) {
 	--------------------------------
  */
 async function bundle(items, options) {
-	spinner.start('Generating temporary HTML file');
+	out.write('Generating temporary HTML file... ');
 	const temp_file = tmp.tmpNameSync({ postfix: '.html' });
 
 	const stylesheet = resolve(options.style || './templates/default.css');
@@ -188,7 +232,8 @@ async function bundle(items, options) {
 
 	fs.writeFileSync(temp_file, html);
 
-	spinner.succeed(`Temporary HTML file: file://${temp_file}`);
+	out.write('✓\n');
+	out.write(`Temporary HTML file: file://${temp_file}\n`);
 
 	const browser = await pup.launch({
 		headless: true,
@@ -218,7 +263,7 @@ async function bundle(items, options) {
 
 	if (options.debug) {
 		page.on('response', response => {
-			spinner.succeed(`Fetched: ${response.url()}`);
+			out.write(`Fetched: ${response.url()}\n`);
 		});
 	}
 
@@ -248,7 +293,7 @@ async function bundle(items, options) {
 
 	await browser.close();
 
-	spinner.succeed(`Saved PDF: ${output_path}`);
+	out.write(`Saved PDF: ${output_path}\n`);
 }
 
 /*
@@ -350,17 +395,30 @@ async function bundleHtml(items, options) {
 	Generate PDF
  */
 async function pdf(urls, options) {
+	if (!configured) {
+		configure();
+	}
 	if (!urls.length) return;
 	let items = [];
-	for (let url of urls) {
-		let item = await cleanup(url, options);
-		if (options.individual) {
+
+	if (options.individual) {
+		for (let i = 0; i < urls.length; i++) {
+			let item = await cleanup(
+				urls[i],
+				options,
+				options.url ? options.url[i] : undefined
+			);
 			await bundle([item], options);
-		} else {
+		}
+	} else {
+		for (let i = 0; i < urls.length; i++) {
+			let item = await cleanup(
+				urls[i],
+				options,
+				options.url ? options.url[i] : undefined
+			);
 			items.push(item);
 		}
-	}
-	if (!options.individual) {
 		await bundle(items, options);
 	}
 }
@@ -369,6 +427,9 @@ async function pdf(urls, options) {
 	Generate EPUB
  */
 async function epub(urls, options) {
+	if (!configured) {
+		configure();
+	}
 	if (!urls.length) return;
 	let items = [];
 	for (let url of urls) {
@@ -388,6 +449,9 @@ async function epub(urls, options) {
 	Generate HTML
  */
 async function html(urls, options) {
+	if (!configured) {
+		configure();
+	}
 	if (!urls.length) return;
 	let items = [];
 	for (let url of urls) {
