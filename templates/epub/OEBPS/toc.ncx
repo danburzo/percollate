@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1">
+    <head>
+        <meta name="dtb:uid" content="urn:uuid:{{uuid}}"/>
+    </head>
+    <docTitle>
+        <text>{{ title }}</text>
+    </docTitle>
+    <navMap>
+    	{% for item in items %}
+		<navPoint id="{{item.id}}">
+			<navLabel>
+				<text>{{item.title}}</text>
+			</navLabel>
+			<content src="{{item.id}}.xhtml" />
+		</navPoint>
+		{% endfor %}
+    </navMap>
+</ncx>
