@@ -42,14 +42,6 @@ a {
 	color: inherit;
 }
 
-a:not(.no-href):after {
-	content: ' → ' attr(href) '';
-	font-size: 0.8em;
-	word-break: break-all;
-	word-wrap: break-word;
-	font-family: var(--alt-font);
-}
-
 /*
 	Going on a limb here,
 	but a.anchor in heading elements
@@ -276,6 +268,24 @@ article:not(:last-of-type) {
 .article__content details > summary {
 	font-weight: bold;
 	font-size: 0.9em;
+	font-family: var(--alt-font);
+}
+
+/*
+	Filetype specific
+	-----------------
+ */
+
+.type--pdf body {
+	margin: 0;
+	padding: 0;
+}
+
+.type--pdf a:not(.no-href):after {
+	content: ' → ' attr(href) '';
+	font-size: 0.8em;
+	word-break: break-all;
+	word-wrap: break-word;
 	font-family: var(--alt-font);
 }
 

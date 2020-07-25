@@ -1,5 +1,11 @@
 # Percollate Changelog
 
+### 0.5.0
+
+You can now generate (basic) EPUB and HTML with the `epub` and `html` commands, respectively.
+
+Added the ability to read HTML content from `stdin` with the `-` operand; you can pass the original URL with the `-u` / `--url` option.
+
 ### 0.4.0
 
 Enhancement: expand `<details>` elements.

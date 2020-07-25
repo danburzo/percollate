@@ -4,7 +4,7 @@ const cliopts = require('./cli-opts');
 
 const { configure, pdf, epub, html } = require('./index');
 
-const { command, opts, operands } = cliopts(process.argv.slice(2));
+const { command, opts, operands } = cliopts(process.argv.slice(2), outputHelp);
 
 /*
 	Some setup
@@ -59,9 +59,7 @@ Commands:
 
   pdf                Bundle web pages as a PDF file
   epub               Bundle web pages as an EPUB file.
-                     (Not implemented yet)
   html               Bundle web pages as a HTML file.
-                     (Not implemented yet)
 
 Commmon options:
 

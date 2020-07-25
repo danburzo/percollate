@@ -2,7 +2,7 @@
 
 <a href="https://www.npmjs.org/package/percollate"><img src="https://img.shields.io/npm/v/percollate.svg?style=flat" alt="npm version"></a>
 
-Percollate is a command-line tool to turn web pages into beautifully formatted PDF, EPUB or HTML files. See [How it works](#how-it-works).
+Percollate is a command-line tool to turn web pages into beautifully formatted PDF, EPUB, or HTML files. See [How it works](#how-it-works).
 
 <img alt="Example Output" src="https://raw.githubusercontent.com/danburzo/percollate/master/img/dimensions-of-colour.png">
 
@@ -51,7 +51,7 @@ yarn global upgrade --latest percollate
 
 ## Usage
 
-> 💡 Run `percollate --help` for a list of available commands. For a particular command, `percollate <command> --help` lists all available options.
+> 💡 Run `percollate --help` for a list of available commands and options.
 
 ### Available commands
 
@@ -70,12 +70,12 @@ The `pdf`, `epub`, and `html` commands have these options:
 | `-o, --output` | The path of the resulting bundle; when ommited, we derive the output file name from the title of the web page.                                                                                  |
 | `-u, --url`    | When reading HTML from stdin (from an external command) using the `-` operand, the `--url` option specifies the page's base URL so that relative paths (links, images, etc.) resolve correctly. |
 | `--individual` | Export each web page as an individual file.                                                                                                                                                     |
-| `--template`   | Path to a custom HTML template                                                                                                                                                                  |
-| `--style`      | Path to a custom CSS                                                                                                                                                                            |
-| `--css`        | Additional CSS styles you can pass from the command-line to override the default/custom stylesheet styles                                                                                       |
-| `--no-amp`     | Don't prefer the AMP version of the web page                                                                                                                                                    |
-| `--debug`      | Print more detailed information                                                                                                                                                                 |
-| `--toc`        | Include a Table of Contents page                                                                                                                                                                |
+| `--template`   | Path to a custom HTML template (not currently applicable to EPUB).                                                                                                                              |
+| `--style`      | Path to a custom CSS.                                                                                                                                                                           |
+| `--css`        | Additional CSS styles you can pass from the command-line to override the default/custom stylesheet styles.                                                                                      |
+| `--no-amp`     | Don't prefer the AMP version of the web page.                                                                                                                                                   |
+| `--debug`      | Print more detailed information.                                                                                                                                                                |
+| `--toc`        | Include a Table of Contents page.                                                                                                                                                               |
 
 ## Examples
 
@@ -224,12 +224,19 @@ An example from the [default stylesheet](./templates/default.css):
 
 ## How it works
 
+All export formats follow a common pipeline:
+
 1. Fetch the page(s) using [`got`](https://github.com/sindresorhus/got)
 2. If an AMP version of the page exists, use that instead (disable with `--no-amp` flag)
 3. [Enhance](./src/enhancements.js) the DOM using [`jsdom`](https://github.com/jsdom/jsdom)
 4. Pass the DOM through [`mozilla/readability`](https://github.com/mozilla/readability) to strip unnecessary elements
-5. Apply the [HTML template](./templates/default.html) and the [print stylesheet](./templates/default.css) to the resulting HTML
-6. Use [`puppeteer`](https://github.com/GoogleChrome/puppeteer) to generate a PDF from the page
+5. Apply the [HTML template](./templates/default.html) and the [stylesheet](./templates/default.css) to the resulting HTML
+
+Different formats then use different tools:
+
+-   PDFs are generated with [`puppeteer`](https://github.com/GoogleChrome/puppeteer);
+-   EPUBs have external images fetched and bundled together with the HTML of each article;
+-   HTMLs are saved without any further changes (images are not saved to the disk).
 
 ## Limitations
 
@@ -261,3 +268,4 @@ Here are some other projects to check out if you're interested in building books
 -   [Mercury](https://mercury.postlight.com/)
 -   [Foliojs](https://github.com/foliojs)
 -   [Magicbook](https://github.com/magicbookproject/magicbook)
+-   [monolith](https://github.com/Y2Z/monolith)
