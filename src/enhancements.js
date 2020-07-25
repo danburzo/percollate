@@ -27,6 +27,10 @@ function fixLazyLoadedImages(doc) {
 			}
 		});
 	});
+
+	Array.from(doc.querySelectorAll('[loading="lazy"]')).forEach(el => {
+		el.removeAttribute('loading');
+	});
 }
 
 function imagesAtFullSize(doc) {
@@ -95,7 +99,7 @@ function wikipediaSpecific(doc) {
 */
 function noUselessHref(doc) {
 	Array.from(doc.querySelectorAll('a'))
-		.filter(function(el) {
+		.filter(function (el) {
 			let href = el.getAttribute('href') || '';
 
 			// in-page anchors

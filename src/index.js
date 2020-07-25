@@ -127,7 +127,7 @@ async function cleanup(url, options) {
 			content
 		});
 
-		const amp = dom.window.document.querySelector('link[rel=amphtml]');
+		const amp = dom.window.document.querySelector('link[rel~=amphtml]');
 		if (amp && options.amp) {
 			out.write('\nFound AMP version (use `--no-amp` to ignore)\n');
 			return cleanup(amp.href, options, amp.href);

@@ -1,5 +1,10 @@
 # Percollate Changelog
 
+### Unreleased
+
+-   Enhancement: remove `loading=lazy` attributes;
+-   Bugfix: identify AMP version when the `rel` attribute has multiple, space-separated values.
+
 ### 0.5.0
 
 You can now generate (basic) EPUB and HTML with the `epub` and `html` commands, respectively.
