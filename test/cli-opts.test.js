@@ -1,5 +1,5 @@
 let tape = require('tape');
-let cliopts = require('../cli-opts');
+let cliopts = require('../src/cli-opts');
 
 tape('cliopts', t => {
 	t.deepEqual(cliopts('pdf - -u https://example.com'.split(' ')), {

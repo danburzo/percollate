@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 const pkg = require('./package.json');
-const cliopts = require('./cli-opts');
+const cliopts = require('./src/cli-opts');
 
-const { configure, pdf, epub, html } = require('./index');
+const { configure, pdf, epub, html } = require('./src/index');
 
 const { command, opts, operands } = cliopts(process.argv.slice(2), outputHelp);
 

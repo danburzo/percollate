@@ -10,8 +10,8 @@ const _fs = require('fs');
 const path = require('path');
 const css = require('css');
 const slugify = require('slugify');
-const Readability = require('./vendor/readability');
-const pkg = require('./package.json');
+const Readability = require('../vendor/readability');
+const pkg = require('../package.json');
 const uuid = require('uuid/v1');
 const mimetype = require('mimetype');
 
@@ -24,13 +24,13 @@ const {
 	relativeToAbsoluteURIs,
 	singleImgToFigure,
 	expandDetailsElements
-} = require('./src/enhancements');
-const mapRemoteResources = require('./src/remote-resources');
-const get_style_attribute_value = require('./src/get-style-attribute-value');
+} = require('./enhancements');
+const mapRemoteResources = require('./remote-resources');
+const get_style_attribute_value = require('./get-style-attribute-value');
 
 const out = process.stdout;
 
-const resolve = require('./src/util/resolve');
+const resolve = require('./util/resolve');
 
 const enhancePage = function (dom) {
 	// Note: the order of the enhancements matters!
