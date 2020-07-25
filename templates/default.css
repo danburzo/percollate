@@ -12,13 +12,6 @@
 	margin: 1cm 1cm 2cm;
 }
 
-@media print {
-	body {
-		margin: 0;
-		padding: 0;
-	}
-}
-
 html {
 	font-size: 12pt;
 	line-height: 1.3;
@@ -40,14 +33,6 @@ h6 {
 
 a {
 	color: inherit;
-}
-
-a:not(.no-href):after {
-	content: ' → ' attr(href) '';
-	font-size: 0.8em;
-	word-break: break-all;
-	word-wrap: break-word;
-	font-family: var(--alt-font);
 }
 
 /*
@@ -276,6 +261,24 @@ article:not(:last-of-type) {
 .article__content details > summary {
 	font-weight: bold;
 	font-size: 0.9em;
+	font-family: var(--alt-font);
+}
+
+/*
+	Filetype specific
+	-----------------
+ */
+
+.type--pdf body {
+	margin: 0;
+	padding: 0;
+}
+
+.type--pdf a:not(.no-href):after {
+	content: ' → ' attr(href) '';
+	font-size: 0.8em;
+	word-break: break-all;
+	word-wrap: break-word;
 	font-family: var(--alt-font);
 }
 

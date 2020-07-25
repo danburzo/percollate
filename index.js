@@ -201,6 +201,7 @@ async function bundlePdf(items, options) {
 			'utf8'
 		),
 		{
+			filetype: 'pdf',
 			items,
 			style,
 			stylesheet, // deprecated
@@ -321,22 +322,6 @@ async function bundlePdf(items, options) {
 async function bundleEpub(items, options) {
 	const stylesheet = resolve(options.style || './templates/default.css');
 	const style = (await fs.readFile(stylesheet, 'utf8')) + (options.css || '');
-	const use_toc = options.toc && items.length > 1;
-
-	const html = nunjucks.renderString(
-		await fs.readFile(
-			resolve(options.template || './templates/default.html'),
-			'utf8'
-		),
-		{
-			items,
-			style,
-			stylesheet, // deprecated
-			options: {
-				use_toc
-			}
-		}
-	);
 
 	out.write('Saving EPUB...\n');
 
@@ -361,7 +346,8 @@ async function bundleEpub(items, options) {
 			title: items.length === 1 ? items[0].title : `percollate-${now}`,
 			date: epubDate(new Date(now)),
 			uuid: uuid(),
-			items
+			items,
+			style
 		},
 		output_path
 	);
@@ -384,6 +370,7 @@ async function bundleHtml(items, options) {
 			'utf8'
 		),
 		{
+			filetype: 'html',
 			items,
 			style,
 			stylesheet, // deprecated
@@ -413,7 +400,7 @@ async function bundleHtml(items, options) {
 	out.write(`Saved HTML: ${output_path}\n`);
 }
 
-async function generate(urls, options, fn, fn_options) {
+async function generate(fn, urls, options) {
 	if (!configured) {
 		configure();
 	}
@@ -424,7 +411,6 @@ async function generate(urls, options, fn, fn_options) {
 		for (let i = 0; i < urls.length; i++) {
 			let item = await cleanup(urls[i], {
 				...options,
-				...(fn_options || {}),
 				preferred_url: options.url ? options.url[i] : undefined
 			});
 			await fn([item], options);
@@ -433,7 +419,6 @@ async function generate(urls, options, fn, fn_options) {
 		for (let i = 0; i < urls.length; i++) {
 			let item = await cleanup(urls[i], {
 				...options,
-				...(fn_options || {}),
 				preferred_url: options.url ? options.url[i] : undefined
 			});
 			items.push(item);
@@ -446,14 +431,19 @@ async function generate(urls, options, fn, fn_options) {
 	Generate PDF
  */
 async function pdf(urls, options) {
-	generate(urls, options, bundlePdf);
+	generate(bundlePdf, urls, {
+		...options,
+		_command: 'pdf'
+	});
 }
 
 /*
 	Generate EPUB
  */
 async function epub(urls, options) {
-	generate(urls, options, bundleEpub, {
+	generate(bundleEpub, urls, {
+		...options,
+		_command: 'epub',
 		xhtml: true,
 		mapRemoteResources: true
 	});
@@ -463,7 +453,10 @@ async function epub(urls, options) {
 	Generate HTML
  */
 async function html(urls, options) {
-	generate(urls, options, bundleHtml);
+	generate(bundleHtml, urls, {
+		...options,
+		_command: 'html'
+	});
 }
 
 /*
@@ -526,6 +519,8 @@ async function epubgen(data, output_path) {
 		'utf8'
 	);
 
+	archive.append(data.style || '', { name: 'OEBPS/style.css' });
+
 	let remoteResources = [];
 	data.items.forEach((item, idx) => {
 		remoteResources = remoteResources.concat(item.remoteResources || []);
@@ -545,6 +540,13 @@ async function epubgen(data, output_path) {
 	const nav = nunjucks.renderString(navTemplate, data);
 	const opf = nunjucks.renderString(opfTemplate, {
 		...data,
+		assets: [
+			{
+				id: 'style',
+				href: 'style.css',
+				mimetype: 'text/css'
+			}
+		],
 		remoteResources: remoteResources.map(entry => ({
 			id: entry[1].replace(/[^a-z0-9]/gi, ''),
 			href: entry[1],
