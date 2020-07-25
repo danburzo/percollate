@@ -59,9 +59,7 @@ Commands:
 
   pdf                Bundle web pages as a PDF file
   epub               Bundle web pages as an EPUB file.
-                     (Not implemented yet)
   html               Bundle web pages as a HTML file.
-                     (Not implemented yet)
 
 Commmon options:
 
