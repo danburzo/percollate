@@ -55,6 +55,8 @@
 		"puppeteer",
 		"cli",
 		"pdf",
-		"readability"
+		"readability",
+		"epub",
+		"html"
 	]
 }
