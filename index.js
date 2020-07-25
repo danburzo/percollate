@@ -431,10 +431,7 @@ async function generate(fn, urls, options) {
 	Generate PDF
  */
 async function pdf(urls, options) {
-	generate(bundlePdf, urls, {
-		...options,
-		_command: 'pdf'
-	});
+	generate(bundlePdf, urls, options);
 }
 
 /*
@@ -443,7 +440,6 @@ async function pdf(urls, options) {
 async function epub(urls, options) {
 	generate(bundleEpub, urls, {
 		...options,
-		_command: 'epub',
 		xhtml: true,
 		mapRemoteResources: true
 	});
@@ -453,10 +449,7 @@ async function epub(urls, options) {
 	Generate HTML
  */
 async function html(urls, options) {
-	generate(bundleHtml, urls, {
-		...options,
-		_command: 'html'
-	});
+	generate(bundleHtml, urls, options);
 }
 
 /*
