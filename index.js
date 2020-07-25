@@ -90,7 +90,7 @@ function fetchContent(url) {
 				.on('end', () => {
 					fulfill(content);
 				})
-				.on('error', () => {
+				.on('error', error => {
 					reject(error);
 				});
 		});
@@ -522,7 +522,7 @@ async function epubgen(data, output_path) {
 	archive.append(data.style || '', { name: 'OEBPS/style.css' });
 
 	let remoteResources = [];
-	data.items.forEach((item, idx) => {
+	data.items.forEach(item => {
 		remoteResources = remoteResources.concat(item.remoteResources || []);
 		let item_content = nunjucks.renderString(contentTemplate, {
 			...data,

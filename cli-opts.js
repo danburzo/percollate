@@ -15,7 +15,7 @@ let aliases = {
 	V: 'version'
 };
 
-module.exports = function (args) {
+module.exports = function (args, outputHelp) {
 	let opts = {};
 	let command;
 	let operands = [];

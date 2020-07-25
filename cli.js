@@ -4,7 +4,7 @@ const cliopts = require('./cli-opts');
 
 const { configure, pdf, epub, html } = require('./index');
 
-const { command, opts, operands } = cliopts(process.argv.slice(2));
+const { command, opts, operands } = cliopts(process.argv.slice(2), outputHelp);
 
 /*
 	Some setup
