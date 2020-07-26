@@ -462,7 +462,7 @@ async function html(urls, options) {
  */
 
 async function epubgen(data, output_path) {
-	const template_base = path.join(__dirname, './templates/epub/');
+	const template_base = path.join(__dirname, '../templates/epub/');
 
 	const output = _fs.createWriteStream(output_path);
 	const archive = archiver('zip', {
