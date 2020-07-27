@@ -1,5 +1,9 @@
 # Percollate Changelog
 
+### 0.6.1
+
+Fix template resolution issue introduced in 0.6.0.
+
 ### 0.6.0
 
 -   Upgraded to latest version, and devendorized, [@mozilla/readability](https://github.com/mozilla/readability);
