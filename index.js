@@ -10,10 +10,16 @@ const _fs = require('fs');
 const path = require('path');
 const css = require('css');
 const slugify = require('slugify');
-const Readability = require('@mozilla/readability');
-const pkg = require('../package.json');
+const { Readability } = require('@mozilla/readability');
+const pkg = require('./package.json');
 const uuid = require('uuid/v1');
 const mimetype = require('mimetype');
+
+function resolve(path) {
+	return require.resolve(path, {
+		paths: [process.cwd(), __dirname]
+	});
+}
 
 const {
 	ampToHtml,
@@ -24,13 +30,11 @@ const {
 	relativeToAbsoluteURIs,
 	singleImgToFigure,
 	expandDetailsElements
-} = require('./enhancements');
-const mapRemoteResources = require('./remote-resources');
-const get_style_attribute_value = require('./get-style-attribute-value');
+} = require('./src/enhancements');
+const mapRemoteResources = require('./src/remote-resources');
+const get_style_attribute_value = require('./src/get-style-attribute-value');
 
 const out = process.stdout;
-
-const resolve = require('./util/resolve');
 
 const enhancePage = function (dom) {
 	// Note: the order of the enhancements matters!
@@ -462,7 +466,7 @@ async function html(urls, options) {
  */
 
 async function epubgen(data, output_path) {
-	const template_base = path.join(__dirname, '../templates/epub/');
+	const template_base = path.join(__dirname, './templates/epub/');
 
 	const output = _fs.createWriteStream(output_path);
 	const archive = archiver('zip', {

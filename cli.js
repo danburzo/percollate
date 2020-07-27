@@ -2,7 +2,7 @@
 const pkg = require('./package.json');
 const cliopts = require('./src/cli-opts');
 
-const { configure, pdf, epub, html } = require('./src/index');
+const { configure, pdf, epub, html } = require('./index');
 
 const { command, opts, operands } = cliopts(process.argv.slice(2), outputHelp);
 

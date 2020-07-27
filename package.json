@@ -2,7 +2,7 @@
 	"name": "percollate",
 	"version": "0.6.0",
 	"description": "A command-line tool to grab web pages as PDF",
-	"main": "src/index.js",
+	"main": "index.js",
 	"repository": "danburzo/percollate",
 	"author": "Dan Burzo <danburzo@gmail.com>",
 	"license": "MIT",

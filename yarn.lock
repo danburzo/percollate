@@ -20,7 +20,7 @@
 
 "@mozilla/readability@github:danburzo/readability#npm":
   version "0.2.0"
-  resolved "https://codeload.github.com/danburzo/readability/tar.gz/55c2d225b013731f12ee6ad6495b6413ce2c69a7"
+  resolved "https://codeload.github.com/danburzo/readability/tar.gz/19214d781bb8b070c7829d06e6dd0c10a2ef5146"
 
 "@sindresorhus/is@^3.0.0":
   version "3.0.0"
