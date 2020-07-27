@@ -1,5 +1,9 @@
 # Percollate Changelog
 
+### 0.6.2
+
+Fix `-V / --version` argument parsing.
+
 ### 0.6.1
 
 Fix template resolution issue introduced in 0.6.0.
