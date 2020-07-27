@@ -2,18 +2,21 @@
 const pkg = require('./package.json');
 const cliopts = require('./src/cli-opts');
 
-const { configure, pdf, epub, html } = require('./index');
+const { pdf, epub, html } = require('./index');
 
-const { command, opts, operands } = cliopts(process.argv.slice(2), outputHelp);
+const { command, opts, operands } = cliopts(process.argv.slice(2));
 
-/*
-	Some setup
-	----------
- */
-configure();
+if (opts.debug) {
+	console.log({
+		command,
+		operands,
+		opts
+	});
+}
 
 if (opts.version) {
-	outputVersion();
+	console.log(pkg.version);
+	process.exit(0);
 }
 
 if (opts.help) {
@@ -22,14 +25,6 @@ if (opts.help) {
 
 if (!command || !operands.length) {
 	outputHelp();
-}
-
-if (opts.debug) {
-	console.log({
-		command,
-		operands,
-		opts
-	});
 }
 
 switch (command) {
@@ -42,6 +37,8 @@ switch (command) {
 	case 'html':
 		html(operands, opts);
 		break;
+	default:
+		outputHelp();
 }
 
 /*
@@ -108,10 +105,5 @@ Examples:
     percollate pdf --output my.pdf --css "@page { size: A3 landscape } html { font-size: 18pt }" https://example.com
 `
 	);
-	process.exit(0);
-}
-
-function outputVersion() {
-	console.log(pkg.version);
 	process.exit(0);
 }

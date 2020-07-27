@@ -15,7 +15,7 @@ let aliases = {
 	V: 'version'
 };
 
-module.exports = function (args, outputHelp) {
+module.exports = function (args) {
 	let opts = {};
 	let command;
 	let operands = [];
@@ -23,10 +23,6 @@ module.exports = function (args, outputHelp) {
 		option(option, value) {
 			if (aliases[option]) {
 				option = aliases[option];
-			}
-			if (!command) {
-				outputHelp();
-				return false;
 			}
 			let m = option.match(/^no-(.+)$/);
 
@@ -59,9 +55,6 @@ module.exports = function (args, outputHelp) {
 				if (!command) {
 					if (available_commands.has(operand)) {
 						command = operand;
-					} else {
-						outputHelp();
-						return false;
 					}
 				} else {
 					operands.push(operand);
