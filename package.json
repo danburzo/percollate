@@ -7,7 +7,6 @@
 	"author": "Dan Burzo <danburzo@gmail.com>",
 	"license": "MIT",
 	"dependencies": {
-		"@mozilla/readability": "github:danburzo/readability#npm",
 		"archiver": "^5.0.0",
 		"css": "^3.0.0",
 		"got": "^11.5.1",
