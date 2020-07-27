@@ -18,6 +18,10 @@
     esutils "^2.0.2"
     js-tokens "^4.0.0"
 
+"@mozilla/readability@github:danburzo/readability#npm":
+  version "0.2.0"
+  resolved "https://codeload.github.com/danburzo/readability/tar.gz/55c2d225b013731f12ee6ad6495b6413ce2c69a7"
+
 "@sindresorhus/is@^3.0.0":
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/@sindresorhus/is/-/is-3.0.0.tgz#78fabc5e295adb6e1ef57eaafe4cc5d7aa35b183"
