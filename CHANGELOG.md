@@ -1,9 +1,11 @@
 # Percollate Changelog
 
-### Unreleased
+### 0.6.0
 
+-   Upgraded to latest version, and devendorized, [@mozilla/readability](https://github.com/mozilla/readability);
 -   Enhancement: remove `loading=lazy` attributes;
 -   Bugfix: identify AMP version when the `rel` attribute has multiple, space-separated values.
+-   Bugfix: add underlines to links in Apple Books
 
 ### 0.5.0
 
