@@ -23,7 +23,7 @@
 		"percollate": "./cli.js"
 	},
 	"engines": {
-		"node": ">= 8.6.0"
+		"node": ">= 10.0.0"
 	},
 	"devDependencies": {
 		"epubchecker": "^4.2.2",

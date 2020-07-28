@@ -15,13 +15,8 @@ const Readability = require('./vendor/readability');
 const pkg = require('./package.json');
 const uuid = require('uuid/v1');
 const mimetype = require('mimetype');
+const slurp = require('./src/util/slurp');
 const epubDate = require('./src/util/epub-date');
-
-function resolve(path) {
-	return require.resolve(path, {
-		paths: [process.cwd(), __dirname]
-	});
-}
 
 const {
 	ampToHtml,
@@ -73,24 +68,7 @@ function configure() {
 
 function fetchContent(url) {
 	if (url === '-') {
-		// Read from stdin
-		return new Promise((fulfill, reject) => {
-			let content = '';
-			process.stdin
-				.setEncoding('utf8')
-				.on('readable', () => {
-					let chunk;
-					while ((chunk = process.stdin.read()) !== null) {
-						content += chunk;
-					}
-				})
-				.on('end', () => {
-					fulfill(content);
-				})
-				.on('error', error => {
-					reject(error);
-				});
-		});
+		return slurp(process.stdin);
 	}
 	/*
 		Must ensure that the URL is properly encoded.
@@ -187,20 +165,20 @@ async function bundlePdf(items, options) {
 	out.write('Generating temporary HTML file... ');
 	const temp_file = tmp.tmpNameSync({ postfix: '.html' });
 
-	const stylesheet = resolve(options.style || './templates/default.css');
-	const style = (await fs.readFile(stylesheet, 'utf8')) + (options.css || '');
+	const DEFAULT_STYLESHEET = path.join(__dirname, 'templates/default.css');
+	const DEFAULT_TEMPLATE = path.join(__dirname, 'templates/default.html');
+
+	const style =
+		(await fs.readFile(options.style || DEFAULT_STYLESHEET, 'utf8')) +
+		(options.css || '');
 	const use_toc = options.toc && items.length > 1;
 
 	const html = nunjucks.renderString(
-		await fs.readFile(
-			resolve(options.template || './templates/default.html'),
-			'utf8'
-		),
+		await fs.readFile(options.template || DEFAULT_TEMPLATE, 'utf8'),
 		{
 			filetype: 'pdf',
 			items,
 			style,
-			stylesheet, // deprecated
 			options: {
 				use_toc
 			}
@@ -316,8 +294,10 @@ async function bundlePdf(items, options) {
 	---------------------------------
  */
 async function bundleEpub(items, options) {
-	const stylesheet = resolve(options.style || './templates/default.css');
-	const style = (await fs.readFile(stylesheet, 'utf8')) + (options.css || '');
+	const DEFAULT_STYLESHEET = path.join(__dirname, 'templates/default.css');
+	const style =
+		(await fs.readFile(options.style || DEFAULT_STYLESHEET, 'utf8')) +
+		(options.css || '');
 
 	out.write('Saving EPUB...\n');
 
@@ -356,20 +336,20 @@ async function bundleEpub(items, options) {
 	--------------------------------
  */
 async function bundleHtml(items, options) {
-	const stylesheet = resolve(options.style || './templates/default.css');
-	const style = (await fs.readFile(stylesheet, 'utf8')) + (options.css || '');
+	const DEFAULT_STYLESHEET = path.join(__dirname, 'templates/default.css');
+	const DEFAULT_TEMPLATE = path.join(__dirname, 'templates/default.html');
+
+	const style =
+		(await fs.readFile(options.style || DEFAULT_STYLESHEET, 'utf8')) +
+		(options.css || '');
 	const use_toc = options.toc && items.length > 1;
 
 	const html = nunjucks.renderString(
-		await fs.readFile(
-			resolve(options.template || './templates/default.html'),
-			'utf8'
-		),
+		await fs.readFile(options.template || DEFAULT_TEMPLATE, 'utf8'),
 		{
 			filetype: 'html',
 			items,
 			style,
-			stylesheet, // deprecated
 			options: {
 				use_toc
 			}
@@ -458,7 +438,7 @@ async function html(urls, options) {
  */
 
 async function epubgen(data, output_path) {
-	const template_base = path.join(__dirname, './templates/epub/');
+	const template_base = path.join(__dirname, 'templates/epub/');
 
 	const output = _fs.createWriteStream(output_path);
 	const archive = archiver('zip', {
