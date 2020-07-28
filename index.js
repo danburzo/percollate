@@ -1,4 +1,5 @@
-#!/usr/bin/env node
+'use strict';
+
 const pup = require('puppeteer');
 const archiver = require('archiver');
 const got = require('got');
@@ -14,6 +15,7 @@ const Readability = require('./vendor/readability');
 const pkg = require('./package.json');
 const uuid = require('uuid/v1');
 const mimetype = require('mimetype');
+const epubDate = require('./src/util/epub-date');
 
 function resolve(path) {
 	return require.resolve(path, {
@@ -52,15 +54,6 @@ const enhancePage = function (dom) {
 	});
 };
 
-function createDom({ url, content }) {
-	const dom = new JSDOM(content, { url });
-
-	// Force relative URL resolution
-	dom.window.document.body.setAttribute(null, null);
-
-	return dom;
-}
-
 /*
 	Some setup
 	----------
@@ -98,17 +91,16 @@ function fetchContent(url) {
 					reject(error);
 				});
 		});
-	} else {
-		/*
-			Must ensure that the URL is properly encoded.
-			See: https://github.com/danburzo/percollate/pull/83
-		 */
-		return got(encodeURI(decodeURI(url)), {
-			headers: {
-				'user-agent': `percollate/${pkg.version}`
-			}
-		}).then(result => result.body);
 	}
+	/*
+		Must ensure that the URL is properly encoded.
+		See: https://github.com/danburzo/percollate/pull/83
+	 */
+	return got(encodeURI(decodeURI(url)), {
+		headers: {
+			'user-agent': `percollate/${pkg.version}`
+		}
+	}).then(result => result.body);
 }
 
 async function cleanup(url, options) {
@@ -126,10 +118,10 @@ async function cleanup(url, options) {
 				? undefined
 				: url;
 
-		const dom = createDom({
-			url: final_url,
-			content
-		});
+		const dom = new JSDOM(content, { url: final_url });
+
+		// Force relative URL resolution
+		dom.window.document.body.setAttribute(null, null);
 
 		const amp = dom.window.document.querySelector('link[rel~=amphtml]');
 		if (amp && options.amp) {
@@ -558,15 +550,6 @@ async function epubgen(data, output_path) {
 	archive.append(toc, { name: 'OEBPS/toc.ncx' });
 
 	archive.finalize();
-}
-
-function epubDate(d) {
-	const pad = num => (num < 10 ? '0' + num : num);
-	return `${pad(d.getUTCFullYear())}-${pad(d.getUTCMonth() + 1)}-${pad(
-		d.getUTCDate()
-	)}T${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(
-		d.getUTCSeconds()
-	)}Z`;
 }
 
 module.exports = {
