@@ -20,7 +20,7 @@
 			<item id="{{res.id}}" href="{{res.href}}" media-type="{{res.mimetype}}" />
 		{% endfor %}
 		{% for asset in assets %}
-			<item id="{{asset.id}}" href="{{item.href}}" media-type="{{item.mimetype}}" />
+			<item id="{{asset.id}}" href="{{asset.href}}" media-type="{{asset.mimetype}}" />
 		{% endfor %}
 		{% if cover %}
 			<item id="{{cover.id}}" href="{{cover.href}}" media-type="{{cover.mimetype}}" />

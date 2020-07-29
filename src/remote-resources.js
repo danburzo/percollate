@@ -10,7 +10,7 @@ module.exports = function remoteResources(doc) {
 			if (srcs.has(src)) {
 				return src;
 			} else {
-				let new_src = `${uuid()}.${m[1]}`;
+				let new_src = `rr-${uuid()}.${m[1]}`;
 				srcs.set(src, new_src);
 				return `./${new_src}`;
 			}
