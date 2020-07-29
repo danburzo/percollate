@@ -143,7 +143,8 @@ Readability.prototype = {
 		whitespace: /^\s*$/,
 		hasContent: /\S$/,
 		srcsetUrl: /(\S+)(\s+[\d.]+[xw])?(\s*(?:,|$))/g,
-		b64DataUrl: /^data:\s*([^\s;,]+)\s*;\s*base64\s*,/i
+		b64DataUrl: /^data:\s*([^\s;,]+)\s*;\s*base64\s*,/i,
+		jsonLdArticleTypes: /^Article|AdvertiserContentArticle|NewsArticle|AnalysisNewsArticle|AskPublicNewsArticle|BackgroundNewsArticle|OpinionNewsArticle|ReportageNewsArticle|ReviewNewsArticle|Report|SatiricalArticle|ScholarlyArticle|MedicalScholarlyArticle|SocialMediaPosting|BlogPosting|LiveBlogPosting|DiscussionForumPosting|TechArticle|APIReference$/
 	},
 
 	DIV_TO_P_ELEMS: [
@@ -1542,14 +1543,58 @@ Readability.prototype = {
 			});
 	},
 
+	/*
+		Try to extract metadata from JSON-LD object.
+		For now, only Schema.org objects of type Article or its
+		subtypes are supported.
+	 */
+	_getJSONLD: function () {
+		var jsonLdElement = this._doc.querySelector(
+			'script[type="application/ld+json"]'
+		);
+		if (jsonLdElement) {
+			try {
+				var parsed = JSON.parse(jsonLdElement.text);
+				var metadata = {};
+				if (
+					parsed['@context'] !== 'https://schema.org' ||
+					!parsed['@type'] ||
+					!parsed['@type'].match(this.REGEXPS.jsonLdArticleTypes)
+				) {
+					return metadata;
+				}
+				if (typeof parsed.name === 'string') {
+					metadata.title = parsed.name;
+				}
+				if (parsed.author && typeof parsed.author.name === 'string') {
+					metadata.author = parsed.author.name;
+				}
+				if (typeof parsed.description === 'string') {
+					metadata.excerpt = parsed.description;
+				}
+				if (
+					parsed.publisher &&
+					typeof parsed.publisher.name === 'string'
+				) {
+					metadata.siteName = parsed.publisher.name;
+				}
+				return metadata;
+			} catch (err) {
+				// ignore malformed JSON-LD
+			}
+		}
+		return {};
+	},
+
 	/**
 	 * Attempts to get excerpt and byline metadata for the article.
 	 *
 	 * @return Object with optional "excerpt" and "byline" properties
 	 */
-	_getArticleMetadata: function () {
+	_getArticleMetadata: function (jsonld) {
 		var metadata = {};
 		var values = {};
+
 		var metaElements = this._doc.getElementsByTagName('meta');
 
 		// property is a space-separated list of values
@@ -1597,6 +1642,7 @@ Readability.prototype = {
 
 		// get title
 		metadata.title =
+			jsonld.title ||
 			values['dc:title'] ||
 			values['dcterm:title'] ||
 			values['og:title'] ||
@@ -1611,12 +1657,14 @@ Readability.prototype = {
 
 		// get author
 		metadata.byline =
+			jsonld.author ||
 			values['dc:creator'] ||
 			values['dcterm:creator'] ||
 			values['author'];
 
 		// get description
 		metadata.excerpt =
+			jsonld.excerpt ||
 			values['dc:description'] ||
 			values['dcterm:description'] ||
 			values['og:description'] ||
@@ -1626,7 +1674,7 @@ Readability.prototype = {
 			values['twitter:description'];
 
 		// get site name
-		metadata.siteName = values['og:site_name'];
+		metadata.siteName = jsonld.siteName || values['og:site_name'];
 
 		// in many sites the meta value is escaped with HTML entities,
 		// so here we need to unescape it
@@ -2363,12 +2411,14 @@ Readability.prototype = {
 		// Unwrap image from noscript
 		this._unwrapNoscriptImages(this._doc);
 
+		var jsonLd = this._getJSONLD();
+
 		// Remove script tags from the document.
 		this._removeScripts(this._doc);
 
 		this._prepDocument();
 
-		var metadata = this._getArticleMetadata();
+		var metadata = this._getArticleMetadata(jsonLd);
 		this._articleTitle = metadata.title;
 
 		var articleContent = this._grabArticle();
