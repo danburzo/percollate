@@ -15,6 +15,7 @@ module.exports = function remoteResources(doc) {
 				return `./${new_src}`;
 			}
 		}
+		return src;
 	}
 
 	Array.from(doc.querySelectorAll('img')).forEach(el => {
@@ -27,9 +28,10 @@ module.exports = function remoteResources(doc) {
 		el.setAttribute(
 			'srcset',
 			srcset.stringify(
-				srcset
-					.parse(el.getAttribute('srcset'))
-					.map(item => replace(item.url))
+				srcset.parse(el.getAttribute('srcset')).map(item => ({
+					...item,
+					url: replace(item.url)
+				}))
 			)
 		);
 	});
