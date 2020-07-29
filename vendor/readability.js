@@ -1565,7 +1565,9 @@ Readability.prototype = {
 				) {
 					return metadata;
 				}
-				if (typeof parsed.name === 'string') {
+				if (typeof parsed.headline === 'string') {
+					metadata.title = parsed.headline;
+				} else if (typeof parsed.name === 'string') {
 					metadata.title = parsed.name;
 				}
 				if (parsed.author && typeof parsed.author.name === 'string') {
