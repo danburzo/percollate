@@ -94,6 +94,28 @@ function wikipediaSpecific(doc) {
 	).forEach(el => el.remove());
 }
 
+function githubSpecific(doc) {
+	/*
+		Fix heading links
+		See: https://github.com/danburzo/percollate/issues/49
+	 */
+	Array.from(
+		doc.querySelectorAll('h1 > a, h2 > a, h3 > a, h4 > a, h5 > a, h6 > a')
+	).forEach(el => {
+		let id = el.id;
+		if (id === el.getAttribute('href').replace(/^#/, 'user-content-')) {
+			el.id = id.replace('user-content-', '');
+			/*
+				`aria-hidden` causes Readability to remove the element,
+				so we remove the attribute.
+			 */
+			if (el.getAttribute('aria-hidden')) {
+				el.removeAttribute('aria-hidden');
+			}
+		}
+	});
+}
+
 /* 
 	Mark some links as not needing their HREF appended.
 */
@@ -190,5 +212,6 @@ module.exports = {
 	wikipediaSpecific,
 	relativeToAbsoluteURIs,
 	singleImgToFigure,
-	expandDetailsElements
+	expandDetailsElements,
+	githubSpecific
 };

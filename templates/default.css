@@ -49,7 +49,8 @@ h3 a.anchor,
 h4 a.anchor,
 h5 a.anchor,
 h6 a.anchor {
-	display: none;
+	visibility: hidden;
+	position: absolute;
 }
 
 th {

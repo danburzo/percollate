@@ -1,11 +1,15 @@
 const tape = require('tape');
 const { JSDOM } = require('jsdom');
-const { wikipediaSpecific, imagesAtFullSize } = require('../src/enhancements');
+const {
+	wikipediaSpecific,
+	githubSpecific,
+	imagesAtFullSize
+} = require('../src/enhancements');
 
-const createDoc = content => new JSDOM(content).window.document;
+const dom = content => new JSDOM(content).window.document;
 
 tape('wikipediaSpecific', t => {
-	const doc1 = createDoc`
+	const doc1 = dom`
         <div class='normal-element'>Hello world</div>
         <span class='normal-element'>Hello</span>
     `;
@@ -16,7 +20,7 @@ tape('wikipediaSpecific', t => {
 		'should leave non-wikipedia specific content untouched'
 	);
 
-	const doc = createDoc`
+	const doc = dom`
         <div class='normal-element'>Hello world</div>
         <span class='mw-editsection'>Hello</span>
         <span class='normal-element'>Hello</span>
@@ -41,7 +45,7 @@ tape('wikipediaSpecific', t => {
 
 tape('imagesAtFullSize', t => {
 	t.test('should strip width and height from all img element', t => {
-		const doc1 = createDoc(`
+		const doc1 = dom(`
 	        <img src='image.png' width=500 height=200 />
 	        <div>
 	            <img src='imagew.png' width=100 height=200 />
@@ -65,7 +69,7 @@ tape('imagesAtFullSize', t => {
 	t.test(
 		'should unlink linked img elements if the link points to an image',
 		t => {
-			const doc = createDoc`
+			const doc = dom`
             <a href="/wow.png">
                 <img src='/wow.png' width=500 height=200 />
             </a>
@@ -84,7 +88,7 @@ tape('imagesAtFullSize', t => {
 	t.test(
 		'should not unlink linked img elements if the link doesnt point to an image',
 		t => {
-			const doc = createDoc`
+			const doc = dom`
             <a href="/some-random-link">
                 <img src='image.png' width=500 height=200 />
             </a>
@@ -105,7 +109,7 @@ tape('imagesAtFullSize', t => {
 	t.test(
 		'should change image source to the link for linked img elements',
 		t => {
-			const doc = createDoc`
+			const doc = dom`
             <a href="/wow.png">
                 <img src='image.png' width=500 height=200 />
             </a>
@@ -119,4 +123,25 @@ tape('imagesAtFullSize', t => {
 			t.end();
 		}
 	);
+});
+
+tape('githubSpecific', t => {
+	const doc = dom`
+		<h2>
+			<a class='anchor' id='user-content-some-anchor' href='#some-anchor'>
+				<svg></svg>
+			</a>
+			My heading
+		</h2>
+	`;
+
+	githubSpecific(doc);
+
+	t.equal(
+		doc.querySelector('h2 a').getAttribute('id'),
+		'some-anchor',
+		'fix GitHub anchors'
+	);
+
+	t.end();
 });

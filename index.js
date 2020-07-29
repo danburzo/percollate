@@ -28,7 +28,8 @@ const {
 	noUselessHref,
 	relativeToAbsoluteURIs,
 	singleImgToFigure,
-	expandDetailsElements
+	expandDetailsElements,
+	githubSpecific
 } = require('./src/enhancements');
 const mapRemoteResources = require('./src/remote-resources');
 const get_style_attribute_value = require('./src/get-style-attribute-value');
@@ -45,7 +46,8 @@ const enhancePage = function (dom) {
 		singleImgToFigure,
 		noUselessHref,
 		expandDetailsElements,
-		wikipediaSpecific
+		wikipediaSpecific,
+		githubSpecific
 	].forEach(enhancement => {
 		enhancement(dom.window.document);
 	});
