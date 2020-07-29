@@ -7,16 +7,16 @@ const { JSDOM } = require('jsdom');
 const nunjucks = require('nunjucks');
 const tmp = require('tmp');
 const fs = require('fs').promises;
-const _fs = require('fs-extra');
+const _fs = require('fs');
 const path = require('path');
 const css = require('css');
-const slugify = require('slugify');
 const Readability = require('./vendor/readability');
 const pkg = require('./package.json');
 const uuid = require('uuid/v1');
 const mimetype = require('mimetype');
 const slurp = require('./src/util/slurp');
 const epubDate = require('./src/util/epub-date');
+const outputPath = require('./src/util/output-path');
 
 const {
 	ampToHtml,
@@ -262,36 +262,7 @@ async function bundlePdf(items, options) {
 
 	await page.goto(`file://${temp_file}`, { waitUntil: 'load' });
 
-	/*
-		When no output path is present,
-		produce the file name from the web page title
-		(if a single page was sent as argument),
-		or a timestamped file (for the moment)
-		in case we're bundling many web pages.
-	 */
-	let output_path;
-	const file_path_present = !!options.output;
-	const file_name_present =
-		file_path_present && /.pdf$/i.test(options.output);
-
-	if (file_path_present) {
-		if (file_name_present) {
-			_fs.ensureDirSync(path.dirname(options.output));
-			output_path = `${options.output.replace(/\.pdf$/i, '')}-${slugify(
-				items[0].title || 'Untitled page'
-			)}.pdf`;
-		} else {
-			_fs.ensureDirSync(options.output);
-			output_path = `${options.output.replace(/\/$/, '')}/${slugify(
-				items[0].title || 'Untitled page'
-			)}.pdf`;
-		}
-	} else {
-		output_path =
-			items.length === 1
-				? `${slugify(items[0].title || 'Untitled page')}.pdf`
-				: `percollate-${Date.now()}.pdf`;
-	}
+	const output_path = outputPath(items, options, '.pdf');
 
 	await page.pdf({
 		path: output_path,
@@ -319,21 +290,8 @@ async function bundleEpub(items, options) {
 
 	out.write('Saving EPUB...\n');
 
-	/*
-		When no output path is present,
-		produce the file name from the web page title
-		(if a single page was sent as argument),
-		or a timestamped file (for the moment)
-		in case we're bundling many web pages.
-	 */
-
 	const now = Date.now();
-
-	const output_path =
-		options.output ||
-		(items.length === 1
-			? `${slugify(items[0].title || 'Untitled page')}.epub`
-			: `percollate-${now}.epub`);
+	const output_path = outputPath(items, options, '.epub', now);
 
 	epubgen(
 		{
@@ -376,18 +334,7 @@ async function bundleHtml(items, options) {
 
 	out.write('Saving HTML...\n');
 
-	/*
-		When no output path is present,
-		produce the file name from the web page title
-		(if a single page was sent as argument),
-		or a timestamped file (for the moment)
-		in case we're bundling many web pages.
-	 */
-	const output_path =
-		options.output ||
-		(items.length === 1
-			? `${slugify(items[0].title || 'Untitled page')}.html`
-			: `percollate-${Date.now()}.html`);
+	const output_path = outputPath(items, options, '.html');
 
 	await fs.writeFile(output_path, html);
 
@@ -399,24 +346,18 @@ async function generate(fn, urls, options) {
 		configure();
 	}
 	if (!urls.length) return;
-	let items = [];
+	let items = await Promise.all(
+		urls.map((url, i) =>
+			cleanup(url, {
+				...options,
+				preferred_url: options.url ? options.url[i] : undefined
+			})
+		)
+	);
 
 	if (options.individual) {
-		for (let i = 0; i < urls.length; i++) {
-			let item = await cleanup(urls[i], {
-				...options,
-				preferred_url: options.url ? options.url[i] : undefined
-			});
-			await fn([item], options);
-		}
+		await Promise.all(items.map(item => fn([item], options)));
 	} else {
-		for (let i = 0; i < urls.length; i++) {
-			let item = await cleanup(urls[i], {
-				...options,
-				preferred_url: options.url ? options.url[i] : undefined
-			});
-			items.push(item);
-		}
 		await fn(items, options);
 	}
 }
