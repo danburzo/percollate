@@ -7,7 +7,7 @@ const { JSDOM } = require('jsdom');
 const nunjucks = require('nunjucks');
 const tmp = require('tmp');
 const fs = require('fs').promises;
-const _fs = require('fs');
+const _fs = require('fs-extra');
 const path = require('path');
 const css = require('css');
 const slugify = require('slugify');
@@ -269,11 +269,29 @@ async function bundlePdf(items, options) {
 		or a timestamped file (for the moment)
 		in case we're bundling many web pages.
 	 */
-	const output_path =
-		options.output ||
-		(items.length === 1
-			? `${slugify(items[0].title || 'Untitled page')}.pdf`
-			: `percollate-${Date.now()}.pdf`);
+	let output_path;
+	const file_path_present = !!options.output;
+	const file_name_present =
+		file_path_present && /.pdf$/i.test(options.output);
+
+	if (file_path_present) {
+		if (file_name_present) {
+			_fs.ensureDirSync(path.dirname(options.output));
+			output_path = `${options.output.replace(/\.pdf$/i, '')}-${slugify(
+				items[0].title || 'Untitled page'
+			)}.pdf`;
+		} else {
+			_fs.ensureDirSync(options.output);
+			output_path = `${options.output.replace(/\/$/, '')}/${slugify(
+				items[0].title || 'Untitled page'
+			)}.pdf`;
+		}
+	} else {
+		output_path =
+			items.length === 1
+				? `${slugify(items[0].title || 'Untitled page')}.pdf`
+				: `percollate-${Date.now()}.pdf`;
+	}
 
 	await page.pdf({
 		path: output_path,
