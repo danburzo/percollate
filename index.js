@@ -113,7 +113,7 @@ async function fetchContent(ref, fetchOptions = {}) {
 
 async function cleanup(url, options) {
 	if (!url) {
-		return;
+		return null;
 	}
 	try {
 		out.write(`Fetching: ${url}`);

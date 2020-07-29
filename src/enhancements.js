@@ -18,18 +18,26 @@ function fixLazyLoadedImages(doc) {
 		doc.querySelectorAll(`
 		img[data-src], 
 		img[data-srcset],
-		img[data-sizes]
+		img[data-lazy-src],
+		img[data-lazy-srcset]
 	`)
 	).forEach(img => {
-		['src', 'srcset', 'sizes'].forEach(attr => {
+		['src', 'srcset', 'lazySrc', 'lazySrcset'].forEach(attr => {
 			if (attr in img.dataset) {
-				img.setAttribute(attr, img.dataset[attr]);
+				img.setAttribute(
+					attr.replace(/^lazyS/, 's'),
+					img.dataset[attr]
+				);
 			}
 		});
 	});
 
 	Array.from(doc.querySelectorAll('[loading="lazy"]')).forEach(el => {
 		el.removeAttribute('loading');
+	});
+
+	Array.from(doc.querySelectorAll('img[sizes]')).forEach(img => {
+		img.removeAttribute('sizes');
 	});
 }
 
