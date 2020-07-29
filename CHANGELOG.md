@@ -1,5 +1,10 @@
 # Percollate Changelog
 
+### 0.6.4
+
+-   Use the value of the `--output` option as a prefix for file names when converting multiple files with the `--individual` flag.
+-   Switched `fetch` implementation from `got` to the smaller `node-fetch` package.
+
 ### 0.6.2
 
 Fix `-V / --version` argument parsing.
@@ -10,7 +15,7 @@ Fix template resolution issue introduced in 0.6.0.
 
 ### 0.6.0
 
--   Upgraded to latest version, and devendorized, [@mozilla/readability](https://github.com/mozilla/readability);
+-   Upgraded to latest version, ~~and devendorized,~~ [@mozilla/readability](https://github.com/mozilla/readability);
 -   Enhancement: remove `loading=lazy` attributes;
 -   Bugfix: identify AMP version when the `rel` attribute has multiple, space-separated values.
 -   Bugfix: add underlines to links in Apple Books

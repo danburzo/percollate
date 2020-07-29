@@ -2,7 +2,7 @@
 
 const pup = require('puppeteer');
 const archiver = require('archiver');
-const got = require('got');
+const fetch = require('node-fetch');
 const { JSDOM } = require('jsdom');
 const nunjucks = require('nunjucks');
 const tmp = require('tmp');
@@ -66,7 +66,7 @@ function configure() {
 	-----------------------------------
  */
 
-function fetchContent(url) {
+function fetchContent(url, fetchOptions) {
 	if (url === '-') {
 		return slurp(process.stdin);
 	}
@@ -74,18 +74,20 @@ function fetchContent(url) {
 		Must ensure that the URL is properly encoded.
 		See: https://github.com/danburzo/percollate/pull/83
 	 */
-	return got(encodeURI(decodeURI(url)), {
+	return fetch(encodeURI(decodeURI(url)), {
+		...fetchOptions,
 		headers: {
+			...fetchOptions.headers,
 			'user-agent': `percollate/${pkg.version}`
 		}
-	}).then(result => result.body);
+	}).then(result => result.text());
 }
 
 async function cleanup(url, options) {
 	try {
 		out.write(`Fetching: ${url}`);
 
-		const content = await fetchContent(url);
+		const content = await fetchContent(url, options.fetch || {});
 
 		out.write(' ✓\n');
 
@@ -461,8 +463,8 @@ async function epubgen(data, output_path) {
 
 	for (let i = 0; i < remoteResources.length; i++) {
 		let entry = remoteResources[i];
-		let buff = await got(entry[0]).buffer();
-		archive.append(buff, { name: `OEBPS/${entry[1]}` });
+		let stream = (await fetch(entry[0])).body;
+		archive.append(stream, { name: `OEBPS/${entry[1]}` });
 	}
 
 	const nav = nunjucks.renderString(navTemplate, data);

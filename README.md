@@ -226,7 +226,7 @@ An example from the [default stylesheet](./templates/default.css):
 
 All export formats follow a common pipeline:
 
-1. Fetch the page(s) using [`got`](https://github.com/sindresorhus/got)
+1. Fetch the page(s) using [`node-fetch`](https://github.com/node-fetch/node-fetch)
 2. If an AMP version of the page exists, use that instead (disable with `--no-amp` flag)
 3. [Enhance](./src/enhancements.js) the DOM using [`jsdom`](https://github.com/jsdom/jsdom)
 4. Pass the DOM through [`mozilla/readability`](https://github.com/mozilla/readability) to strip unnecessary elements
