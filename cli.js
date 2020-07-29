@@ -69,17 +69,33 @@ Commmon options:
 
   -o <output>,       Path for the generated bundle.
   --output=<path>  
+
   --template=<path>  Path to a custom HTML template.
+  
   --style=<path>     Path to a custom CSS file.
+  
   --css=<style>      Additional inline CSS style.
+  
   -u, --url=<url>    Sets the base URL when HTML is provided on stdin.
                      Multiple URL options can be specified.
+  
   -t <title>,        The bundle title.
   --title=<title>
+  
   --individual       Export each web page as an individual file.
-  --no-amp           Don't prefer the AMP version of the web page.
+  
   --toc              Generate a Table of Contents.
-  --cover            Add a cover to the PDF / EPUB.
+                     Implicitly enabled when bundling more than one item.
+  
+  --cover            Generate a cover for the PDF / EPUB.
+                     Implicitly enabled when bundling more than one item
+                     or the --title option is provided.
+
+Options to disable features:
+
+  --no-amp           Don't prefer the AMP version of the web page.
+  --no-toc           Don't generate a table of contents.
+  --no-cover         Don't generate a cover.
 
 PDF options: 
 

@@ -79,6 +79,7 @@ pre code {
  */
 
 .toc {
+	page-break-before: always;
 	page-break-after: always;
 }
 

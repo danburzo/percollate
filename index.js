@@ -205,9 +205,12 @@ async function bundlePdf(items, options) {
 			items,
 			style,
 			options: {
-				use_toc: options.toc && items.length > 1,
+				use_toc:
+					options.toc || (items.length > 1 && options.toc !== false),
 				use_cover:
-					options.cover || (options.title && options.cover !== false)
+					options.cover ||
+					(options.cover !== false &&
+						(options.title || items.length > 1))
 			}
 		}
 	);
@@ -312,7 +315,10 @@ async function bundleEpub(items, options) {
 				options.title ||
 				(items.length === 1 ? items[0].title : 'Untitled'),
 			date: epubDate(new Date()),
-			cover: options.cover || (options.title && options.cover !== false),
+			cover:
+				options.cover ||
+				(options.cover !== false &&
+					(options.title || items.length > 1)),
 			uuid: uuid(),
 			items,
 			style
@@ -347,9 +353,12 @@ async function bundleHtml(items, options) {
 			items,
 			style,
 			options: {
-				use_toc: options.toc && items.length > 1,
+				use_toc:
+					options.toc || (items.length > 1 && options.toc !== false),
 				use_cover:
-					options.cover || (options.title && options.cover !== false)
+					options.cover ||
+					(options.cover !== false &&
+						(options.title || items.length > 1))
 			}
 		}
 	);
