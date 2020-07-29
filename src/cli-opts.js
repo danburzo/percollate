@@ -6,11 +6,19 @@ const opsh = require('opsh');
  */
 
 const available_commands = new Set(['pdf', 'epub', 'html']);
-let opts_with_optarg = new Set(['output', 'template', 'style', 'css', 'url']);
+let opts_with_optarg = new Set([
+	'output',
+	'template',
+	'style',
+	'css',
+	'url',
+	'title'
+]);
 let opts_with_arr = new Set(['url']);
 let aliases = {
 	o: 'output',
 	u: 'url',
+	t: 'title',
 	h: 'help',
 	V: 'version'
 };
@@ -27,7 +35,7 @@ module.exports = function (args) {
 			let m = option.match(/^no-(.+)$/);
 
 			if (m) {
-				opts[m[1]] = value !== undefined ? value : false;
+				opts[m[1]] = false;
 			} else {
 				if (opts_with_arr.has(option)) {
 					if (!opts[option]) {

@@ -5,6 +5,7 @@
 	--alt-font: 'helvetica neue', ubuntu, roboto, noto, 'segoe ui', arial,
 		sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
 	--code-font: Menlo, Consolas, monospace;
+	--accent-color: black;
 }
 
 @page {
@@ -266,6 +267,50 @@ article:not(:last-of-type) {
 }
 
 /*
+	Page header / footer
+	--------------------
+
+	These are extracted when generating the PDF
+	and are not subject to the page's CSS cascade.
+
+	They're just placed here for easier style coordination
+ */
+
+.header-template {
+}
+
+.footer-template {
+	font-size: 10pt;
+	font-weight: bold;
+}
+
+/*
+	Cover page
+	----------
+ */
+
+.cover {
+	color: var(--accent-color);
+	border: 0.5em solid;
+	font-family: var(--cover-font, var(--alt-font));
+	padding: 2em;
+}
+
+.cover__title {
+	font-size: 2.4em;
+	margin: 0;
+	line-height: 1.1;
+}
+
+.cover__subtitle {
+	margin: 1em 0;
+}
+
+.cover__date {
+	font-weight: bold;
+}
+
+/*
 	Filetype specific
 	-----------------
  */
@@ -283,20 +328,35 @@ article:not(:last-of-type) {
 	font-family: var(--alt-font);
 }
 
-/*
-	Page header / footer
-	--------------------
-
-	These are extracted when generating the PDF
-	and are not subject to the page's CSS cascade.
-
-	They're just placed here for easier style coordination
- */
-
-.header-template {
+.type--pdf .cover,
+.type--epub .cover {
+	position: absolute;
+	overflow: hidden;
 }
 
-.footer-template {
-	font-size: 10pt;
-	font-weight: bold;
+.type--pdf .cover {
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+}
+
+.type--epub .cover {
+	top: 2em;
+	left: 2em;
+	right: 2em;
+	bottom: 2em;
+}
+
+.type--pdf .cover__content,
+.type--epub .cover__content {
+	position: absolute;
+	top: 30%;
+	left: 2em;
+	right: 2em;
+	transform: translate(0, -50%);
+}
+
+.type--pdf .cover__sentinel {
+	page-break-after: always;
 }

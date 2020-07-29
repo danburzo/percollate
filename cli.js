@@ -74,9 +74,12 @@ Commmon options:
   --css=<style>      Additional inline CSS style.
   -u, --url=<url>    Sets the base URL when HTML is provided on stdin.
                      Multiple URL options can be specified.
+  -t <title>,        The bundle title.
+  --title=<title>
   --individual       Export each web page as an individual file.
   --no-amp           Don't prefer the AMP version of the web page.
   --toc              Generate a Table of Contents.
+  --cover            Add a cover to the PDF / EPUB.
 
 PDF options: 
 

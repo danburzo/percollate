@@ -2,14 +2,26 @@
 <html class="type--{{filetype}}">
 	<head>
 		<meta charset="utf-8" />
-		<title>Percollate</title>
+		<title>{{ title }}</title>
 
 		<style type="text/css">
 			{{style }}
 		</style>
 	</head>
 	<body>
-		{% if options.use_toc %}
+		{% if options.use_cover %}
+		<div class="cover">
+			<div class="cover__content">
+				<h1 class="cover__title">{{ title }}</h1>
+				<p class="cover__subtitle">
+					<time class="cover__date" datetime="{{ date }}"
+						>{{ date }}</time
+					>
+				</p>
+			</div>
+		</div>
+		<div class="cover__sentinel">&nbsp;</div>
+		{% endif %} {% if options.use_toc %}
 		<nav class="toc">
 			<h1 class="toc__title">Table of Contents</h1>
 			<ol class="toc__list">

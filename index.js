@@ -16,6 +16,7 @@ const uuid = require('uuid/v1');
 const mimetype = require('mimetype');
 const slurp = require('./src/util/slurp');
 const epubDate = require('./src/util/epub-date');
+const humanDate = require('./src/util/human-date');
 const outputPath = require('./src/util/output-path');
 
 const {
@@ -59,6 +60,28 @@ function configure() {
 		nunjucks.configure({ autoescape: false, noCache: true });
 		configured = true;
 	}
+}
+
+function launch(options, size) {
+	return pup.launch({
+		headless: true,
+		/*
+			Allow running with no sandbox
+			See: https://github.com/danburzo/percollate/issues/26
+		 */
+		args: options.sandbox
+			? undefined
+			: ['--no-sandbox', '--disable-setuid-sandbox'],
+		defaultViewport: {
+			// Emulate retina display (@2x)...
+			deviceScaleFactor: 2,
+			// ...but then we need to provide the other
+			// viewport parameters as well
+			width: 1920,
+			height: 1080,
+			...size
+		}
+	});
 }
 
 /*
@@ -164,25 +187,27 @@ async function cleanup(url, options) {
 	--------------------------------
  */
 async function bundlePdf(items, options) {
-	out.write('Generating temporary HTML file... ');
-	const temp_file = tmp.tmpNameSync({ postfix: '.html' });
-
 	const DEFAULT_STYLESHEET = path.join(__dirname, 'templates/default.css');
 	const DEFAULT_TEMPLATE = path.join(__dirname, 'templates/default.html');
 
 	const style =
 		(await fs.readFile(options.style || DEFAULT_STYLESHEET, 'utf8')) +
 		(options.css || '');
-	const use_toc = options.toc && items.length > 1;
 
 	const html = nunjucks.renderString(
 		await fs.readFile(options.template || DEFAULT_TEMPLATE, 'utf8'),
 		{
 			filetype: 'pdf',
+			title:
+				options.title ||
+				(items.length === 1 ? items[0].title : 'Untitled'),
+			date: humanDate(new Date()),
 			items,
 			style,
 			options: {
-				use_toc
+				use_toc: options.toc && items.length > 1,
+				use_cover:
+					options.cover || (options.title && options.cover !== false)
 			}
 		}
 	);
@@ -225,29 +250,15 @@ async function bundlePdf(items, options) {
 		);
 	}
 
-	await fs.writeFile(temp_file, html);
+	if (options.debug) {
+		out.write('Generating temporary HTML file... ');
+		const temp_file = tmp.tmpNameSync({ postfix: '.html' });
+		await fs.writeFile(temp_file, html);
+		out.write('✓\n');
+		out.write(`Temporary HTML file: file://${temp_file}\n`);
+	}
 
-	out.write('✓\n');
-	out.write(`Temporary HTML file: file://${temp_file}\n`);
-
-	const browser = await pup.launch({
-		headless: true,
-		/*
-			Allow running with no sandbox
-			See: https://github.com/danburzo/percollate/issues/26
-		 */
-		args: options.sandbox
-			? undefined
-			: ['--no-sandbox', '--disable-setuid-sandbox'],
-		defaultViewport: {
-			// Emulate retina display (@2x)...
-			deviceScaleFactor: 2,
-			// ...but then we need to provide the other
-			// viewport parameters as well
-			width: 1920,
-			height: 1080
-		}
-	});
+	const browser = await launch(options);
 	const page = await browser.newPage();
 
 	/*
@@ -262,7 +273,7 @@ async function bundlePdf(items, options) {
 		});
 	}
 
-	await page.goto(`file://${temp_file}`, { waitUntil: 'load' });
+	await page.setContent(html, { waitUntil: 'load' });
 
 	const output_path = outputPath(items, options, '.pdf');
 
@@ -292,18 +303,22 @@ async function bundleEpub(items, options) {
 
 	out.write('Saving EPUB...\n');
 
-	const now = Date.now();
-	const output_path = outputPath(items, options, '.epub', now);
+	const output_path = outputPath(items, options, '.epub');
 
 	epubgen(
 		{
-			title: items.length === 1 ? items[0].title : `percollate-${now}`,
-			date: epubDate(new Date(now)),
+			filetype: 'epub',
+			title:
+				options.title ||
+				(items.length === 1 ? items[0].title : 'Untitled'),
+			date: epubDate(new Date()),
+			cover: options.cover || (options.title && options.cover !== false),
 			uuid: uuid(),
 			items,
 			style
 		},
-		output_path
+		output_path,
+		options
 	);
 
 	out.write(`Saved EPUB: ${output_path}\n`);
@@ -320,16 +335,21 @@ async function bundleHtml(items, options) {
 	const style =
 		(await fs.readFile(options.style || DEFAULT_STYLESHEET, 'utf8')) +
 		(options.css || '');
-	const use_toc = options.toc && items.length > 1;
 
 	const html = nunjucks.renderString(
 		await fs.readFile(options.template || DEFAULT_TEMPLATE, 'utf8'),
 		{
 			filetype: 'html',
+			title:
+				options.title ||
+				(items.length === 1 ? items[0].title : 'Untitled'),
+			date: humanDate(new Date()),
 			items,
 			style,
 			options: {
-				use_toc
+				use_toc: options.toc && items.length > 1,
+				use_cover:
+					options.cover || (options.title && options.cover !== false)
 			}
 		}
 	);
@@ -398,7 +418,7 @@ async function html(urls, options) {
 		https://www.ibm.com/developerworks/xml/tutorials/x-epubtut/index.html
  */
 
-async function epubgen(data, output_path) {
+async function epubgen(data, output_path, options) {
 	const template_base = path.join(__dirname, 'templates/epub/');
 
 	const output = _fs.createWriteStream(output_path);
@@ -467,16 +487,50 @@ async function epubgen(data, output_path) {
 		archive.append(stream, { name: `OEBPS/${entry[1]}` });
 	}
 
+	const assets = [
+		{
+			id: 'style',
+			href: 'style.css',
+			mimetype: 'text/css'
+		}
+	];
+
+	if (data.cover) {
+		const COVER_TEMPLATE = path.join(__dirname, 'templates/cover.html');
+		const cover_html = nunjucks.renderString(
+			await fs.readFile(COVER_TEMPLATE, 'utf8'),
+			data
+		);
+
+		const browser = await launch(options, {
+			width: 400,
+			height: 565
+		});
+		const page = await browser.newPage();
+
+		await page.setContent(cover_html, { waitUntil: 'load' });
+
+		let buff = await page.screenshot({
+			type: 'png',
+			fullPage: true
+		});
+
+		archive.append(buff, { name: 'OEBPS/cover.png' });
+
+		await browser.close();
+	}
+
 	const nav = nunjucks.renderString(navTemplate, data);
 	const opf = nunjucks.renderString(opfTemplate, {
 		...data,
-		assets: [
-			{
-				id: 'style',
-				href: 'style.css',
-				mimetype: 'text/css'
-			}
-		],
+		assets,
+		cover: data.cover
+			? {
+					id: 'cover',
+					href: 'cover.png',
+					mimetype: 'image/png'
+			  }
+			: undefined,
 		remoteResources: remoteResources.map(entry => ({
 			id: entry[1].replace(/[^a-z0-9]/gi, ''),
 			href: entry[1],
