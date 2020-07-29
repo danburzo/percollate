@@ -1,53 +1,112 @@
 #!/usr/bin/env node
-const program = require('commander');
+
+'use strict';
+
 const pkg = require('./package.json');
+const cliopts = require('./src/cli-opts');
 
-const { configure, pdf, epub, html } = require('.');
+const { pdf, epub, html } = require('./index');
 
-/*
-	Some setup
-	----------
- */
-configure();
+const { command, opts, operands } = cliopts(process.argv.slice(2));
 
-/*
-	Command-Line Interface definition
-	---------------------------------
- */
-
-function with_common_options(cmd) {
-	return cmd
-		.option('-o, --output [output]', 'Path for the generated bundle')
-		.option('--template [template]', 'Path to custom HTML template')
-		.option('--style [stylesheet]', 'Path to custom CSS')
-		.option('--css [style]', 'Additional CSS style')
-		.option('--individual', 'Export each web page as an individual file');
+if (opts.debug) {
+	console.log({
+		command,
+		operands,
+		opts
+	});
 }
 
-program.version(pkg.version);
+if (opts.version) {
+	console.log(pkg.version);
+	process.exit(0);
+}
 
-with_common_options(program.command('pdf [urls...]'))
-	.option('--no-sandbox', 'Passed to Puppeteer')
-	.description('Bundle web pages as a PDF file')
-	.action(pdf);
+if (opts.help) {
+	outputHelp();
+}
 
-with_common_options(program.command('epub [urls...]'))
-	.description('Bundle web pages as an EPUB file')
-	.action(epub);
+if (!command || !operands.length) {
+	outputHelp();
+}
 
-with_common_options(program.command('html [urls...]'))
-	.description('Bundle web pages as a HTML file')
-	.action(html);
+switch (command) {
+	case 'pdf':
+		pdf(operands, opts);
+		break;
+	case 'epub':
+		epub(operands, opts);
+		break;
+	case 'html':
+		html(operands, opts);
+		break;
+	default:
+		outputHelp();
+}
 
-// with_common_options(
-// 	program.command('', 'default command', { isDefault: true })
-// ).action(() => {
-// 	program.outputHelp();
-// });
+/*
+	Help & version
+	--------------
+ */
 
-program.parse(process.argv);
+function outputHelp() {
+	console.log(
+		`percollate v${pkg.version}
 
-// Show help by default when no arguments provided
-if (!program.args.length) {
-	program.outputHelp();
+Usage: percollate <command> [options] url [url]...
+
+Commands:
+
+  pdf                Bundle web pages as a PDF file
+  epub               Bundle web pages as an EPUB file.
+  html               Bundle web pages as a HTML file.
+
+Commmon options:
+
+  -h, --help         Output usage information.
+  -V, --version      Output program version.
+  --debug            Print more detailed information.
+
+  -o <output>,       Path for the generated bundle.
+  --output=<path>  
+  --template=<path>  Path to a custom HTML template.
+  --style=<path>     Path to a custom CSS file.
+  --css=<style>      Additional inline CSS style.
+  -u, --url=<url>    Sets the base URL when HTML is provided on stdin.
+                     Multiple URL options can be specified.
+  --individual       Export each web page as an individual file.
+  --no-amp           Don't prefer the AMP version of the web page.
+  --toc              Generate a Table of Contents.
+
+PDF options: 
+
+  --no-sandbox       Passed to Puppeteer.
+
+Operands:
+
+  percollate accepts one or more URLs.
+  
+  Use the hyphen character ('-') to specify 
+  that the HTML should be read from stdin.
+
+Examples:
+
+  Single web page to PDF:
+
+    percollate pdf --output my.pdf https://example.com
+
+  Single web page read from stdin to PDF:
+
+    curl https://example.com | percollate pdf -o my.pdf -u https://example.com -
+  
+  Several web pages to a single PDF:
+
+    percollate pdf --output my.pdf https://example.com/1 https://example.com/2
+  
+  Custom page size and font size:
+    
+    percollate pdf --output my.pdf --css "@page { size: A3 landscape } html { font-size: 18pt }" https://example.com
+`
+	);
+	process.exit(0);
 }

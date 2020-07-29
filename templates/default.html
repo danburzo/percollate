@@ -1,42 +1,53 @@
 <!DOCTYPE html>
-<html>
-<head>
-	<meta charset="utf-8">
-	<title>🌐 Percollate</title>
+<html class="type--{{filetype}}">
+	<head>
+		<meta charset="utf-8" />
+		<title>Percollate</title>
 
-	<style type='text/css'>
-		{{ style }}
-	</style>
-</head>
-<body>
-	{% for item in items %}
-	<article class='article'>
-		<header class='article__header'>
-			<h1 class='article__title'>
-				{{ item.title }}
-			</h1>
-			{% if item.byline %}
-				<p class='article__byline'>
-					By <span>{{ item.byline }}</span>
+		<style type="text/css">
+			{{style }}
+		</style>
+	</head>
+	<body>
+		{% if options.use_toc %}
+		<nav class="toc">
+			<h1 class="toc__title">Table of Contents</h1>
+			<ol class="toc__list">
+				{% for item in items %}
+				<li class="toc__list-item">
+					<a href="#{{ item.id }}" class="no-href"
+						>{{ item.title }}</a
+					>
+				</li>
+				{% endfor %}
+			</ol>
+		</nav>
+		{% endif %} {% for item in items %}
+		<article id="{{ item.id }}" class="article">
+			<header class="article__header">
+				<h1 class="article__title">
+					{{ item.title }}
+				</h1>
+				{% if item.byline %}
+				<p class="article__byline">By <span>{{ item.byline }}</span></p>
+				{% endif %}
+				<p class="article__url">
+					Source:
+					<a class="no-href" href="{{item.url}}">{{item.url}}</a>
 				</p>
-			{% endif %}
-			<p class='article__url'>
-				Source: 
-				<a class='no-href' href="{{item.url}}">{{item.url}}</a>
-			</p>
-		</header>
+			</header>
 
-		<div class='article__content'>
-			{{ item.content }}
-		</div>
-	</article>
-	{% endfor %}
+			<div class="article__content">
+				{{ item.content }}
+			</div>
+		</article>
+		{% endfor %}
 
-	<!-- Template to use for page footer -->
-	<template class='footer-template'>
-		<div class='text center'>
-			<span class='pageNumber'></span>
-		</div>
-	</template>
-</body>
+		<!-- Template to use for page footer -->
+		<template class="footer-template">
+			<div class="text center">
+				<span class="pageNumber"></span>
+			</div>
+		</template>
+	</body>
 </html>

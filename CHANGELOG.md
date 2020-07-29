@@ -1,5 +1,66 @@
 # Percollate Changelog
 
+### 0.6.2
+
+Fix `-V / --version` argument parsing.
+
+### 0.6.1
+
+Fix template resolution issue introduced in 0.6.0.
+
+### 0.6.0
+
+-   Upgraded to latest version, and devendorized, [@mozilla/readability](https://github.com/mozilla/readability);
+-   Enhancement: remove `loading=lazy` attributes;
+-   Bugfix: identify AMP version when the `rel` attribute has multiple, space-separated values.
+-   Bugfix: add underlines to links in Apple Books
+
+### 0.5.0
+
+You can now generate (basic) EPUB and HTML with the `epub` and `html` commands, respectively.
+
+Added the ability to read HTML content from `stdin` with the `-` operand; you can pass the original URL with the `-u` / `--url` option.
+
+### 0.4.0
+
+Enhancement: expand `<details>` elements.
+
+Chore: upgrade dependencies to their latest version.
+
+### 0.3.0
+
+Prefer the AMP version of an article, if available. [Details here](https://github.com/danburzo/percollate/pull/70).
+
+Support for lazy-loaded images. ([#71](https://github.com/danburzo/percollate/issues/71))
+
+Increased Puppeteer navigation timeout to 2 minutes. ([#80](https://github.com/danburzo/percollate/issues/80), thanks [@butu5](https://github.com/butu5)!). Also added a `--debug` flag to print more information about the process.
+
+Fixed URL encoding before fetching it. ([#83](https://github.com/danburzo/percollate/pull/83), thanks [@ncsing](https://github.com/ncsing)!)
+
+Generate a Table of Contents page ([#81](https://github.com/danburzo/percollate/pull/81), thanks [@guybedo](https://github.com/guybedo)!) when using the `--toc` option.
+
+### 0.2.14
+
+Fixes bug with the URL class not being globally available in Node < 10. ([#64](https://github.com/danburzo/percollate/pull/64), thanks [@tanmayrajani](https://github.com/tanmayrajani)!).
+
+Adds usage examples to the CLI help output. ([#55](https://github.com/danburzo/percollate/pull/55), thanks [@opw0011](https://github.com/opw0011)!)
+
+### 0.2.13
+
+Adds `percollate/${version}` user-agent to prevent some HTTP 405 errors ([#59](https://github.com/danburzo/percollate/issues/59)).
+
+We now perform relative to absolute URI conversion inside Percollate itself rather than rely on Readability ([#33](https://github.com/danburzo/percollate/issues/33), thank you [@ramadis](https://github.com/ramadis), [@tanmayrajani](https://github.com/tanmayrajani) for the help!). This includes the `srcset` attribute, which caused images to be broken on some sites ([#58](https://github.com/danburzo/percollate/issues/58)).
+
+Made `imagesAtFullSize` ignore Wikipedia image file links ([#42](https://github.com/danburzo/percollate/issues/42)).
+
+Percollate now emulates a high-resolution display, which in some cases helps get the best quality image available.
+
+Adds new enhancement, `singleImgToFigure`, that transforms single images into `<figure>` elements, using the image's `alt` attribute as `<figcaption>`.
+
+Preserve `anchor` class on hyperlinks, hide them when they're part of a heading. (A common pattern for Markdown to HTML tools).
+
+Align `ol` and `ul` elements to match paragraph indentation.
+
 ### 0.2.12
 
 -   Fixes indentation of images wrapped in `<p>` tags ([#48](https://github.com/danburzo/percollate/issues/48))

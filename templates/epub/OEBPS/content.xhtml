@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta charset="utf-8" />
+		<title>{{ item.title }}</title>
+		<link rel="stylesheet" type="text/css" href="./style.css" />
+	</head>
+	<body>
+		<header class="article__header">
+			<h1 class="article__title">{{ item.title }}</h1>
+			{% if item.byline %}
+			<p class="article__byline">By <span>{{ item.byline }}</span></p>
+			{% endif %}
+			<p class="article__url">
+				Source:
+				<a class="no-href" href="{{item.url}}">{{item.url}}</a>
+			</p>
+		</header>
+		<div class="article__content">
+			{{ item.content }}
+		</div>
+	</body>
+</html>

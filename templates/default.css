@@ -13,15 +13,10 @@
 }
 
 html {
-	font-size: 13pt;
+	font-size: 12pt;
 	line-height: 1.3;
 	font-family: var(--main-font);
-}
-
-body {
-	margin: 0;
-	padding: 0;
-	width: 100%;
+	-webkit-print-color-adjust: exact;
 }
 
 h1,
@@ -34,19 +29,26 @@ h6 {
 	font-family: var(--alt-font);
 	font-weight: bold;
 	page-break-after: avoid;
-	page-break-before: avoid;
 }
 
 a {
 	color: inherit;
+	text-decoration: underline;
 }
 
-a:not(.no-href):after {
-	content: ' → ' attr(href) '';
-	font-size: 0.8em;
-	word-break: break-all;
-	word-wrap: break-word;
-	font-family: var(--alt-font);
+/*
+	Going on a limb here,
+	but a.anchor in heading elements
+	is most likely a '#' or '§' anchor
+	we don't want to display in the PDF.
+ */
+h1 a.anchor,
+h2 a.anchor,
+h3 a.anchor,
+h4 a.anchor,
+h5 a.anchor,
+h6 a.anchor {
+	display: none;
 }
 
 th {
@@ -68,6 +70,15 @@ pre code {
 [hidden],
 [aria-hidden] {
 	display: none;
+}
+
+/*
+	Table of Contents page
+	----------------------------------------------------
+ */
+
+.toc {
+	page-break-after: always;
 }
 
 /*
@@ -111,9 +122,12 @@ article:not(:last-of-type) {
 
 .article__content img {
 	max-width: 100%;
+	display: block;
+	margin: 0 auto;
 }
 
 .article__content figure {
+	display: block;
 	margin: 1.5em 0;
 	padding: 0;
 	text-align: center;
@@ -122,6 +136,12 @@ article:not(:last-of-type) {
 .article__content figcaption {
 	font-size: 0.8em;
 	font-family: var(--alt-font);
+	margin: 0.81em 0;
+	line-height: 1.625;
+}
+
+.article__content figure blockquote {
+	text-align: left;
 }
 
 .article__content table,
@@ -219,6 +239,48 @@ article:not(:last-of-type) {
 
 .article__content dt {
 	font-weight: bold;
+}
+
+.article__content ol,
+.article__content ul {
+	padding-left: 2em;
+	list-style-position: outside;
+	margin: 0.65em 0;
+}
+
+.article__content aside {
+	font-family: var(--alt-font);
+	font-size: 0.9em;
+	line-height: 1.44;
+	padding-left: 2em;
+}
+
+.article__content details {
+	margin: 0.65em 0;
+}
+
+.article__content details > summary {
+	font-weight: bold;
+	font-size: 0.9em;
+	font-family: var(--alt-font);
+}
+
+/*
+	Filetype specific
+	-----------------
+ */
+
+.type--pdf body {
+	margin: 0;
+	padding: 0;
+}
+
+.type--pdf a:not(.no-href):after {
+	content: ' → ' attr(href) '';
+	font-size: 0.8em;
+	word-break: break-all;
+	word-wrap: break-word;
+	font-family: var(--alt-font);
 }
 
 /*
