@@ -372,7 +372,7 @@ async function bundleHtml(items, options) {
 	out.write(`Saved HTML: ${output_path}\n`);
 }
 
-async function generate(fn, urls, options) {
+async function generate(fn, urls, options = {}) {
 	if (!configured) {
 		configure();
 	}
@@ -560,6 +560,5 @@ module.exports = {
 	configure,
 	pdf,
 	epub,
-	epubgen,
 	html
 };
