@@ -31,7 +31,8 @@
 		"husky": "^4.2.5",
 		"prettier": "^2.0.5",
 		"pretty-quick": "^2.0.1",
-		"tape": "^5.0.1"
+		"tape": "^5.0.1",
+		"tape-promise": "^4.0.0"
 	},
 	"scripts": {
 		"test": "tape test/**/*.test.js",

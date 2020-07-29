@@ -8,6 +8,7 @@ const nunjucks = require('nunjucks');
 const tmp = require('tmp');
 const fs = require('fs').promises;
 const _fs = require('fs');
+const stream = require('stream');
 const path = require('path');
 const css = require('css');
 const Readability = require('./vendor/readability');
@@ -89,15 +90,17 @@ function launch(options, size) {
 	-----------------------------------
  */
 
-function fetchContent(url, fetchOptions) {
-	if (url === '-') {
-		return slurp(process.stdin);
+async function fetchContent(ref, fetchOptions = {}) {
+	if (ref instanceof stream.Readable) {
+		return slurp(ref);
 	}
+
+	let url = new URL(ref);
 	/*
 		Must ensure that the URL is properly encoded.
 		See: https://github.com/danburzo/percollate/pull/83
 	 */
-	return fetch(encodeURI(decodeURI(url)), {
+	return fetch(url.href, {
 		...fetchOptions,
 		headers: {
 			...fetchOptions.headers,
@@ -110,7 +113,10 @@ async function cleanup(url, options) {
 	try {
 		out.write(`Fetching: ${url}`);
 
-		const content = await fetchContent(url, options.fetch || {});
+		const content = await fetchContent(
+			url !== '-' ? url : process.stdin,
+			options.fetch || {}
+		);
 
 		out.write(' ✓\n');
 
@@ -560,5 +566,8 @@ module.exports = {
 	configure,
 	pdf,
 	epub,
-	html
+	html,
+	__test__: {
+		fetchContent
+	}
 };
