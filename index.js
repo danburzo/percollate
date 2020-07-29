@@ -112,6 +112,9 @@ async function fetchContent(ref, fetchOptions = {}) {
 }
 
 async function cleanup(url, options) {
+	if (!url) {
+		return;
+	}
 	try {
 		out.write(`Fetching: ${url}`);
 
@@ -385,14 +388,20 @@ async function generate(fn, urls, options = {}) {
 		configure();
 	}
 	if (!urls.length) return;
-	let items = await Promise.all(
-		urls.map((url, i) =>
-			cleanup(url, {
-				...options,
-				preferred_url: options.url ? options.url[i] : undefined
-			})
+	let items = (
+		await Promise.all(
+			urls.map((url, i) =>
+				cleanup(url, {
+					...options,
+					preferred_url: options.url ? options.url[i] : undefined
+				}).catch(err => {
+					console.error(err);
+					console.log('Ignoring item');
+					return null;
+				})
+			)
 		)
-	);
+	).filter(it => it);
 
 	if (options.individual) {
 		await Promise.all(items.map(item => fn([item], options)));
