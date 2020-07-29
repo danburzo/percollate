@@ -1552,12 +1552,14 @@ Readability.prototype = {
 		var jsonLdElement = this._doc.querySelector(
 			'script[type="application/ld+json"]'
 		);
+
 		if (jsonLdElement) {
 			try {
 				var parsed = JSON.parse(jsonLdElement.text);
 				var metadata = {};
 				if (
-					parsed['@context'] !== 'https://schema.org' ||
+					!parsed['@context'] ||
+					!parsed['@context'].match(/^https?\:\/\/schema\.org$/) ||
 					!parsed['@type'] ||
 					!parsed['@type'].match(this.REGEXPS.jsonLdArticleTypes)
 				) {
