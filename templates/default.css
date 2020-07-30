@@ -143,7 +143,8 @@ article:not(:last-of-type) {
 	line-height: 1.625;
 }
 
-.article__content figure blockquote {
+.article__content figure blockquote,
+.article__content figure pre {
 	text-align: left;
 }
 
