@@ -174,7 +174,14 @@ function relativeToAbsoluteURIs(doc) {
 	Array.from(
 		doc.querySelectorAll('picture source[srcset], img[srcset]')
 	).forEach(el => {
-		el.setAttribute('srcset', absoluteSrcset(el.getAttribute('srcset')));
+		try {
+			el.setAttribute(
+				'srcset',
+				absoluteSrcset(el.getAttribute('srcset'))
+			);
+		} catch (err) {
+			console.error(err);
+		}
 	});
 }
 

@@ -25,15 +25,19 @@ module.exports = function remoteResources(doc) {
 	Array.from(
 		doc.querySelectorAll('picture source[srcset], img[srcset]')
 	).forEach(el => {
-		el.setAttribute(
-			'srcset',
-			srcset.stringify(
-				srcset.parse(el.getAttribute('srcset')).map(item => ({
-					...item,
-					url: replace(item.url)
-				}))
-			)
-		);
+		try {
+			el.setAttribute(
+				'srcset',
+				srcset.stringify(
+					srcset.parse(el.getAttribute('srcset')).map(item => ({
+						...item,
+						url: replace(item.url)
+					}))
+				)
+			);
+		} catch (err) {
+			console.error(err);
+		}
 	});
 	return Array.from(srcs.entries());
 };
