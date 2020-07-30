@@ -1559,7 +1559,21 @@ Readability.prototype = {
 				var metadata = {};
 				if (
 					!parsed['@context'] ||
-					!parsed['@context'].match(/^https?\:\/\/schema\.org$/) ||
+					!parsed['@context'].match(/^https?\:\/\/schema\.org$/)
+				) {
+					return metadata;
+				}
+
+				if (!parsed['@type'] && Array.isArray(parsed['@graph'])) {
+					parsed = parsed['@graph'].find(it =>
+						(it['@type'] || '').match(
+							this.REGEXPS.jsonLdArticleTypes
+						)
+					);
+				}
+
+				if (
+					!parsed ||
 					!parsed['@type'] ||
 					!parsed['@type'].match(this.REGEXPS.jsonLdArticleTypes)
 				) {
