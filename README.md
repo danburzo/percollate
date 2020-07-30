@@ -20,6 +20,7 @@ _Example spread from the generated PDF of [a chapter in Dimensions of Colour](ht
     -   [The `--style` option](#the---style-option)
     -   [The `--template` option](#the---template-option)
 -   [How it works](#how-it-works)
+-   [Updating](#updating)
 -   [Limitations](#limitations)
 -   [Troubleshooting](#troubleshooting)
 -   [Contributing](#contributing)
@@ -27,7 +28,7 @@ _Example spread from the generated PDF of [a chapter in Dimensions of Colour](ht
 
 ## Installation
 
-> 💡 `percollate` needs Node.js version 8.6.0 or later, as it uses new(ish) JavaScript syntax. If you get _SyntaxError: Unexpected token_ errors, check your Node version with `node --version`.
+> 💡 `percollate` needs Node.js version 10.0.0 or later, as it uses new(ish) JavaScript syntax. If you get _SyntaxError: Unexpected token_ errors, check your Node version with `node --version`.
 
 You can install `percollate` globally:
 
@@ -37,16 +38,6 @@ npm install -g percollate
 
 # using yarn
 yarn global add percollate
-```
-
-To keep the package up-to-date, you can run:
-
-```bash
-# using npm, upgrading is the same command as installing
-npm install -g percollate
-
-# yarn has a separate command
-yarn global upgrade --latest percollate
 ```
 
 ## Usage
@@ -222,6 +213,28 @@ An example from the [default stylesheet](./templates/default.css):
 	font-size: 10pt;
 	font-weight: bold;
 }
+```
+
+## Updating
+
+To keep the tool up-to-date, you can run:
+
+```bash
+# using npm, upgrading is the same command as installing
+npm install -g percollate
+
+# yarn has a separate command
+yarn global upgrade --latest percollate
+```
+
+Occasionally, an ugrade might not go according to plan; in this case, you can uninstall and re-install:
+
+```bash
+# using npm
+npm uninstall -g percollate && npm install -g percollate
+
+# using yarn
+yarn global remove percollate && yarn global add percollate
 ```
 
 ## How it works
