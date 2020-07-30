@@ -15,13 +15,24 @@ tape('fetchContent', async t => {
 	);
 
 	let template = path.join(__dirname, '../templates/default.html');
+	let missing = path.join(__dirname, '../templates/default--missing.html');
 
-	await t.rejects(
+	await t.doesNotReject(
 		fetchContent('file://' + template),
-		'rejects file:// protocol'
+		'accepts file:// protocol'
 	);
 
-	await t.rejects(fetchContent(template), 'rejects local file');
+	await t.doesNotReject(
+		fetchContent(template),
+		'accepts existing local file'
+	);
+
+	await t.rejects(fetchContent(missing), 'rejects missing local file');
+
+	await t.doesNotReject(
+		fetchContent('./templates/default.html'),
+		'accepts path to local file relative to process.cwd()'
+	);
 
 	t.end();
 });

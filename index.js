@@ -92,12 +92,35 @@ function launch(options, size) {
 	-----------------------------------
  */
 
+function isURL(ref) {
+	try {
+		new URL(ref);
+		return true;
+	} catch (err) {}
+	return false;
+}
+
 async function fetchContent(ref, fetchOptions = {}) {
 	if (ref instanceof stream.Readable) {
 		return slurp(ref);
 	}
 
-	let url = new URL(ref);
+	let url;
+	try {
+		url = new URL(ref);
+	} catch (err) {
+		// no-op
+	}
+
+	if (!url) {
+		return fs.readFile(ref, 'utf8');
+	}
+
+	if (url && url.protocol === 'file:') {
+		url = url.href.replace(/^file:\/\//, '');
+		return fs.readFile(url, 'utf8');
+	}
+
 	/*
 		Must ensure that the URL is properly encoded.
 		See: https://github.com/danburzo/percollate/pull/83
@@ -119,7 +142,7 @@ async function cleanup(url, options) {
 		out.write(`Fetching: ${url}`);
 
 		const content = await fetchContent(
-			url !== '-' ? url : process.stdin,
+			url === '-' ? process.stdin : url,
 			options.fetch || {}
 		);
 
@@ -130,7 +153,9 @@ async function cleanup(url, options) {
 				? options.preferred_url
 				: url === '-'
 				? undefined
-				: url;
+				: isURL(url)
+				? url
+				: 'file://' + path.resolve(url);
 
 		const dom = new JSDOM(content, { url: final_url });
 
@@ -579,6 +604,7 @@ module.exports = {
 	epub,
 	html,
 	__test__: {
-		fetchContent
+		fetchContent,
+		isURL
 	}
 };
