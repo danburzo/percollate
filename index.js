@@ -66,15 +66,24 @@ function configure() {
 }
 
 function launch(options, size) {
+	/*
+		Produce tagged PDFs, better for accessibility;
+		Hopefully will also produce an Outline (ToC) eventually.
+		See: https://github.com/danburzo/percollate/issues/47
+	 */
+	let args = ['--export-tagged-pdf'];
+
+	/*
+		Allow running with no sandbox
+		See: https://github.com/danburzo/percollate/issues/26
+	 */
+	if (options.sandbox === false) {
+		args = args.concat(['--no-sandbox', '--disable-setuid-sandbox']);
+	}
+
 	return pup.launch({
 		headless: true,
-		/*
-			Allow running with no sandbox
-			See: https://github.com/danburzo/percollate/issues/26
-		 */
-		args: options.sandbox
-			? undefined
-			: ['--no-sandbox', '--disable-setuid-sandbox'],
+		args,
 		defaultViewport: {
 			// Emulate retina display (@2x)...
 			deviceScaleFactor: 2,
