@@ -1,5 +1,5 @@
 let tape = require('tape');
-let R = require('../vendor/readability');
+let { Readability } = require('@mozilla/readability');
 let { JSDOM } = require('jsdom');
 
 /*
@@ -9,7 +9,7 @@ let { JSDOM } = require('jsdom');
  */
 tape('Supports custom serializer', t => {
 	let dom = new JSDOM(`Hello: <img src=''>`);
-	let res = new R(dom.window.document, {
+	let res = new Readability(dom.window.document, {
 		serializer: el =>
 			new dom.window.XMLSerializer().serializeToString(el.firstChild)
 	}).parse();
@@ -27,7 +27,7 @@ tape('Supports custom serializer', t => {
  */
 tape('Does not make relative links absolute', t => {
 	let dom = new JSDOM(`Hello: <img src='./photo.jpg'>`);
-	let res = new R(dom.window.document).parse();
+	let res = new Readability(dom.window.document).parse();
 	t.deepEqual(
 		res.content,
 		`<div id="readability-page-1" class="page">Hello: <img src="./photo.jpg"></div>`

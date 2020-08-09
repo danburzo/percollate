@@ -18,6 +18,11 @@
     esutils "^2.0.2"
     js-tokens "^4.0.0"
 
+"@mozilla/readability@^0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@mozilla/readability/-/readability-0.3.0.tgz#a473790e8b42ea39f9f03703fa1f17fec7984b60"
+  integrity sha512-q8f1CAZsRKK1j+O0BmikGIlKSK03RpT4woT0PCQwhw0nH0z4+rG026AkxoPcjT7Dsgh1ifGscW8tOpvjoyOjvw==
+
 "@types/color-name@^1.1.1":
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/@types/color-name/-/color-name-1.1.1.tgz#1c1261bbeaa10a8055bbc5d8ab84b7b2afc846a0"
@@ -635,6 +640,11 @@ domexception@^2.0.1:
   integrity sha512-yxJ2mFy/sibVQlu5qHjOkf9J3K6zgmCxgJ94u2EdvDOV09H+32LtRswEcUsmUWN72pVLOEnTSRaIVVzVQgS0dg==
   dependencies:
     webidl-conversions "^5.0.0"
+
+dompurify@^2.0.12:
+  version "2.0.12"
+  resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-2.0.12.tgz#284a2b041e1c60b8e72d7b4d2fadad36141254ae"
+  integrity sha512-Fl8KseK1imyhErHypFPA8qpq9gPzlsJ/EukA6yk9o0gX23p1TzC+rh9LqNg1qvErRTc0UNMYlKxEGSfSh43NDg==
 
 dotignore@^0.1.2:
   version "0.1.2"

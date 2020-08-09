@@ -11,10 +11,11 @@ const _fs = require('fs');
 const stream = require('stream');
 const path = require('path');
 const css = require('css');
-const Readability = require('./vendor/readability');
+const { Readability } = require('@mozilla/readability');
 const pkg = require('./package.json');
 const uuid = require('uuid/v1');
 const mimetype = require('mimetype');
+const createDOMPurify = require('dompurify');
 const slurp = require('./src/util/slurp');
 const epubDate = require('./src/util/epub-date');
 const humanDate = require('./src/util/human-date');
@@ -171,6 +172,8 @@ async function cleanup(url, options) {
 		// Force relative URL resolution
 		dom.window.document.body.setAttribute(null, null);
 
+		const sanitizer = createDOMPurify(dom.window);
+
 		const amp = dom.window.document.querySelector('link[rel~=amphtml]');
 		if (amp && options.amp) {
 			out.write('\nFound AMP version (use `--no-amp` to ignore)\n');
@@ -216,9 +219,16 @@ async function cleanup(url, options) {
 
 		out.write(' ✓\n');
 		return {
-			...parsed,
 			id: `percollate-page-${uuid()}`,
 			url: final_url,
+			title: sanitizer.sanitize(parsed.title),
+			byline: sanitizer.sanitize(parsed.byline),
+			dir: sanitizer.sanitize(parsed.dir),
+			excerpt: sanitizer.sanitize(parsed.excerpt),
+			content: sanitizer.sanitize(parsed.content),
+			textContent: sanitizer.sanitize(parsed.textContent),
+			length: parsed.length,
+			siteName: sanitizer.sanitize(parsed.siteName),
 			remoteResources
 		};
 	} catch (error) {
