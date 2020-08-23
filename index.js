@@ -110,6 +110,12 @@ function isURL(ref) {
 	return false;
 }
 
+const accepted_content_types = new Set([
+	'text/html',
+	'application/xhtml+xml',
+	'application/xml'
+]);
+
 async function fetchContent(ref, fetchOptions = {}) {
 	if (ref instanceof stream.Readable) {
 		return slurp(ref);
@@ -141,7 +147,18 @@ async function fetchContent(ref, fetchOptions = {}) {
 			...fetchOptions.headers,
 			'user-agent': `percollate/${pkg.version}`
 		}
-	}).then(result => result.text());
+	}).then(response => {
+		let ct = response.headers.get('Content-Type').trim();
+		if (ct.indexOf(';') > -1) {
+			ct = ct.split(';')[0].trim();
+		}
+		if (!accepted_content_types.has(ct)) {
+			throw new Error(
+				`URL ${url.href} has unsupported content type: ${ct}`
+			);
+		}
+		return response.text();
+	});
 }
 
 async function cleanup(url, options) {
@@ -180,7 +197,7 @@ async function cleanup(url, options) {
 			return cleanup(amp.href, options, amp.href);
 		}
 
-		out.write('Enhancing web page...');
+		out.write(`Enhancing web page: ${url}`);
 
 		/* 
 			Run enhancements
@@ -193,6 +210,10 @@ async function cleanup(url, options) {
 			remoteResources = mapRemoteResources(dom.window.document);
 		}
 
+		const serializer = options.xhtml
+			? el => new dom.window.XMLSerializer().serializeToString(el)
+			: el => el.innerHTML;
+
 		// Run through readability and return
 		const R = new Readability(dom.window.document, {
 			classesToPreserve: [
@@ -204,9 +225,7 @@ async function cleanup(url, options) {
 				 */
 				'anchor'
 			],
-			serializer: options.xhtml
-				? el => new dom.window.XMLSerializer().serializeToString(el)
-				: undefined
+			serializer
 		});
 
 		// TODO: find better solution to prevent Readability from
@@ -215,17 +234,22 @@ async function cleanup(url, options) {
 			R._fixRelativeUris = () => {};
 		}
 
-		const parsed = R.parse();
+		const parsed = R.parse() || {};
 
 		out.write(' ✓\n');
+
 		return {
 			id: `percollate-page-${uuid()}`,
 			url: final_url,
 			title: sanitizer.sanitize(parsed.title),
 			byline: sanitizer.sanitize(parsed.byline),
 			dir: sanitizer.sanitize(parsed.dir),
-			excerpt: sanitizer.sanitize(parsed.excerpt),
-			content: sanitizer.sanitize(parsed.content),
+			excerpt: serializer(
+				sanitizer.sanitize(parsed.excerpt, { RETURN_DOM: true })
+			),
+			content: serializer(
+				sanitizer.sanitize(parsed.content, { RETURN_DOM: true })
+			),
 			textContent: sanitizer.sanitize(parsed.textContent),
 			length: parsed.length,
 			siteName: sanitizer.sanitize(parsed.siteName),
@@ -553,8 +577,12 @@ async function epubgen(data, output_path, options) {
 
 	for (let i = 0; i < remoteResources.length; i++) {
 		let entry = remoteResources[i];
-		let stream = (await fetch(entry[0])).body;
-		archive.append(stream, { name: `OEBPS/${entry[1]}` });
+		try {
+			let stream = (await fetch(entry[0])).body;
+			archive.append(stream, { name: `OEBPS/${entry[1]}` });
+		} catch (err) {
+			console.log(err);
+		}
 	}
 
 	const assets = [
