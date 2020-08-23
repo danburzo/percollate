@@ -1,5 +1,11 @@
 # Percollate Changelog
 
+Please see [the Releases tab on GitHub](https://github.com/danburzo/percollate/releases) for the changelog.
+
+---
+
+_Here are the release notes for older versions, kept here for historical purposes._
+
 ### 0.6.4
 
 -   Use the value of the `--output` option as a prefix for file names when converting multiple files with the `--individual` flag.
