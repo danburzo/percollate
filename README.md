@@ -2,20 +2,18 @@
 
 <a href="https://www.npmjs.org/package/percollate"><img src="https://img.shields.io/npm/v/percollate.svg?style=flat-square&labelColor=324A97&color=black" alt="npm version"></a>
 
-Percollate is a command-line tool to turn web pages into beautifully formatted PDF, EPUB, or HTML files. See [How it works](#how-it-works).
+Percollate is a command-line tool that turns web pages into beautifully formatted PDF, EPUB, or HTML files.
 
 <img alt="Example Output" src="https://raw.githubusercontent.com/danburzo/percollate/master/.github/dimensions-of-colour.png">
 
-_Example spread from the generated PDF of [a chapter in Dimensions of Colour](http://www.huevaluechroma.com/072.php); rendered here in black & white for a smaller image file size._
-
-## Table of Contents
+<!--Example spread from the generated PDF of [a chapter in Dimensions of Colour](http://www.huevaluechroma.com/072.php); rendered here in black & white for a smaller image file size._-->
 
 -   [Installation](#installation)
 -   [Usage](#usage)
     -   [Available commands](#available-commands)
     -   [Available options](#available-options)
--   [Examples](#examples)
-    -   [Basic PDF Generation](#basic-pdf-generation)
+-   [Recipes](#recipes)
+    -   [Basic bundling](#basic-bundling)
     -   [The `--css` option](#the---css-option)
     -   [The `--style` option](#the---style-option)
     -   [The `--template` option](#the---template-option)
@@ -28,9 +26,7 @@ _Example spread from the generated PDF of [a chapter in Dimensions of Colour](ht
 
 ## Installation
 
-> 💡 `percollate` needs Node.js version 10.22.0 or later, as it uses new(ish) JavaScript syntax. If you get _SyntaxError: Unexpected token_ errors, check your Node version with `node --version`.
-
-You can install `percollate` globally:
+`percollate` is a Node.js command-line tool that works best when installed globally from npm:
 
 ```bash
 # using npm
@@ -40,56 +36,114 @@ npm install -g percollate
 yarn global add percollate
 ```
 
+Percollate and its dependencies require Node.js version 10.22.0 or later.
+
 ## Usage
 
-> 💡 Run `percollate --help` for a list of available commands and options.
+> Run `percollate --help` for a list of available commands and options.
 
-### Available commands
+Percollate is invoked on one or more operands (usually URLs):
 
-| Command           | What it does                                   |
-| ----------------- | ---------------------------------------------- |
-| `percollate pdf`  | Bundles one or more web pages into a PDF       |
-| `percollate epub` | Bundles one or more web pages into an EPUB     |
-| `percollate html` | Bundles one or more web pages into a HTML file |
+```bash
+percollate <command> [options] url [url]...
+```
+
+The following commands are available:
+
+-   `percollate pdf` produces a PDF file;
+-   `percollate epub` produces an EPUB file;
+-   `percollate html` produces a HTML file.
+
+The operands can be URLs, paths to local files, or the `-` character which stands for `stdin` (the standard inputs).
 
 ### Available options
 
-The `pdf`, `epub`, and `html` commands have these options:
+Unless otherwise stated, these options apply to all three commands.
 
-| Option         | What it does                                                                                                                                                                                                            |
-| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `-o, --output` | The path of the resulting bundle; when ommited, we derive the output file name from the title of the web page.                                                                                                          |
-| `-u, --url`    | When reading HTML from stdin (from an external command) using the `-` operand, the `--url` option specifies the page's base URL so that relative paths (links, images, etc.) resolve correctly.                         |
-| `--individual` | Export each web page as an individual file.                                                                                                                                                                             |
-| `--template`   | Path to a custom HTML template (not currently applicable to EPUB).                                                                                                                                                      |
-| `--style`      | Path to a custom CSS.                                                                                                                                                                                                   |
-| `--css`        | Additional CSS styles you can pass from the command-line to override the default/custom stylesheet styles.                                                                                                              |
-| `--no-amp`     | Don't prefer the AMP version of the web page.                                                                                                                                                                           |
-| `--debug`      | Print more detailed information.                                                                                                                                                                                        |
-| `--title`      | Provide a title for the bundle.                                                                                                                                                                                         |
-| `--toc`        | (PDF, HTML) Generate a Table of Contents page. The option is implicitly enabled when more than one web page is being bundled in the same file. Disable this implicit behavior by passing the `--no-toc` flag.           |
-| `--cover`      | Generate a cover. The option is implicitly enabled when the `--title` option is provided, or more than one web page is being bundled in the same file. Disable this implicit behavior by passing the `--no-cover` flag. |
+#### `-o, --output`
 
-## Examples
-
-### Basic PDF generation
-
-To transform a single web page to PDF:
+Specify the path of the resulting bundle relative to the current folder.
 
 ```bash
-percollate pdf --output some.pdf https://example.com
+percollate pdf https://example.com -o my-example.pdf
+```
+
+#### `-u, --url`
+
+Using the `-` operand you can read the HTML content from `stdin`, as fetched by a separate command, such as `curl`. In this sort of setup, `percollate` does not know the URL from which the content has been fetched, and relative paths on images, anchors, et cetera won't resolve correctly.
+
+Use the `--url` option to supply the source's original URL.
+
+```bash
+curl https://example.com | percollate pdf - --url=https://example.com
+```
+
+#### `--individual`
+
+By default, percollate bundles all web pages in a single file. Use the `--individual` flag to export each source to a separate file.
+
+```bash
+percollate pdf --individual http://example.com/page1 http://example.com/page2
+```
+
+#### `--template`
+
+Path to a custom HTML template. Applies to `pdf` and `html`.
+
+#### `--style`
+
+Path to a custom CSS stylesheet, relative to the current folder.
+
+#### `--css`
+
+Additional CSS styles you can pass from the command-line to override styles specified by the default/custom stylesheet.
+
+#### `--no-amp`
+
+Don't prefer the AMP version of the web page.
+
+#### `--debug`
+
+Print more detailed information.
+
+#### `-t, --title`
+
+Provide a title for the bundle.
+
+```bash
+percollate epub http://example.com/page-1 http://example.com/page-2 --title="Best Of Example"
+```
+
+#### `--cover`
+
+Generate a cover. The option is implicitly enabled when the `--title` option is provided, or when bundling more than one web page to a single file. Disable this implicit behavior by passing the `--no-cover` flag.
+
+#### `--toc`
+
+Generate a hyperlinked table of contents. The option is implicitly enabled when bundling more than one web page to a single file. Disable this implicit behavior by passing the `--no-toc` flag.
+
+Applies to `pdf` and `html`.
+
+## Recipes
+
+### Basic bundling
+
+To turn a single web page into a PDF:
+
+```bash
+percollate pdf --output=some.pdf https://example.com
 ```
 
 To bundle _several_ web pages into a single PDF, specify them as separate arguments to the command:
 
 ```bash
-percollate pdf --output some.pdf https://example.com/page1 https://example.com/page2
+percollate pdf --output=some.pdf https://example.com/page1 https://example.com/page2
 ```
 
 You can use common Unix commands and keep the list of URLs in a newline-delimited text file:
 
 ```bash
-cat urls.txt | xargs percollate pdf --output some.pdf
+cat urls.txt | xargs percollate pdf --output=some.pdf
 ```
 
 To transform several web pages into individual PDF files at once, use the `--individual` flag:
@@ -98,7 +152,7 @@ To transform several web pages into individual PDF files at once, use the `--ind
 percollate pdf --individual https://example.com/page1 https://example.com/page2
 ```
 
-If you'd like to fetch the HTML with an external command, you can use `-` as an operand, which stands for `stdin` (the standard input).
+If you'd like to fetch the HTML with an external command, you can use `-` as an operand, which stands for `stdin` (the standard input):
 
 ```bash
 curl https://example.com/page1 | percollate pdf --url=https://example.com/page1 -
@@ -227,7 +281,7 @@ npm install -g percollate
 yarn global upgrade --latest percollate
 ```
 
-Occasionally, an ugrade might not go according to plan; in this case, you can uninstall and re-install:
+Occasionally, an ugrade might not go according to plan; in this case, you can uninstall and re-install `percollate`:
 
 ```bash
 # using npm
