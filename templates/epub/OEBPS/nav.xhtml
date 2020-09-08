@@ -5,14 +5,14 @@
 >
 	<head>
 		<meta charset="utf-8" />
-		<title>{{ title }}</title>
+		<title>{{ title | e }}</title>
 	</head>
 	<body>
 		<nav epub:type="toc" id="toc">
 			<ol>
 				{% for item in items %}
 				<li>
-					<a href="{{item.id}}.xhtml">{{ item.title }}</a>
+					<a href="{{item.id}}.xhtml">{{ item.title | e }}</a>
 				</li>
 				{% endfor %}
 			</ol>

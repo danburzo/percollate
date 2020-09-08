@@ -36,6 +36,7 @@ const mapRemoteResources = require('./src/remote-resources');
 const get_style_attribute_value = require('./src/get-style-attribute-value');
 
 const out = process.stdout;
+const UA = `percollate/${pkg.version}`;
 
 const enhancePage = function (dom) {
 	// Note: the order of the enhancements matters!
@@ -145,10 +146,10 @@ async function fetchContent(ref, fetchOptions = {}) {
 		...fetchOptions,
 		headers: {
 			...fetchOptions.headers,
-			'user-agent': `percollate/${pkg.version}`
+			'user-agent': UA
 		}
 	}).then(response => {
-		let ct = response.headers.get('Content-Type').trim();
+		let ct = (response.headers.get('Content-Type') || '').trim();
 		if (ct.indexOf(';') > -1) {
 			ct = ct.split(';')[0].trim();
 		}
@@ -256,7 +257,7 @@ async function cleanup(url, options) {
 			remoteResources
 		};
 	} catch (error) {
-		console.error(error.message);
+		console.error(`${url}:`, error.message);
 		throw error;
 	}
 }
@@ -578,7 +579,17 @@ async function epubgen(data, output_path, options) {
 	for (let i = 0; i < remoteResources.length; i++) {
 		let entry = remoteResources[i];
 		try {
-			let stream = (await fetch(entry[0])).body;
+			if (options.debug) {
+				out.write(`Fetching: ${entry[0]}\n`);
+			}
+			let stream = (
+				await fetch(entry[0], {
+					headers: {
+						'user-agent': UA
+					},
+					timeout: 10 * 1000
+				})
+			).body;
 			archive.append(stream, { name: `OEBPS/${entry[1]}` });
 		} catch (err) {
 			console.log(err);
@@ -606,6 +617,7 @@ async function epubgen(data, output_path, options) {
 		});
 		const page = await browser.newPage();
 
+		await page.setUserAgent(UA);
 		await page.setContent(cover_html, { waitUntil: 'load' });
 
 		let buff = await page.screenshot({
