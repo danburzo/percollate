@@ -36,6 +36,17 @@ npm install -g percollate
 yarn global add percollate
 ```
 
+There's also a packaged version on [Arch's
+AUR](https://wiki.archlinux.org/index.php/Arch_User_Repository)
+repositories, and you can install using your local [AUR
+helper](https://wiki.archlinux.org/index.php/AUR_helpers) (yay, pacaur,
+etc).
+
+```bash
+# using yay
+yay -S nodejs-percollate
+```
+
 Percollate and its dependencies require Node.js version 10.22.0 or later.
 
 ## Usage
