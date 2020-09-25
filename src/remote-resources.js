@@ -9,11 +9,10 @@ module.exports = function remoteResources(doc) {
 		if ((m = src.match(/\.(gif|jpe?g|png|svg)$/))) {
 			if (srcs.has(src)) {
 				return src;
-			} else {
-				let new_src = `rr-${uuid()}.${m[1]}`;
-				srcs.set(src, new_src);
-				return `./${new_src}`;
 			}
+			let new_src = `rr-${uuid()}.${m[1]}`;
+			srcs.set(src, new_src);
+			return `./${new_src}`;
 		}
 		return src;
 	}
