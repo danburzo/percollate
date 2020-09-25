@@ -29,30 +29,26 @@ module.exports = function (args) {
 	let operands = [];
 	opsh(args, {
 		option(option, value) {
-			if (aliases[option]) {
-				option = aliases[option];
-			}
-			let m = option.match(/^no-(.+)$/);
+			const opt = aliases[option] ? aliases[option] : option;
+			let m = opt.match(/^no-(.+)$/);
 
 			if (m) {
 				opts[m[1]] = false;
 			} else {
-				if (opts_with_arr.has(option)) {
-					if (!opts[option]) {
-						opts[option] = [];
+				if (opts_with_arr.has(opt)) {
+					if (!opts[opt]) {
+						opts[opt] = [];
 					}
 					if (value !== undefined) {
-						opts[option].push(value);
+						opts[opt].push(value);
 					}
 				} else {
-					opts[option] = value !== undefined ? value : true;
+					opts[opt] = value !== undefined ? value : true;
 				}
 			}
 		},
-		operand(operand, opt) {
-			if (aliases[opt]) {
-				opt = aliases[opt];
-			}
+		operand(operand, option) {
+			const opt = aliases[option] ? aliases[option] : option;
 			if (opts_with_optarg.has(opt)) {
 				if (opts_with_arr.has(opt)) {
 					opts[opt].push(operand);
