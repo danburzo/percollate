@@ -277,11 +277,8 @@ async function bundlePdf(items, options) {
 
 	const title =
 		options.title || (items.length === 1 ? items[0].title : 'Untitled');
-	const author = options.author
-		? options.author
-		: items.length === 1
-		? items[0].byline
-		: null;
+	const author =
+		options.author || (items.length === 1 ? items[0].byline : null);
 
 	const html = nunjucks.renderString(
 		await fs.readFile(options.template || DEFAULT_TEMPLATE, 'utf8'),
