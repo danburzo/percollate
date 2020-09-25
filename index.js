@@ -275,19 +275,19 @@ async function bundlePdf(items, options) {
 		(await fs.readFile(options.style || DEFAULT_STYLESHEET, 'utf8')) +
 		(options.css || '');
 
-	const title = options.title ||
-		(items.length === 1 ? items[0].title : 'Untitled')
-	const author = options.author ? options.author :
-		(items.length === 1 ? items[0].byline : null)
+	const title =
+		options.title || (items.length === 1 ? items[0].title : 'Untitled');
+	const author = options.author
+		? options.author
+		: items.length === 1
+		? items[0].byline
+		: null;
 
 	const html = nunjucks.renderString(
 		await fs.readFile(options.template || DEFAULT_TEMPLATE, 'utf8'),
 		{
 			filetype: 'pdf',
 			title,
-			title:
-				options.title ||
-				(items.length === 1 ? items[0].title : 'Untitled'),
 			date: humanDate(new Date()),
 			items,
 			style,
@@ -378,10 +378,13 @@ async function bundlePdf(items, options) {
 
 	await browser.close();
 
-	await addExif({
-		Title: title,
-		Author: author
-	}, output_path);
+	await addExif(
+		{
+			Title: title,
+			Author: author
+		},
+		output_path
+	);
 
 	out.write(`Saved PDF: ${output_path}\n`);
 }
