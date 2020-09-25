@@ -12,13 +12,15 @@ let opts_with_optarg = new Set([
 	'style',
 	'css',
 	'url',
-	'title'
+	'title',
+	'author'
 ]);
 let opts_with_arr = new Set(['url']);
 let aliases = {
 	o: 'output',
 	u: 'url',
 	t: 'title',
+	a: 'author',
 	h: 'help',
 	V: 'version'
 };
