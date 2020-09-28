@@ -1,5 +1,6 @@
-const exiftoolBin = require('dist-exiftool');
-const exiftool = require('node-exiftool');
+const util = require('util');
+const fs = require('fs');
+const { PDFDocument } = require('pdf-lib');
 
 /**
  * Adds exif data to a file
@@ -7,15 +8,18 @@ const exiftool = require('node-exiftool');
  * @param {string} filePath
  */
 module.exports = async function addExif(metaData, filePath) {
-	const ep = new exiftool.ExiftoolProcess(exiftoolBin);
+	const readFile = util.promisify(fs.readFile);
+	const existingPdfBytes = await readFile(filePath);
 
-	try {
-		await ep.open();
-		await ep.writeMetadata(filePath, metaData);
-	} catch (error) {
-		throw error;
-	} finally {
-		ep.close();
-	}
-	return metaData;
+	const pdfDoc = await PDFDocument.load(existingPdfBytes, {
+		updateMetadata: false
+	});
+
+	pdfDoc.setTitle(metaData.Title);
+	pdfDoc.setAuthor(metaData.Author);
+
+	const pdfBytes = await pdfDoc.save();
+
+	const writeFile = util.promisify(fs.writeFile);
+	await writeFile(filePath, pdfBytes);
 };
