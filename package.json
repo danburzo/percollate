@@ -16,6 +16,7 @@
 		"node-fetch": "^2.6.0",
 		"nunjucks": "^3.2.2",
 		"opsh": "^0.1.1",
+		"pdf-lib": "^1.11.1",
 		"puppeteer": "^5.2.1",
 		"slugify": "^1.4.5",
 		"srcset": "^3.0.0",
