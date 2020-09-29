@@ -114,6 +114,14 @@ Provide a title for the bundle.
 percollate epub http://example.com/page-1 http://example.com/page-2 --title="Best Of Example"
 ```
 
+### `-a, --author`
+
+Provide an author for the bundle.
+
+```bash
+percollate pdf --author="Ella Example" http://example.com
+```
+
 #### `--cover`
 
 Generate a cover. The option is implicitly enabled when the `--title` option is provided, or when bundling more than one web page to a single file. Disable this implicit behavior by passing the `--no-cover` flag.

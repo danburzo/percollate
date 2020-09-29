@@ -278,13 +278,14 @@ async function bundlePdf(items, options) {
 	const title =
 		options.title || (items.length === 1 ? items[0].title : 'Untitled');
 	const author =
-		options.author || (items.length === 1 ? items[0].byline : null);
+		options.author || (items.length === 1 ? items[0].byline : undefined);
 
 	const html = nunjucks.renderString(
 		await fs.readFile(options.template || DEFAULT_TEMPLATE, 'utf8'),
 		{
 			filetype: 'pdf',
 			title,
+			author,
 			date: humanDate(new Date()),
 			items,
 			style,
@@ -364,8 +365,7 @@ async function bundlePdf(items, options) {
 
 	const output_path = outputPath(items, options, '.pdf');
 
-	await page.pdf({
-		path: output_path,
+	let buffer = await page.pdf({
 		preferCSSPageSize: true,
 		displayHeaderFooter: true,
 		headerTemplate: header.body.innerHTML,
@@ -375,13 +375,12 @@ async function bundlePdf(items, options) {
 
 	await browser.close();
 
-	await addExif(
-		{
-			Title: title,
-			Author: author
-		},
-		output_path
-	);
+	let pdf = await addExif(buffer, {
+		Title: title,
+		Author: author
+	});
+
+	await fs.writeFile(output_path, pdf);
 
 	out.write(`Saved PDF: ${output_path}\n`);
 }
@@ -400,12 +399,16 @@ async function bundleEpub(items, options) {
 
 	const output_path = outputPath(items, options, '.epub');
 
+	const title =
+		options.title || (items.length === 1 ? items[0].title : 'Untitled');
+	const author =
+		options.author || (items.length === 1 ? items[0].byline : undefined);
+
 	epubgen(
 		{
 			filetype: 'epub',
-			title:
-				options.title ||
-				(items.length === 1 ? items[0].title : 'Untitled'),
+			title,
+			author,
 			date: epubDate(new Date()),
 			cover:
 				options.cover ||

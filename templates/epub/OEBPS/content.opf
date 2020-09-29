@@ -4,6 +4,9 @@
 	<metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
 		<dc:identifier id="uid">urn:uuid:{{ uuid }}</dc:identifier>
 		<dc:title>{{ title | e }}</dc:title>
+		{% if author %}
+			<dc:creator>{{ author | e }}</dc:creator>
+		{% endif %}
 		<dc:date>{{ date }}</dc:date>
 		<meta property="dcterms:modified">{{ date }}</meta>
 		<dc:language>{{ lang | default('en-US')}}</dc:language>

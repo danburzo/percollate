@@ -12,6 +12,9 @@
 		{% if options.use_cover %}
 		<div class="cover">
 			<div class="cover__content">
+				{% if author %}
+				<p class="cover__author">{{ author }}</p>
+				{% endif %}
 				<h1 class="cover__title">{{ title }}</h1>
 				<p class="cover__subtitle">
 					<time class="cover__date" datetime="{{ date }}"

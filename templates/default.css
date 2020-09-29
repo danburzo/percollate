@@ -299,6 +299,11 @@ article:not(:last-of-type) {
 	padding: 2em;
 }
 
+.cover__author {
+	margin: 1em 0;
+	font-weight: bold;
+}
+
 .cover__title {
 	font-size: 2.4em;
 	margin: 0;
