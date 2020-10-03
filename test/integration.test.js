@@ -32,7 +32,6 @@ tape('files exists', async t => {
 
 tape('website to html & html to pdf', async t => {
 	percollate.configure();
-	await generateTestFiles();
 	await percollate.html([testUrl], {
 		output: testWebtoHtml
 	});
