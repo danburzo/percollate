@@ -11,16 +11,13 @@ const testHtmltoPdf = `${__dirname}/testHtmlToPdf.pdf`;
 
 async function generateTestFiles() {
 	await percollate.pdf(['https://de.wikipedia.org/wiki/JavaScript'], {
-		output: testPdf,
-		sandbox: false
+		output: testPdf
 	});
 	await percollate.html(['https://de.wikipedia.org/wiki/JavaScript'], {
-		output: testHtml,
-		sandbox: false
+		output: testHtml
 	});
 	await percollate.epub(['https://de.wikipedia.org/wiki/JavaScript'], {
-		output: testEpub,
-		sandbox: false
+		output: testEpub
 	});
 }
 
@@ -37,12 +34,10 @@ tape('website to html & html to pdf', async t => {
 	percollate.configure();
 	await generateTestFiles();
 	await percollate.html([testUrl], {
-		output: testWebtoHtml,
-		sandbox: false
+		output: testWebtoHtml
 	});
 	await percollate.pdf([testWebtoHtml], {
-		output: testHtmltoPdf,
-		sandbox: false
+		output: testHtmltoPdf
 	});
 	t.pass();
 });
