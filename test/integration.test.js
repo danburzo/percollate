@@ -10,13 +10,13 @@ const testWebtoHtml = `${__dirname}/testWebToHtml.html`;
 const testHtmltoPdf = `${__dirname}/testHtmlToPdf.pdf`;
 
 async function generateTestFiles() {
-	await percollate.pdf(['https://de.wikipedia.org/wiki/JavaScript'], {
+	await percollate.pdf([testUrl], {
 		output: testPdf
 	});
-	await percollate.html(['https://de.wikipedia.org/wiki/JavaScript'], {
+	await percollate.html([testUrl], {
 		output: testHtml
 	});
-	await percollate.epub(['https://de.wikipedia.org/wiki/JavaScript'], {
+	await percollate.epub([testUrl], {
 		output: testEpub
 	});
 }
