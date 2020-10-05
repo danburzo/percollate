@@ -30,6 +30,27 @@ h6 {
 	font-family: var(--alt-font);
 	font-weight: bold;
 	page-break-after: avoid;
+	page-break-inside: avoid;
+}
+
+/*
+	Prevent dangling headings at the end of the page.
+
+	See:
+	
+	* https://github.com/danburzo/percollate/issues/110
+	* https://stackoverflow.com/a/53742871/21613
+ */
+h1::after,
+h2::after,
+h3::after,
+h4::after,
+h5::after,
+h6::after {
+	content: '';
+	display: block;
+	height: 5rem;
+	margin-bottom: -5rem;
 }
 
 a {
@@ -328,7 +349,7 @@ article:not(:last-of-type) {
 	padding: 0;
 }
 
-.type--pdf a:not(.no-href):after {
+.type--pdf a:not(.no-href)::after {
 	content: ' → ' attr(href) '';
 	font-size: 0.8em;
 	word-break: break-all;
