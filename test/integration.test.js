@@ -3,11 +3,11 @@ const fs = require('fs');
 const percollate = require('..');
 
 const testUrl = 'https://de.wikipedia.org/wiki/JavaScript';
-const testPdf = `${__dirname}/test.pdf`;
-const testHtml = `${__dirname}/test.html`;
-const testEpub = `${__dirname}/test.epub`;
-const testWebtoHtml = `${__dirname}/testWebToHtml.html`;
-const testHtmltoPdf = `${__dirname}/testHtmlToPdf.pdf`;
+const testPdf = `${__dirname}/percollate-output.pdf`;
+const testHtml = `${__dirname}/percollate-output.html`;
+const testEpub = `${__dirname}/percollate-output.epub`;
+const testWebtoHtml = `${__dirname}/percollate-output-webToHtml.html`;
+const testHtmltoPdf = `${__dirname}/percollate-output-htmlToPdf.pdf`;
 
 async function generateTestFiles() {
 	await percollate.pdf([testUrl], {

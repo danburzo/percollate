@@ -65,5 +65,8 @@ typings/
 .project
 .settings
 
-# test PDFs
-*.pdf
+# Test files
+/*.pdf
+/*.epub
+/*.html
+/test/percollate-output*
