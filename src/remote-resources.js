@@ -1,5 +1,5 @@
 const srcset = require('srcset');
-const uuid = require('uuid/v1');
+const { v1: uuid } = require('uuid');
 
 module.exports = function remoteResources(doc) {
 	let srcs = new Map();
