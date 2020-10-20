@@ -135,7 +135,7 @@ async function fetchContent(ref, fetchOptions = {}) {
 	}
 
 	if (url && url.protocol === 'file:') {
-		url = url.href.replace(/^file:\/\//, '');
+		url = decodeURI(url.href.replace(/^file:\/\//, ''));
 		return fs.readFile(url, 'utf8');
 	}
 
