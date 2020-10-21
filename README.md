@@ -29,11 +29,7 @@ Percollate is a command-line tool that turns web pages into beautifully formatte
 `percollate` is a Node.js command-line tool that works best when installed globally from npm:
 
 ```bash
-# using npm
 npm install -g percollate
-
-# using yarn
-yarn global add percollate
 ```
 
 Percollate and its dependencies require Node.js version 10.22.0 or later.
@@ -251,9 +247,7 @@ Puppeteer can print some basic information about the page in the PDF. The follow
 You place your header / footer template in a `template` element in your HTML:
 
 ```html
-<template class="header-template">
-	My header
-</template>
+<template class="header-template"> My header </template>
 
 <template class="footer-template">
 	<div class="text center">
@@ -282,21 +276,13 @@ An example from the [default stylesheet](./templates/default.css):
 To keep the tool up-to-date, you can run:
 
 ```bash
-# using npm, upgrading is the same command as installing
 npm install -g percollate
-
-# yarn has a separate command
-yarn global upgrade --latest percollate
 ```
 
 Occasionally, an ugrade might not go according to plan; in this case, you can uninstall and re-install `percollate`:
 
 ```bash
-# using npm
 npm uninstall -g percollate && npm install -g percollate
-
-# using yarn
-yarn global remove percollate && yarn global add percollate
 ```
 
 ## How it works
