@@ -44,7 +44,7 @@
 	"husky": {
 		"hooks": {
 			"pre-commit": "pretty-quick --staged",
-			"post-commit": "yarn lint"
+			"post-commit": "npm run-script lint"
 		}
 	},
 	"prettier": {
