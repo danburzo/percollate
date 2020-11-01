@@ -40,7 +40,7 @@ function opsh(arr, fn) {
 			continue;
 		}
 
-		if (curr == '--') {
+		if (curr === '--') {
 			if (fn_delim(curr, last_opt) === false) {
 				return;
 			}
@@ -61,7 +61,7 @@ function opsh(arr, fn) {
 			return;
 		}
 	}
-	return undefined;
+	return;
 }
 
 const available_commands = new Set(['pdf', 'epub', 'html']);

@@ -36,13 +36,13 @@
 		"tape-promise": "^4.0.0"
 	},
 	"scripts": {
-		"test": "tape test/**/*.test.js",
-		"lint": "eslint {src,test}/**/*.js *.js"
+		"test": "tape 'test/**/*.test.js'",
+		"lint": "eslint '{src,test}/**/*.js' '*.js'"
 	},
 	"husky": {
 		"hooks": {
 			"pre-commit": "pretty-quick --staged",
-			"post-commit": "npm run-script lint"
+			"post-commit": "npm run lint"
 		}
 	},
 	"prettier": {
