@@ -5,7 +5,6 @@ const archiver = require('archiver');
 const fetch = require('node-fetch');
 const { JSDOM } = require('jsdom');
 const nunjucks = require('nunjucks');
-const tmp = require('tmp');
 const fs = require('fs').promises;
 const _fs = require('fs');
 const stream = require('stream');
@@ -340,7 +339,7 @@ async function bundlePdf(items, options) {
 
 	if (options.debug) {
 		out.write('Generating temporary HTML file... ');
-		const temp_file = tmp.tmpNameSync({ postfix: '.html' });
+		const temp_file = path.resolve(process.cwd(), `${uuid()}.html`);
 		await fs.writeFile(temp_file, html);
 		out.write('✓\n');
 		out.write(`Temporary HTML file: file://${temp_file}\n`);
