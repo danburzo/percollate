@@ -112,6 +112,7 @@ pre code {
 
 article {
 	font-size: 1em;
+	text-align: justify;
 }
 
 article:not(:last-of-type) {

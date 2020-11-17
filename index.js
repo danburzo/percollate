@@ -20,6 +20,7 @@ const epubDate = require('./src/util/epub-date');
 const humanDate = require('./src/util/human-date');
 const outputPath = require('./src/util/output-path');
 const addExif = require('./src/exif');
+const { hyphenateHtml } = require('./src/hyphenate');
 
 const {
 	ampToHtml,
@@ -236,6 +237,9 @@ async function cleanup(url, options) {
 		}
 
 		const parsed = R.parse() || {};
+
+		// Hyphenate the text
+		parsed.content = hyphenateHtml(parsed.content);
 
 		out.write(' ✓\n');
 
