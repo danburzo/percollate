@@ -18,14 +18,6 @@ function hyphenate(text, lang) {
 	return hyphenator.get('en-us')(text);
 }
 
-function hyphenateText(text) {
-	if (typeof text === 'string') {
-		return hyphenate(text);
-	}
-
-	return undefined;
-}
-
 // This code is from here https://mnater.github.io/Hyphenopoly/Special-use-cases.html#hyphenate-html-strings-using-hyphenopolymodulejs
 function hyphenateHtml(html) {
 	const lang = textToLang(html);
@@ -50,4 +42,4 @@ function hyphenateHtml(html) {
 	return undefined;
 }
 
-module.exports = { hyphenateText, hyphenateHtml };
+module.exports = { hyphenateHtml };
