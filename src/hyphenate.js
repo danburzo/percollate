@@ -19,7 +19,7 @@ function getHypenatorByLang(lang) {
 // This code is from here https://mnater.github.io/Hyphenopoly/Special-use-cases.html#hyphenate-html-strings-using-hyphenopolymodulejs
 function hyphenateHtml(html) {
 	const lang = textToLang(html);
-	const hyphenator = getHypenatorByLang(lang);
+	const hyphenate = getHypenatorByLang(lang);
 	if (typeof html === 'string') {
 		if (html.trim().startsWith('<')) {
 			const fragment = JSDOM.fragment(html);
@@ -27,7 +27,7 @@ function hyphenateHtml(html) {
 				let node = nodeParam;
 				for (node = node.firstChild; node; node = node.nextSibling) {
 					if (node.nodeType === 3) {
-						node.textContent = hyphenator(node.textContent);
+						node.textContent = hyphenate(node.textContent);
 					} else {
 						hyphenateNode(node);
 					}
@@ -36,7 +36,7 @@ function hyphenateHtml(html) {
 			hyphenateNode(fragment);
 			return fragment.firstChild.outerHTML;
 		}
-		return hyphenator(html);
+		return hyphenate(html);
 	}
 	return undefined;
 }
