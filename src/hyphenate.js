@@ -26,6 +26,7 @@ function hyphenateText(text) {
 	return undefined;
 }
 
+// This code is from here https://mnater.github.io/Hyphenopoly/Special-use-cases.html#hyphenate-html-strings-using-hyphenopolymodulejs
 function hyphenateHtml(html) {
 	const lang = textToLang(html);
 	if (typeof html === 'string') {
