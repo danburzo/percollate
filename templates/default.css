@@ -112,7 +112,6 @@ pre code {
 
 article {
 	font-size: 1em;
-	text-align: justify;
 }
 
 article:not(:last-of-type) {
@@ -201,6 +200,7 @@ article:not(:last-of-type) {
 .article__content p {
 	margin: 0;
 	orphans: 3;
+	text-align: justify;
 	widows: 3;
 }
 
