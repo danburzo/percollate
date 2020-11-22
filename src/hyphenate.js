@@ -10,10 +10,8 @@ const hyphenator = Hyphenator.config({
 	leftmin: 4,
 	rightmin: 4
 });
-console.log(hyphenator);
 
 function hyphenate(text, lang) {
-	console.log(lang);
 	if (hyphenator.get(lang)) {
 		return hyphenator.get(lang)(text);
 	}
