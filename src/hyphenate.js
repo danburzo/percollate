@@ -1,6 +1,5 @@
 const { JSDOM } = require('jsdom');
 const Hyphenator = require('hyphenopoly');
-const { textToLang } = require('./util/language');
 
 function getHypenatorByLang(lang) {
 	const language = Hyphenator.supportedLanguages.includes(lang)
@@ -17,8 +16,7 @@ function getHypenatorByLang(lang) {
 }
 
 // This code is from here https://mnater.github.io/Hyphenopoly/Special-use-cases.html#hyphenate-html-strings-using-hyphenopolymodulejs
-function hyphenateHtml(html) {
-	const lang = textToLang(html);
+function hyphenateHtml(html, lang) {
 	const hyphenate = getHypenatorByLang(lang);
 	if (typeof html === 'string') {
 		if (html.trim().startsWith('<')) {

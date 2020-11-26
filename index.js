@@ -21,6 +21,7 @@ const humanDate = require('./src/util/human-date');
 const outputPath = require('./src/util/output-path');
 const addExif = require('./src/exif');
 const { hyphenateHtml } = require('./src/hyphenate');
+const { textToLang } = require('./src/util/language');
 
 const {
 	ampToHtml,
@@ -239,7 +240,8 @@ async function cleanup(url, options) {
 		const parsed = R.parse() || {};
 
 		// Hyphenate the text
-		parsed.content = hyphenateHtml(parsed.content);
+		const lang = textToLang(parsed.content);
+		parsed.content = hyphenateHtml(parsed.content, lang);
 
 		out.write(' ✓\n');
 
