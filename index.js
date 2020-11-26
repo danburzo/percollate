@@ -240,8 +240,8 @@ async function cleanup(url, options) {
 		const parsed = R.parse() || {};
 
 		// Hyphenate the text
-		const lang = textToLang(parsed.content);
-		parsed.content = hyphenateHtml(parsed.content, lang);
+		const textContent = sanitizer.sanitize(parsed.textContent);
+		const lang = textToLang(textContent);
 
 		out.write(' ✓\n');
 
@@ -255,8 +255,11 @@ async function cleanup(url, options) {
 				sanitizer.sanitize(parsed.excerpt, { RETURN_DOM: true })
 			),
 			content: serializer(
-				sanitizer.sanitize(parsed.content, { RETURN_DOM: true })
+				sanitizer.sanitize(hyphenateHtml(parsed.textContent, lang), {
+					RETURN_DOM: true
+				})
 			),
+			lang,
 			textContent: sanitizer.sanitize(parsed.textContent),
 			length: parsed.length,
 			siteName: sanitizer.sanitize(parsed.siteName),
