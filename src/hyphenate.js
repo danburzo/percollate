@@ -16,22 +16,23 @@ function getHypenatorByLang(lang) {
 }
 
 // This code is from here https://mnater.github.io/Hyphenopoly/Special-use-cases.html#hyphenate-html-strings-using-hyphenopolymodulejs
+function hyphenateNode(nodeParam, lang) {
+	const hyphenate = getHypenatorByLang(lang);
+	let node = nodeParam;
+	for (node = node.firstChild; node; node = node.nextSibling) {
+		if (node.nodeType === 3) {
+			node.textContent = hyphenate(node.textContent);
+		} else {
+			hyphenateNode(node, lang);
+		}
+	}
+}
 function hyphenateHtml(html, lang) {
 	const hyphenate = getHypenatorByLang(lang);
 	if (typeof html === 'string') {
 		if (html.trim().startsWith('<')) {
 			const fragment = JSDOM.fragment(html);
-			const hyphenateNode = async nodeParam => {
-				let node = nodeParam;
-				for (node = node.firstChild; node; node = node.nextSibling) {
-					if (node.nodeType === 3) {
-						node.textContent = hyphenate(node.textContent);
-					} else {
-						hyphenateNode(node);
-					}
-				}
-			};
-			hyphenateNode(fragment);
+			hyphenateNode(fragment, lang);
 			return fragment.firstChild.outerHTML;
 		}
 		return hyphenate(html);
@@ -39,4 +40,4 @@ function hyphenateHtml(html, lang) {
 	return undefined;
 }
 
-module.exports = { hyphenateHtml };
+module.exports = { hyphenateNode, hyphenateHtml };
