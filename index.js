@@ -213,10 +213,6 @@ async function cleanup(url, options) {
 			remoteResources = mapRemoteResources(dom.window.document);
 		}
 
-		const serializer = options.xhtml
-			? el => new dom.window.XMLSerializer().serializeToString(el)
-			: el => el.innerHTML;
-
 		// Run through readability and return
 		const R = new Readability(dom.window.document, {
 			classesToPreserve: [
@@ -228,7 +224,16 @@ async function cleanup(url, options) {
 				 */
 				'anchor'
 			],
-			serializer
+			/*
+				Change Readability's serialization to return 
+				a DOM element (instead of a HTML string) 
+				as the `.content` property returned from `.parse()`
+
+				This makes it easier for us to run subsequent
+				transformations (sanitization, hyphenation, etc.)
+				without having to parse/serialize the HTML repeatedly.
+			 */
+			serializer: el => el
 		});
 
 		// TODO: find better solution to prevent Readability from
@@ -244,6 +249,16 @@ async function cleanup(url, options) {
 		const lang = textToLang(textContent);
 
 		out.write(' ✓\n');
+
+		/*
+			Select the appropriate serialization method
+			based on the bundle target. EPUBs need the 
+			content to be XHTML (produced by a XML serializer),
+			rather than normal HTML.
+		 */
+		const serializer = options.xhtml
+			? el => new dom.window.XMLSerializer().serializeToString(el)
+			: el => el.innerHTML;
 
 		return {
 			id: `percollate-page-${uuid()}`,
