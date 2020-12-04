@@ -20,7 +20,7 @@ const epubDate = require('./src/util/epub-date');
 const humanDate = require('./src/util/human-date');
 const outputPath = require('./src/util/output-path');
 const addExif = require('./src/exif');
-const { hyphenateHtml } = require('./src/hyphenate');
+const { hyphenateDom } = require('./src/hyphenate');
 const { textToLang } = require('./src/util/language');
 
 const {
@@ -270,9 +270,10 @@ async function cleanup(url, options) {
 				sanitizer.sanitize(parsed.excerpt, { RETURN_DOM: true })
 			),
 			content: serializer(
-				sanitizer.sanitize(hyphenateHtml(parsed.textContent, lang), {
-					RETURN_DOM: true
-				})
+				hyphenateDom(
+					sanitizer.sanitize(parsed.content, { RETURN_DOM: true }),
+					lang
+				)
 			),
 			lang,
 			textContent: sanitizer.sanitize(parsed.textContent),

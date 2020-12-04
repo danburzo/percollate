@@ -1,4 +1,3 @@
-const { JSDOM } = require('jsdom');
 const Hyphenator = require('hyphenopoly');
 
 function getHypenatorByLang(lang) {
@@ -15,29 +14,15 @@ function getHypenatorByLang(lang) {
 	});
 }
 
-// This code is from here https://mnater.github.io/Hyphenopoly/Special-use-cases.html#hyphenate-html-strings-using-hyphenopolymodulejs
-function hyphenateNode(nodeParam, lang) {
+function hyphenateDom(el, lang) {
 	const hyphenate = getHypenatorByLang(lang);
-	let node = nodeParam;
-	for (node = node.firstChild; node; node = node.nextSibling) {
-		if (node.nodeType === 3) {
-			node.textContent = hyphenate(node.textContent);
-		} else {
-			hyphenateNode(node, lang);
-		}
+	const it = el.ownerDocument.createNodeIterator(el, 4);
+	let node = it.nextNode();
+	while (node) {
+		node.textContent = hyphenate(node.textContent);
+		node = it.nextNode();
 	}
-}
-function hyphenateHtml(html, lang) {
-	const hyphenate = getHypenatorByLang(lang);
-	if (typeof html === 'string') {
-		if (html.trim().startsWith('<')) {
-			const fragment = JSDOM.fragment(html);
-			hyphenateNode(fragment, lang);
-			return fragment.firstChild.outerHTML;
-		}
-		return hyphenate(html);
-	}
-	return undefined;
+	return el;
 }
 
-module.exports = { hyphenateNode, hyphenateHtml };
+module.exports = { hyphenateDom };
