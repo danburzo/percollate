@@ -7,7 +7,6 @@ function textToIso6393(text) {
 
 function textToIso6391(text) {
 	const franLanguage = textToIso6393(text);
-	console.log(franLanguage);
 	if (iso6393.hasOwnProperty(franLanguage)) {
 		return iso6393[franLanguage];
 	}
