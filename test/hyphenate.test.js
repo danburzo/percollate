@@ -13,6 +13,7 @@ tape('hyphenateDom()', t => {
 	const test = `<head></head><body><div>Automa${hyphen}tion</div></body>`;
 
 	t.equal(serializer(hyphenateDom(doc1, 'en-us')), test);
-	t.equal(serializer(hyphenateDom(doc2, 'en-us')), test);
+	// not supported language fallback to en-us
+	t.equal(serializer(hyphenateDom(doc2, 'en')), test);
 	t.end();
 });
