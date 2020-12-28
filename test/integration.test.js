@@ -27,7 +27,7 @@ tape('files exists', async t => {
 	t.pass();
 });
 
-tape('epub', async t => {
+tape('generates valid epub', async t => {
 	percollate.configure();
 	await percollate.epub([testUrl], {
 		output: testEpub
