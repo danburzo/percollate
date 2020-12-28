@@ -549,7 +549,7 @@ async function epubgen(data, output_path, options) {
 		});
 	};
 
-	return wrapAsync(async resolve => {
+	return wrapAsync(async (resolve, reject) => {
 		const template_base = path.join(__dirname, 'templates/epub/');
 
 		const output = _fs.createWriteStream(output_path);
@@ -558,25 +558,13 @@ async function epubgen(data, output_path, options) {
 		});
 
 		output
-			.on('close', () => {
-				out.write(archive.pointer() + ' total bytes');
-				out.write(
-					'archiver has been finalized and the output file descriptor has closed.'
-				);
+			.on('finish', () => {
+				out.write(`${archive.pointer()} total bytes, archive closed\n`);
+				resolve();
 			})
-			.on('end', () => {
-				out.write('Data has been drained');
-			})
-			.on('finish', resolve);
+			.on('error', reject);
 
-		archive
-			.on('warning', err => {
-				throw err;
-			})
-			.on('error', err => {
-				throw err;
-			})
-			.pipe(output);
+		archive.on('warning', reject).on('error', reject).pipe(output);
 
 		// mimetype file must be first
 		archive.append('application/epub+zip', { name: 'mimetype' });
