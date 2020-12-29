@@ -220,7 +220,8 @@ function expandDetailsElements(doc) {
 }
 
 /*
-	Wrap <pre> blocks in <figure> elements
+	Wrap <pre> blocks in <figure> elements,
+	to make sure Readability preserves them.
  */
 function wrapPreBlocks(doc) {
 	Array.from(doc.querySelectorAll('pre')).forEach(pre => {

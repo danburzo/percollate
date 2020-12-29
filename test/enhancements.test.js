@@ -157,7 +157,8 @@ tape('wrapPreBlocks', t => {
 	t.equal(
 		doc1.body.innerHTML,
 		`<p>Here is the command:</p>
-		<figure><pre>cd my-app/</pre></figure>`
+		<figure><pre>cd my-app/</pre></figure>`,
+		'Wraps <pre> when appropriate'
 	);
 
 	const doc2 = dom`
@@ -169,7 +170,8 @@ tape('wrapPreBlocks', t => {
 	t.equal(
 		doc2.body.innerHTML,
 		`<p>Here is the command:</p>
-		<figure><pre>cd my-app/</pre><figcaption>The command</figcaption></figure>`
+		<figure><pre>cd my-app/</pre><figcaption>The command</figcaption></figure>`,
+		"Doesn't double-wrap in <figure>"
 	);
 
 	const doc3 = dom`
@@ -181,7 +183,8 @@ tape('wrapPreBlocks', t => {
 	t.equal(
 		doc3.body.innerHTML,
 		`<p>Here is the command:</p>
-		<figure><pre>cd my-app/</pre></figure>`
+		<figure><pre>cd my-app/</pre></figure>`,
+		'Removes useless wrapping element'
 	);
 
 	t.end();
