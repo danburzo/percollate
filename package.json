@@ -7,10 +7,10 @@
 	"author": "Dan Burzo <danburzo@gmail.com>",
 	"license": "MIT",
 	"dependencies": {
-		"@mozilla/readability": "^0.3.0",
-		"archiver": "^5.0.2",
+		"@mozilla/readability": "^0.4.0",
+		"archiver": "^5.1.0",
 		"css": "^3.0.0",
-		"dompurify": "^2.1.1",
+		"dompurify": "^2.2.6",
 		"franc-all": "^6.0.0",
 		"hyphenopoly": "^4.9.0",
 		"iso-639-3-to-1": "^1.0.0",
@@ -18,9 +18,9 @@
 		"mimetype": "^0.0.8",
 		"node-fetch": "^2.6.1",
 		"nunjucks": "^3.2.2",
-		"pdf-lib": "^1.11.1",
-		"puppeteer": "^5.3.1",
-		"slugify": "^1.4.5",
+		"pdf-lib": "^1.14.0",
+		"puppeteer": "^5.5.0",
+		"slugify": "^1.4.6",
 		"srcset": "^3.0.0"
 	},
 	"bin": {
@@ -31,10 +31,10 @@
 	},
 	"devDependencies": {
 		"epubchecker": "^4.2.2",
-		"eslint": "^7.10.0",
-		"husky": "^4.3.0",
+		"eslint": "^7.16.0",
+		"husky": "^4.3.6",
 		"prettier": "^2.0.5",
-		"pretty-quick": "^3.0.2",
+		"pretty-quick": "^3.1.0",
 		"tape": "^5.0.1",
 		"tape-promise": "^4.0.0"
 	},

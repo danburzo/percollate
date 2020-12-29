@@ -1,6 +1,7 @@
 let tape = require('tape');
 const fs = require('fs');
 const percollate = require('..');
+const epubchecker = require('epubchecker');
 
 const testUrl = 'https://de.wikipedia.org/wiki/JavaScript';
 const testPdf = `${__dirname}/percollate-output.pdf`;
@@ -16,9 +17,6 @@ async function generateTestFiles() {
 	await percollate.html([testUrl], {
 		output: testHtml
 	});
-	await percollate.epub([testUrl], {
-		output: testEpub
-	});
 }
 
 tape('files exists', async t => {
@@ -26,8 +24,19 @@ tape('files exists', async t => {
 	await generateTestFiles();
 	t.true(fs.existsSync(testPdf));
 	t.true(fs.existsSync(testHtml));
-	t.true(fs.existsSync(testEpub));
 	t.pass();
+});
+
+tape('generates valid epub', async t => {
+	percollate.configure();
+	await percollate.epub([testUrl], {
+		output: testEpub
+	});
+
+	t.true(fs.existsSync(testEpub));
+
+	const report = await epubchecker(testEpub);
+	t.equal(report.checker.nFatal, 0);
 });
 
 tape('website to html & html to pdf', async t => {
