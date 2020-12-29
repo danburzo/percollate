@@ -272,10 +272,14 @@ async function cleanup(url, options) {
 				sanitizer.sanitize(parsed.excerpt, { RETURN_DOM: true })
 			),
 			content: serializer(
-				hyphenateDom(
-					sanitizer.sanitize(parsed.content, { RETURN_DOM: true }),
-					lang
-				)
+				options.hyphenate
+					? hyphenateDom(
+							sanitizer.sanitize(parsed.content, {
+								RETURN_DOM: true
+							}),
+							lang
+					  )
+					: sanitizer.sanitize(parsed.content, { RETURN_DOM: true })
 			),
 			lang,
 			textContent: sanitizer.sanitize(parsed.textContent),
