@@ -13,4 +13,9 @@ function textToIso6391(text) {
 	return null;
 }
 
-module.exports = { textToIso6391 };
+function getLanguageAttribute(doc) {
+	const htmlElement = doc.querySelector('html');
+	return htmlElement.getAttribute('lang');
+}
+
+module.exports = { textToIso6391, getLanguageAttribute };
