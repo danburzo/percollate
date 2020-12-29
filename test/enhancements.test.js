@@ -3,7 +3,8 @@ const { JSDOM } = require('jsdom');
 const {
 	wikipediaSpecific,
 	githubSpecific,
-	imagesAtFullSize
+	imagesAtFullSize,
+	wrapPreBlocks
 } = require('../src/enhancements');
 
 const dom = content => new JSDOM(content).window.document;
@@ -141,6 +142,46 @@ tape('githubSpecific', t => {
 		doc.querySelector('h2 a').getAttribute('id'),
 		'some-anchor',
 		'fix GitHub anchors'
+	);
+
+	t.end();
+});
+
+tape('wrapPreBlocks', t => {
+	const doc1 = dom`
+		<p>Here is the command:</p>
+		<pre>cd my-app/</pre>`;
+
+	wrapPreBlocks(doc1);
+
+	t.equal(
+		doc1.body.innerHTML,
+		`<p>Here is the command:</p>
+		<figure><pre>cd my-app/</pre></figure>`
+	);
+
+	const doc2 = dom`
+		<p>Here is the command:</p>
+		<figure><pre>cd my-app/</pre><figcaption>The command</figcaption></figure>`;
+
+	wrapPreBlocks(doc2);
+
+	t.equal(
+		doc2.body.innerHTML,
+		`<p>Here is the command:</p>
+		<figure><pre>cd my-app/</pre><figcaption>The command</figcaption></figure>`
+	);
+
+	const doc3 = dom`
+		<p>Here is the command:</p>
+		<div><pre>cd my-app/</pre></div>`;
+
+	wrapPreBlocks(doc3);
+
+	t.equal(
+		doc3.body.innerHTML,
+		`<p>Here is the command:</p>
+		<figure><pre>cd my-app/</pre></figure>`
 	);
 
 	t.end();
