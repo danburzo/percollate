@@ -219,6 +219,25 @@ function expandDetailsElements(doc) {
 	);
 }
 
+/*
+	Wrap <pre> blocks in <figure> elements,
+	to make sure Readability preserves them.
+ */
+function wrapPreBlocks(doc) {
+	Array.from(doc.querySelectorAll('pre')).forEach(pre => {
+		if (pre.parentNode && !pre.parentNode.matches('figure')) {
+			let fig = doc.createElement('figure');
+			fig.appendChild(pre.cloneNode(true));
+			/*
+				If the <pre> is the only child (of a <div> or <p>),
+				also remove this parent in the process.
+			 */
+			let to_replace = pre.matches(':only-child') ? pre.parentNode : pre;
+			to_replace.parentNode.replaceChild(fig, to_replace);
+		}
+	});
+}
+
 module.exports = {
 	ampToHtml,
 	fixLazyLoadedImages,
@@ -228,5 +247,6 @@ module.exports = {
 	relativeToAbsoluteURIs,
 	singleImgToFigure,
 	expandDetailsElements,
-	githubSpecific
+	githubSpecific,
+	wrapPreBlocks
 };
