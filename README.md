@@ -98,6 +98,10 @@ Additional CSS styles you can pass from the command-line to override styles spec
 
 Don't prefer the AMP version of the web page.
 
+#### `--no-hyphenate`
+
+Don't use hyphenation for PDFs.
+
 #### `--debug`
 
 Print more detailed information.
