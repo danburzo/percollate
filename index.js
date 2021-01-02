@@ -272,7 +272,7 @@ async function cleanup(url, options) {
 				sanitizer.sanitize(parsed.excerpt, { RETURN_DOM: true })
 			),
 			content: serializer(
-				options.hyphenate
+				options.hyphenate === true
 					? hyphenateDom(
 							sanitizer.sanitize(parsed.content, {
 								RETURN_DOM: true
@@ -300,9 +300,15 @@ async function cleanup(url, options) {
 async function bundlePdf(items, options) {
 	const DEFAULT_STYLESHEET = path.join(__dirname, 'templates/default.css');
 	const DEFAULT_TEMPLATE = path.join(__dirname, 'templates/default.html');
+	const JUSTIFY_CSS = `
+		.article__content p {
+			text-align: justify;
+		}
+	`;
 
 	const style =
 		(await fs.readFile(options.style || DEFAULT_STYLESHEET, 'utf8')) +
+		(options.hyphenate === true ? JUSTIFY_CSS : '') +
 		(options.css || '');
 
 	const title =
@@ -501,6 +507,12 @@ async function generate(fn, urls, options = {}) {
 	if (!configured) {
 		configure();
 	}
+
+	options.hyphenate =
+		options.hyphenate === undefined
+			? fn.name === 'bundlePdf'
+			: options.hyphenate;
+
 	if (!urls.length) return;
 	let items = (
 		await Promise.all(
