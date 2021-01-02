@@ -38,11 +38,9 @@
 			</ol>
 		</nav>
 		{% endif %} {% for item in items %}
-		<article id="{{ item.id }}" class="article">
+		<article id="{{ item.id }}" class="article" lang="{{item.lang}}">
 			<header class="article__header">
-				<h1 class="article__title">
-					{{ item.title }}
-				</h1>
+				<h1 class="article__title">{{ item.title }}</h1>
 				{% if item.byline %}
 				<p class="article__byline">By <span>{{ item.byline }}</span></p>
 				{% endif %}
@@ -52,9 +50,7 @@
 				</p>
 			</header>
 
-			<div class="article__content">
-				{{ item.content }}
-			</div>
+			<div class="article__content">{{ item.content }}</div>
 		</article>
 		{% endfor %}
 

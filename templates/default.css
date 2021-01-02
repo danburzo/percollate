@@ -200,6 +200,7 @@ article:not(:last-of-type) {
 .article__content p {
 	margin: 0;
 	orphans: 3;
+	hyphens: auto;
 	widows: 3;
 }
 

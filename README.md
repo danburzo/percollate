@@ -128,6 +128,10 @@ Generate a hyperlinked table of contents. The option is implicitly enabled when 
 
 Applies to `pdf` and `html`.
 
+#### `--hyphenate`
+
+Enable hyphenation for gernerated files. It is enabled by default for PDFs. Disable this implicit behavior by passing the `--no-hyphenate` flag.
+
 ## Recipes
 
 ### Basic bundling

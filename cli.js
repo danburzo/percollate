@@ -97,6 +97,7 @@ Commmon options:
 Options to disable features:
 
   --no-amp           Don't prefer the AMP version of the web page.
+  --no-hyphenate     Don't use hyphenation for PDFs.
   --no-toc           Don't generate a table of contents.
   --no-cover         Don't generate a cover.
 

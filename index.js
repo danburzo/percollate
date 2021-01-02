@@ -20,6 +20,8 @@ const epubDate = require('./src/util/epub-date');
 const humanDate = require('./src/util/human-date');
 const outputPath = require('./src/util/output-path');
 const addExif = require('./src/exif');
+const { hyphenateDom } = require('./src/hyphenate');
+const { textToIso6391, getLanguageAttribute } = require('./src/util/language');
 
 const {
 	ampToHtml,
@@ -244,6 +246,12 @@ async function cleanup(url, options) {
 
 		const parsed = R.parse() || {};
 
+		// Hyphenate the text
+		const textContent = sanitizer.sanitize(parsed.textContent);
+		const lang =
+			getLanguageAttribute(dom.window.document) ||
+			textToIso6391(textContent);
+
 		out.write(' ✓\n');
 
 		/*
@@ -266,8 +274,16 @@ async function cleanup(url, options) {
 				sanitizer.sanitize(parsed.excerpt, { RETURN_DOM: true })
 			),
 			content: serializer(
-				sanitizer.sanitize(parsed.content, { RETURN_DOM: true })
+				options.hyphenate === true
+					? hyphenateDom(
+							sanitizer.sanitize(parsed.content, {
+								RETURN_DOM: true
+							}),
+							lang
+					  )
+					: sanitizer.sanitize(parsed.content, { RETURN_DOM: true })
 			),
+			lang,
 			textContent: sanitizer.sanitize(parsed.textContent),
 			length: parsed.length,
 			siteName: sanitizer.sanitize(parsed.siteName),
@@ -286,9 +302,15 @@ async function cleanup(url, options) {
 async function bundlePdf(items, options) {
 	const DEFAULT_STYLESHEET = path.join(__dirname, 'templates/default.css');
 	const DEFAULT_TEMPLATE = path.join(__dirname, 'templates/default.html');
+	const JUSTIFY_CSS = `
+		.article__content p {
+			text-align: justify;
+		}
+	`;
 
 	const style =
 		(await fs.readFile(options.style || DEFAULT_STYLESHEET, 'utf8')) +
+		(options.hyphenate === true ? JUSTIFY_CSS : '') +
 		(options.css || '');
 
 	const title =
@@ -448,9 +470,15 @@ async function bundleEpub(items, options) {
 async function bundleHtml(items, options) {
 	const DEFAULT_STYLESHEET = path.join(__dirname, 'templates/default.css');
 	const DEFAULT_TEMPLATE = path.join(__dirname, 'templates/default.html');
+	const JUSTIFY_CSS = `
+		.article__content p {
+			text-align: justify;
+		}
+	`;
 
 	const style =
 		(await fs.readFile(options.style || DEFAULT_STYLESHEET, 'utf8')) +
+		(options.hyphenate === true ? JUSTIFY_CSS : '') +
 		(options.css || '');
 
 	const html = nunjucks.renderString(
@@ -487,6 +515,12 @@ async function generate(fn, urls, options = {}) {
 	if (!configured) {
 		configure();
 	}
+
+	options.hyphenate =
+		options.hyphenate === undefined
+			? fn.name === 'bundlePdf'
+			: options.hyphenate;
+
 	if (!urls.length) return;
 	let items = (
 		await Promise.all(
