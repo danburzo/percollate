@@ -98,10 +98,6 @@ Additional CSS styles you can pass from the command-line to override styles spec
 
 Don't prefer the AMP version of the web page.
 
-#### `--no-hyphenate`
-
-Don't use hyphenation for PDFs.
-
 #### `--debug`
 
 Print more detailed information.
@@ -131,6 +127,10 @@ Generate a cover. The option is implicitly enabled when the `--title` option is 
 Generate a hyperlinked table of contents. The option is implicitly enabled when bundling more than one web page to a single file. Disable this implicit behavior by passing the `--no-toc` flag.
 
 Applies to `pdf` and `html`.
+
+#### `--hyphenate`
+
+Enable hyphenation for gernerated files. It is enabled by default for PDFs. Disable this implicit behavior by passing the `--no-hyphenate` flag.
 
 ## Recipes
 
