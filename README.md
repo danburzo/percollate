@@ -26,24 +26,21 @@ Percollate is a command-line tool that turns web pages into beautifully formatte
 
 ## Installation
 
-`percollate` is a Node.js command-line tool that works best when installed globally from npm:
+`percollate` is a Node.js command-line tool which you can install globally from npm:
 
 ```bash
 npm install -g percollate
 ```
 
-There's also a packaged version on [Arch's
-AUR](https://wiki.archlinux.org/index.php/Arch_User_Repository)
-repositories, and you can install using your local [AUR
-helper](https://wiki.archlinux.org/index.php/AUR_helpers) (yay, pacaur,
-etc).
+Percollate and its dependencies require Node.js version 10.22.0 or later.
 
-```bash
-# using yay
+#### Community-maintained packages
+
+There's [a packaged version](https://aur.archlinux.org/packages/nodejs-percollate/) available on [Arch User Repository](https://wiki.archlinux.org/index.php/Arch_User_Repository), which you can install using your local [AUR helper](https://wiki.archlinux.org/index.php/AUR_helpers) (`yay`, `pacaur`, or similar):
+
+```
 yay -S nodejs-percollate
 ```
-
-Percollate and its dependencies require Node.js version 10.22.0 or later.
 
 ## Usage
 
