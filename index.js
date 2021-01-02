@@ -468,9 +468,15 @@ async function bundleEpub(items, options) {
 async function bundleHtml(items, options) {
 	const DEFAULT_STYLESHEET = path.join(__dirname, 'templates/default.css');
 	const DEFAULT_TEMPLATE = path.join(__dirname, 'templates/default.html');
+	const JUSTIFY_CSS = `
+		.article__content p {
+			text-align: justify;
+		}
+	`;
 
 	const style =
 		(await fs.readFile(options.style || DEFAULT_STYLESHEET, 'utf8')) +
+		(options.hyphenate === true ? JUSTIFY_CSS : '') +
 		(options.css || '');
 
 	const html = nunjucks.renderString(
