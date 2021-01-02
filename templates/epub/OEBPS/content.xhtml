@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html
+	xmlns="http://www.w3.org/1999/xhtml"
+	lang="{{ item.lang | default('en-us') }}"
+>
 	<head>
 		<meta charset="utf-8" />
 		<title>{{ item.title | e }}</title>
@@ -16,8 +19,6 @@
 				<a class="no-href" href="{{item.url}}">{{item.url}}</a>
 			</p>
 		</header>
-		<div class="article__content">
-			{{ item.content }}
-		</div>
+		<div class="article__content">{{ item.content }}</div>
 	</body>
 </html>

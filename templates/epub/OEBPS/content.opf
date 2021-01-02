@@ -9,7 +9,7 @@
 		{% endif %}
 		<dc:date>{{ date }}</dc:date>
 		<meta property="dcterms:modified">{{ date }}</meta>
-		<dc:language>{{ lang | default('en-US')}}</dc:language>
+		<dc:language>{{ lang | default('en-us')}}</dc:language>
 		{% if cover %}
 			<meta name="cover" content="{{ cover.id }}" />
 		{% endif %}

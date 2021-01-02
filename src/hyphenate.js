@@ -1,16 +1,18 @@
 const Hyphenator = require('hyphenopoly');
 
+const DEFAULT_LANG = 'en-us';
+
 function getHypenatorByLang(lang) {
 	const language = Hyphenator.supportedLanguages.includes(lang)
 		? lang
-		: 'en-us';
+		: DEFAULT_LANG;
 	return Hyphenator.config({
 		sync: true,
 		require: [language],
-		defaultLanguage: 'en-us',
+		defaultLanguage: DEFAULT_LANG,
 		minWordLength: 6,
-		leftmin: 4,
-		rightmin: 4
+		leftmin: 3,
+		rightmin: 3
 	});
 }
 

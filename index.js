@@ -41,6 +41,12 @@ const get_style_attribute_value = require('./src/get-style-attribute-value');
 const out = process.stdout;
 const UA = `percollate/${pkg.version}`;
 
+const JUSTIFY_CSS = `
+	.article__content p {
+		text-align: justify;
+	}
+`;
+
 const enhancePage = function (dom) {
 	// Note: the order of the enhancements matters!
 	[
@@ -284,7 +290,7 @@ async function cleanup(url, options) {
 					: sanitizer.sanitize(parsed.content, { RETURN_DOM: true })
 			),
 			lang,
-			textContent: sanitizer.sanitize(parsed.textContent),
+			textContent,
 			length: parsed.length,
 			siteName: sanitizer.sanitize(parsed.siteName),
 			remoteResources
@@ -302,11 +308,6 @@ async function cleanup(url, options) {
 async function bundlePdf(items, options) {
 	const DEFAULT_STYLESHEET = path.join(__dirname, 'templates/default.css');
 	const DEFAULT_TEMPLATE = path.join(__dirname, 'templates/default.html');
-	const JUSTIFY_CSS = `
-		.article__content p {
-			text-align: justify;
-		}
-	`;
 
 	const style =
 		(await fs.readFile(options.style || DEFAULT_STYLESHEET, 'utf8')) +
@@ -431,6 +432,7 @@ async function bundleEpub(items, options) {
 	const DEFAULT_STYLESHEET = path.join(__dirname, 'templates/default.css');
 	const style =
 		(await fs.readFile(options.style || DEFAULT_STYLESHEET, 'utf8')) +
+		(options.hyphenate === true ? JUSTIFY_CSS : '') +
 		(options.css || '');
 
 	out.write('Saving EPUB...\n');
@@ -470,11 +472,6 @@ async function bundleEpub(items, options) {
 async function bundleHtml(items, options) {
 	const DEFAULT_STYLESHEET = path.join(__dirname, 'templates/default.css');
 	const DEFAULT_TEMPLATE = path.join(__dirname, 'templates/default.html');
-	const JUSTIFY_CSS = `
-		.article__content p {
-			text-align: justify;
-		}
-	`;
 
 	const style =
 		(await fs.readFile(options.style || DEFAULT_STYLESHEET, 'utf8')) +
@@ -515,12 +512,6 @@ async function generate(fn, urls, options = {}) {
 	if (!configured) {
 		configure();
 	}
-
-	options.hyphenate =
-		options.hyphenate === undefined
-			? fn.name === 'bundlePdf'
-			: options.hyphenate;
-
 	if (!urls.length) return;
 	let items = (
 		await Promise.all(
@@ -548,7 +539,11 @@ async function generate(fn, urls, options = {}) {
 	Generate PDF
  */
 async function pdf(urls, options) {
-	await generate(bundlePdf, urls, options);
+	await generate(bundlePdf, urls, {
+		...options,
+		// Hyphenate by default
+		hyphenate: options.hyphenate !== undefined ? options.hyphenate : true
+	});
 }
 
 /*
@@ -558,7 +553,8 @@ async function epub(urls, options) {
 	await generate(bundleEpub, urls, {
 		...options,
 		xhtml: true,
-		mapRemoteResources: true
+		mapRemoteResources: true,
+		hyphenate: options.hyphenate !== undefined ? options.hyphenate : false
 	});
 }
 
@@ -566,7 +562,10 @@ async function epub(urls, options) {
 	Generate HTML
  */
 async function html(urls, options) {
-	await generate(bundleHtml, urls, options);
+	await generate(bundleHtml, urls, {
+		...options,
+		hyphenate: options.hyphenate !== undefined ? options.hyphenate : false
+	});
 }
 
 /*

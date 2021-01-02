@@ -138,7 +138,9 @@ Applies to `pdf` and `html`.
 
 #### `--hyphenate`
 
-Enable hyphenation for gernerated files. It is enabled by default for PDFs. Disable this implicit behavior by passing the `--no-hyphenate` flag.
+Hyphenation is enabled by default for `pdf`, and disabled for `epub` and `html`. You can opt into hyphenation with the `--hyphenate` flag, or disable it with the `--no-hyphenate` flag.
+
+See also the [Hyphenation and justification](#hyphenation-and-justification) recipe.
 
 ## Recipes
 
@@ -228,6 +230,24 @@ The idea with percollate is to make PDFs that can be printed without losing wher
 
 ```bash
 percollate pdf --css "a:after { display: none }" http://example.com
+```
+
+#### Hyphenation and justification
+
+Hyphenation is only enabled by default for PDFs, but you can opt in or out of it for any output format with [a flag](#--hyphenate).
+
+When hyphenation is enabled, paragraphs will be justified:
+
+```css
+.article__content p {
+	text-align: justify;
+}
+```
+
+If you prefer left-aligned text:
+
+```bash
+percollate pdf --css ".article__content p { text-align: left }" http://example.com
 ```
 
 ### The `--style` option
