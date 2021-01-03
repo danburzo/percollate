@@ -93,13 +93,15 @@ Commmon options:
   --cover            Generate a cover for the PDF / EPUB.
                      Implicitly enabled when bundling more than one item
                      or the --title option is provided.
+  
+  --hyphenate        Enable hyphenation. Enabled by default for PDF.
 
 Options to disable features:
 
   --no-amp           Don't prefer the AMP version of the web page.
-  --no-hyphenate     Don't use hyphenation for PDFs.
   --no-toc           Don't generate a table of contents.
   --no-cover         Don't generate a cover.
+  --no-hyphenate     Disable hyphenation.
 
 PDF options: 
 

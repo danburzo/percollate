@@ -118,7 +118,7 @@ Provide a title for the bundle.
 percollate epub http://example.com/page-1 http://example.com/page-2 --title="Best Of Example"
 ```
 
-### `-a, --author`
+#### `-a, --author`
 
 Provide an author for the bundle.
 
