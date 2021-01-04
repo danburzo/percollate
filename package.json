@@ -18,7 +18,7 @@
 		"mimetype": "^0.0.8",
 		"node-fetch": "^2.6.1",
 		"nunjucks": "^3.2.2",
-		"pdf-lib": "^1.14.0",
+		"pdf-lib": "^1.14.1",
 		"puppeteer": "^5.5.0",
 		"slugify": "^1.4.6",
 		"srcset": "^3.0.0"
@@ -31,11 +31,11 @@
 	},
 	"devDependencies": {
 		"epubchecker": "^4.2.2",
-		"eslint": "^7.16.0",
+		"eslint": "^7.17.0",
 		"husky": "^4.3.6",
 		"prettier": "^2.0.5",
 		"pretty-quick": "^3.1.0",
-		"tape": "^5.0.1",
+		"tape": "^5.1.0",
 		"tape-promise": "^4.0.0"
 	},
 	"scripts": {
