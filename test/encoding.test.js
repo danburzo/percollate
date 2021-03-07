@@ -1,5 +1,4 @@
 const tape = require('tape-promise').default(require('tape'));
-const path = require('path');
 
 const { __test__ } = require('../index');
 const { fetchContent } = __test__;
