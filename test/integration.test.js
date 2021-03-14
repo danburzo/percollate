@@ -52,14 +52,14 @@ tape('website to html & html to pdf', async t => {
 
 tape('programmatic api result', async t => {
 	percollate.configure();
-	const test = await percollate.pdf([testUrl], {
+	const result = await percollate.pdf([testUrl], {
 		output: testPdf
 	});
-	t.true(test.items.length > 0);
-	t.equal(test.items[0].title, 'JavaScript');
-	t.true('html' in test.items[0]);
-	t.true(test.items[0].html.length > 0);
-	t.true('options' in test);
-	t.equal(test.options.output, testPdf);
+	t.true(result.items.length > 0);
+	t.equal(result.items[0].title, 'JavaScript');
+	t.true('html' in result.items[0]);
+	t.true(result.items[0].html.length > 0);
+	t.true('options' in result);
+	t.equal(result.options.output, testPdf);
 	t.pass();
 });
