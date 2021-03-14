@@ -562,7 +562,7 @@ async function pdf(urls, options) {
 	Generate EPUB
  */
 async function epub(urls, options) {
-	await generate(bundleEpub, urls, {
+	return await generate(bundleEpub, urls, {
 		...options,
 		xhtml: true,
 		mapRemoteResources: true,
@@ -574,7 +574,7 @@ async function epub(urls, options) {
 	Generate HTML
  */
 async function html(urls, options) {
-	await generate(bundleHtml, urls, {
+	return await generate(bundleHtml, urls, {
 		...options,
 		hyphenate: options.hyphenate !== undefined ? options.hyphenate : false
 	});
