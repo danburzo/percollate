@@ -300,7 +300,8 @@ async function cleanup(url, options) {
 			textContent,
 			length: parsed.length,
 			siteName: sanitizer.sanitize(parsed.siteName),
-			remoteResources
+			remoteResources,
+			html: content
 		};
 	} catch (error) {
 		console.error(`${url}:`, error.message);
@@ -519,7 +520,7 @@ async function generate(fn, urls, options = {}) {
 	if (!configured) {
 		configure();
 	}
-	if (!urls.length) return;
+	if (!urls.length) return null;
 	let items = (
 		await Promise.all(
 			urls.map((url, i) =>
@@ -540,13 +541,17 @@ async function generate(fn, urls, options = {}) {
 	} else {
 		await fn(items, options);
 	}
+	return {
+		items,
+		options
+	};
 }
 
 /*
 	Generate PDF
  */
 async function pdf(urls, options) {
-	await generate(bundlePdf, urls, {
+	return await generate(bundlePdf, urls, {
 		...options,
 		// Hyphenate by default
 		hyphenate: options.hyphenate !== undefined ? options.hyphenate : true
