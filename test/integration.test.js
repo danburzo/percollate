@@ -60,6 +60,12 @@ tape('website to html & html to pdf', async t => {
 
 tape('programmatic api result', async t => {
 	percollate.configure();
+
+	const resultNull = await percollate.pdf([], {
+		output: testPdf
+	});
+	t.equal(resultNull, null, 'testing no urls provided');
+
 	const result = await percollate.pdf([testUrl], {
 		output: testPdf
 	});
