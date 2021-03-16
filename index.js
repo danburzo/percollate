@@ -267,8 +267,22 @@ async function cleanup(url, options) {
 			rather than normal HTML.
 		 */
 		const serializer = options.xhtml
-			? el => new dom.window.XMLSerializer().serializeToString(el)
-			: el => el.innerHTML;
+			? arr => {
+					const xs = new dom.window.XMLSerializer();
+					return arr.map(el => xs.serializeToString(el)).join('');
+			  }
+			: arr => arr.map(el => el.innerHTML).join('');
+
+		/*
+			When dompurify returns a DOM node, it always wraps it 
+			in a HTMLBodyElement. We only need its children.
+		 */
+		const sanitize_to_dom = dirty =>
+			Array.from(
+				sanitizer.sanitize(dirty, { RETURN_DOM: true }).children
+			);
+
+		const content_els = sanitize_to_dom(parsed.content);
 
 		return {
 			id: `percollate-page-${uuid()}`,
@@ -276,18 +290,11 @@ async function cleanup(url, options) {
 			title: sanitizer.sanitize(parsed.title),
 			byline: sanitizer.sanitize(parsed.byline),
 			dir: sanitizer.sanitize(parsed.dir),
-			excerpt: serializer(
-				sanitizer.sanitize(parsed.excerpt, { RETURN_DOM: true })
-			),
+			excerpt: serializer(sanitize_to_dom(parsed.excerpt)),
 			content: serializer(
 				options.hyphenate === true
-					? hyphenateDom(
-							sanitizer.sanitize(parsed.content, {
-								RETURN_DOM: true
-							}),
-							lang
-					  )
-					: sanitizer.sanitize(parsed.content, { RETURN_DOM: true })
+					? content_els.map(el => hyphenateDom(el, lang))
+					: content_els
 			),
 			lang,
 			textContent,
