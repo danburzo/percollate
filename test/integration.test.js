@@ -71,8 +71,8 @@ tape('programmatic api result', async t => {
 	});
 	t.true(result.items.length > 0);
 	t.equal(result.items[0].title, 'JavaScript');
-	t.true('html' in result.items[0]);
-	t.true(result.items[0].html.length > 0);
+	t.true('originalContent' in result.items[0]);
+	t.true(result.items[0].originalContent.length > 0);
 	t.true('options' in result);
 	t.equal(result.options.output, testPdf);
 	t.pass();

@@ -301,7 +301,7 @@ async function cleanup(url, options) {
 			length: parsed.length,
 			siteName: sanitizer.sanitize(parsed.siteName),
 			remoteResources,
-			html: content
+			originalContent: content
 		};
 	} catch (error) {
 		console.error(`${url}:`, error.message);
