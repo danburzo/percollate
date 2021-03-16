@@ -216,11 +216,6 @@ async function cleanup(url, options) {
 		*/
 		enhancePage(dom);
 
-		let remoteResources;
-		if (options.mapRemoteResources) {
-			remoteResources = mapRemoteResources(dom.window.document);
-		}
-
 		// Run through readability and return
 		const R = new Readability(dom.window.document, {
 			classesToPreserve: [
@@ -251,6 +246,11 @@ async function cleanup(url, options) {
 		}
 
 		const parsed = R.parse() || {};
+
+		let remoteResources;
+		if (options.mapRemoteResources) {
+			remoteResources = mapRemoteResources(parsed.content);
+		}
 
 		// Hyphenate the text
 		const textContent = sanitizer.sanitize(parsed.textContent);
