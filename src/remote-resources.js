@@ -5,14 +5,14 @@ module.exports = function remoteResources(doc) {
 	let srcs = new Map();
 
 	function replace(src) {
-		let m;
-		if ((m = src.match(/\.(gif|jpe?g|png|svg)$/))) {
-			if (srcs.has(src)) {
-				return src;
+		let cleanSrc = src.split('?')[0];
+		let match;
+		if ((match = cleanSrc.match(/\.(gif|jpe?g|png|svg|webp)(\/)?$/))) {
+			if (!srcs.has(cleanSrc)) {
+				let new_src = `rr-${uuid()}.${match[1]}`;
+				srcs.set(cleanSrc, new_src);
 			}
-			let new_src = `rr-${uuid()}.${m[1]}`;
-			srcs.set(src, new_src);
-			return `./${new_src}`;
+			return `./${srcs.get(cleanSrc)}`;
 		}
 		return src;
 	}
@@ -25,15 +25,19 @@ module.exports = function remoteResources(doc) {
 		doc.querySelectorAll('picture source[srcset], img[srcset]')
 	).forEach(el => {
 		try {
-			el.setAttribute(
-				'srcset',
-				srcset.stringify(
-					srcset.parse(el.getAttribute('srcset')).map(item => ({
-						...item,
-						url: replace(item.url)
-					}))
-				)
-			);
+			if (el.getAttribute('src')) {
+				el.removeAttribute('srcset');
+			} else {
+				el.setAttribute(
+					'srcset',
+					srcset.stringify(
+						srcset.parse(el.getAttribute('srcset')).map(item => ({
+							...item,
+							url: replace(item.url)
+						}))
+					)
+				);
+			}
 		} catch (err) {
 			console.error(err);
 		}
