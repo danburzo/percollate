@@ -22,7 +22,8 @@
 		"pdf-lib": "^1.14.1",
 		"puppeteer": "^5.5.0",
 		"slugify": "^1.4.6",
-		"srcset": "^3.0.0"
+		"srcset": "^3.0.0",
+		"uuid": "^8.3.2"
 	},
 	"bin": {
 		"percollate": "./cli.js"
