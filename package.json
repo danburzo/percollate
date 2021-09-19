@@ -31,7 +31,7 @@
 		"percollate": "./cli.js"
 	},
 	"engines": {
-		"node": ">= 10.22.0"
+		"node": "^12.20.0 || ^14.13.1 || >=16.0.0"
 	},
 	"devDependencies": {
 		"epubchecker": "^4.2.2",
