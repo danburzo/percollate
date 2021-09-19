@@ -1,6 +1,5 @@
-const tape = require('tape-promise').default(require('tape'));
-
-const { __test__ } = require('../index');
+import tape from 'tape';
+import { __test__ } from '../index.js';
 const { fetchContent } = __test__;
 
 tape('fetchContent', async t => {

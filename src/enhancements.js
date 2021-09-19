@@ -1,6 +1,5 @@
-const srcset = require('srcset');
-const URL = require('url').URL;
-const replaceElementType = require('./replace-element-type');
+import srcset from 'srcset';
+import replaceElementType from './replace-element-type.js';
 
 /* 
 	Convert AMP markup to HMTL markup
@@ -251,7 +250,7 @@ function wrapPreBlocks(doc) {
 	});
 }
 
-module.exports = {
+export {
 	ampToHtml,
 	fixLazyLoadedImages,
 	imagesAtFullSize,

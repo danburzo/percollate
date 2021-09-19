@@ -1,23 +1,26 @@
-let tape = require('tape');
-const fs = require('fs');
-const { PDFDocument } = require('pdf-lib');
-const percollate = require('..');
+import tape from 'tape';
+import fs from 'fs';
+import { PDFDocument } from 'pdf-lib';
+import { pdf, configure } from '../index.js';
 
 const testUrl = 'https://de.wikipedia.org/wiki/JavaScript';
-const testPdf = `${__dirname}/percollate-output-exif.pdf`;
-const testPdfMultiple = `${__dirname}/percollate-output-exif-multiple.pdf`;
+const testPdf = new URL('percollate-output-exif.pdf', import.meta.url);
+const testPdfMultiple = new URL(
+	'percollate-output-exif-multiple.pdf',
+	import.meta.url
+);
 
 async function generateTestFiles() {
-	await percollate.pdf([testUrl], {
+	await pdf([testUrl], {
 		output: testPdf
 	});
-	await percollate.pdf([testUrl, testUrl], {
+	await pdf([testUrl, testUrl], {
 		output: testPdfMultiple
 	});
 }
 
 tape('exif feature test', async t => {
-	percollate.configure();
+	configure();
 	await generateTestFiles();
 
 	t.true(fs.existsSync(testPdf));

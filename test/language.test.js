@@ -1,9 +1,9 @@
-let tape = require('tape');
-const { JSDOM } = require('jsdom');
-let {
-	textToIso6391: textToLang,
+import tape from 'tape';
+import { JSDOM } from 'jsdom';
+import {
+	textToIso6391 as textToLang,
 	getLanguageAttribute
-} = require('../src/util/language');
+} from '../src/util/language.js';
 
 const dom = content => new JSDOM(content);
 

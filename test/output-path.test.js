@@ -1,5 +1,5 @@
-let tape = require('tape');
-let outputPath = require('../src/util/output-path.js');
+import tape from 'tape';
+import outputPath from '../src/util/output-path.js';
 
 tape('outputPath', t => {
 	t.equal(

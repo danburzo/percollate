@@ -1,4 +1,4 @@
-module.exports = stream =>
+export default stream =>
 	new Promise((fulfill, reject) => {
 		let content = '';
 		stream

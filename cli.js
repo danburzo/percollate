@@ -1,13 +1,14 @@
 #!/usr/bin/env node
 
-'use strict';
-
-const pkg = require('./package.json');
-const cliopts = require('./src/cli-opts');
-
-const { pdf, epub, html } = require('./index');
+import { readFileSync } from 'fs';
+import cliopts from './src/cli-opts.js';
+import { pdf, epub, html } from './index.js';
 
 const { command, opts, operands } = cliopts(process.argv.slice(2));
+
+const pkg = JSON.parse(
+	readFileSync(new URL('./package.json', import.meta.url))
+);
 
 if (opts.debug) {
 	console.log({

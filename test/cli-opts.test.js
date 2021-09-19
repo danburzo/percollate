@@ -1,5 +1,5 @@
-let tape = require('tape');
-let cliopts = require('../src/cli-opts');
+import tape from 'tape';
+import cliopts from '../src/cli-opts.js';
 
 const argv = str => str.split(/\s+/);
 

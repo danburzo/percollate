@@ -1,11 +1,11 @@
-const tape = require('tape');
-const { JSDOM } = require('jsdom');
-const {
+import tape from 'tape';
+import { JSDOM } from 'jsdom';
+import {
 	wikipediaSpecific,
 	githubSpecific,
 	imagesAtFullSize,
 	wrapPreBlocks
-} = require('../src/enhancements');
+} from '../src/enhancements.js';
 
 const dom = content => new JSDOM(content).window.document;
 

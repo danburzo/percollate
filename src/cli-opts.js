@@ -84,7 +84,7 @@ let aliases = {
 	V: 'version'
 };
 
-module.exports = function (args) {
+export default function (args) {
 	let opts = {};
 	let command;
 	let operands = [];
@@ -128,4 +128,4 @@ module.exports = function (args) {
 		}
 	});
 	return { opts, command, operands };
-};
+}

@@ -1,29 +1,27 @@
-'use strict';
+import pup from 'puppeteer';
+import archiver from 'archiver';
+import fetch from 'node-fetch';
+import convertBody from '@danburzo/fetch-charset-detection';
+import { JSDOM } from 'jsdom';
+import nunjucks from 'nunjucks';
+import fs from 'fs/promises';
+import _fs from 'fs';
+import stream from 'stream';
+import path from 'path';
+import css from 'css';
+import { Readability } from '@mozilla/readability';
+import { v1 as uuid } from 'uuid';
+import mimetype from 'mimetype';
+import createDOMPurify from 'dompurify';
+import slurp from './src/util/slurp.js';
+import epubDate from './src/util/epub-date.js';
+import humanDate from './src/util/human-date.js';
+import outputPath from './src/util/output-path.js';
+import addExif from './src/exif.js';
+import { hyphenateDom } from './src/hyphenate.js';
+import { textToIso6391, getLanguageAttribute } from './src/util/language.js';
 
-const pup = require('puppeteer');
-const archiver = require('archiver');
-const fetch = require('node-fetch');
-const { JSDOM } = require('jsdom');
-const nunjucks = require('nunjucks');
-const fs = require('fs').promises;
-const _fs = require('fs');
-const stream = require('stream');
-const path = require('path');
-const css = require('css');
-const { Readability } = require('@mozilla/readability');
-const pkg = require('./package.json');
-const { v1: uuid } = require('uuid');
-const mimetype = require('mimetype');
-const createDOMPurify = require('dompurify');
-const slurp = require('./src/util/slurp');
-const epubDate = require('./src/util/epub-date');
-const humanDate = require('./src/util/human-date');
-const outputPath = require('./src/util/output-path');
-const addExif = require('./src/exif');
-const { hyphenateDom } = require('./src/hyphenate');
-const { textToIso6391, getLanguageAttribute } = require('./src/util/language');
-
-const {
+import {
 	ampToHtml,
 	fixLazyLoadedImages,
 	imagesAtFullSize,
@@ -34,12 +32,16 @@ const {
 	expandDetailsElements,
 	githubSpecific,
 	wrapPreBlocks
-} = require('./src/enhancements');
-const mapRemoteResources = require('./src/remote-resources');
-const get_style_attribute_value = require('./src/get-style-attribute-value');
+} from './src/enhancements.js';
+import mapRemoteResources from './src/remote-resources.js';
+import get_style_attribute_value from './src/get-style-attribute-value.js';
 
 const out = process.stdout;
-const UA = `percollate/${pkg.version}`;
+
+const pkg = JSON.parse(
+	_fs.readFileSync(new URL('./package.json', import.meta.url))
+);
+let UA = `percollate/${pkg.version}`;
 
 const JUSTIFY_CSS = `
 	.article__content p {
@@ -158,7 +160,7 @@ async function fetchContent(ref, fetchOptions = {}) {
 			...fetchOptions.headers,
 			'user-agent': UA
 		}
-	}).then(response => {
+	}).then(async response => {
 		let ct = (response.headers.get('Content-Type') || '').trim();
 		if (ct.indexOf(';') > -1) {
 			ct = ct.split(';')[0].trim();
@@ -168,7 +170,8 @@ async function fetchContent(ref, fetchOptions = {}) {
 				`URL ${url.href} has unsupported content type: ${ct}`
 			);
 		}
-		return response.textConverted();
+		console.warn(url.href);
+		return convertBody(await response.arrayBuffer(), response.headers);
 	});
 }
 
@@ -314,8 +317,11 @@ async function cleanup(url, options) {
 	--------------------------------
  */
 async function bundlePdf(items, options) {
-	const DEFAULT_STYLESHEET = path.join(__dirname, 'templates/default.css');
-	const DEFAULT_TEMPLATE = path.join(__dirname, 'templates/default.html');
+	const DEFAULT_STYLESHEET = new URL(
+		'templates/default.css',
+		import.meta.url
+	);
+	const DEFAULT_TEMPLATE = new URL('templates/default.html', import.meta.url);
 
 	const style =
 		(await fs.readFile(options.style || DEFAULT_STYLESHEET, 'utf8')) +
@@ -437,7 +443,10 @@ async function bundlePdf(items, options) {
 	---------------------------------
  */
 async function bundleEpub(items, options) {
-	const DEFAULT_STYLESHEET = path.join(__dirname, 'templates/default.css');
+	const DEFAULT_STYLESHEET = new URL(
+		'templates/default.css',
+		import.meta.url
+	);
 	const style =
 		(await fs.readFile(options.style || DEFAULT_STYLESHEET, 'utf8')) +
 		(options.hyphenate === true ? JUSTIFY_CSS : '') +
@@ -478,8 +487,11 @@ async function bundleEpub(items, options) {
 	--------------------------------
  */
 async function bundleHtml(items, options) {
-	const DEFAULT_STYLESHEET = path.join(__dirname, 'templates/default.css');
-	const DEFAULT_TEMPLATE = path.join(__dirname, 'templates/default.html');
+	const DEFAULT_STYLESHEET = new URL(
+		'templates/default.css',
+		import.meta.url
+	);
+	const DEFAULT_TEMPLATE = new URL('templates/default.html', import.meta.url);
 
 	const style =
 		(await fs.readFile(options.style || DEFAULT_STYLESHEET, 'utf8')) +
@@ -597,7 +609,7 @@ async function epubgen(data, output_path, options) {
 	};
 
 	return wrapAsync(async (resolve, reject) => {
-		const template_base = path.join(__dirname, 'templates/epub/');
+		const template_base = new URL('templates/epub/', import.meta.url);
 
 		const output = _fs.createWriteStream(output_path);
 		const archive = archiver('zip', {
@@ -679,7 +691,10 @@ async function epubgen(data, output_path, options) {
 		];
 
 		if (data.cover) {
-			const COVER_TEMPLATE = path.join(__dirname, 'templates/cover.html');
+			const COVER_TEMPLATE = new URL(
+				'templates/cover.html',
+				import.meta.url
+			);
 			const cover_html = nunjucks.renderString(
 				await fs.readFile(COVER_TEMPLATE, 'utf8'),
 				data
@@ -732,13 +747,9 @@ async function epubgen(data, output_path, options) {
 	});
 }
 
-module.exports = {
-	configure,
-	pdf,
-	epub,
-	html,
-	__test__: {
-		fetchContent,
-		isURL
-	}
+export { configure, pdf, epub, html };
+
+export const __test__ = {
+	fetchContent,
+	isURL
 };

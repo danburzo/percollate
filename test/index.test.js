@@ -1,7 +1,7 @@
-const tape = require('tape-promise').default(require('tape'));
-const path = require('path');
+import tape from 'tape';
+import path from 'path';
 
-const { __test__ } = require('../index');
+import { __test__ } from '../index.js';
 const { fetchContent } = __test__;
 
 tape('fetchContent', async t => {
@@ -14,8 +14,11 @@ tape('fetchContent', async t => {
 		'should reject if the result is a rejected promise'
 	);
 
-	let template = path.join(__dirname, '../templates/default.html');
-	let missing = path.join(__dirname, '../templates/default--missing.html');
+	let template = new URL('../templates/default.html', import.meta.url);
+	let missing = new URL(
+		'../templates/default--missing.html',
+		import.meta.url
+	);
 
 	await t.doesNotReject(
 		fetchContent('file://' + template),
