@@ -1,5 +1,4 @@
 import tape from 'tape';
-import path from 'path';
 
 import { __test__ } from '../index.js';
 const { fetchContent } = __test__;

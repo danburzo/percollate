@@ -56,7 +56,7 @@ function imagesAtFullSize(doc) {
 		/*
 			Exclude Wikipedia links to image file pages
 		*/
-		/wiki\/File\:/,
+		/wiki\/File:/,
 
 		/* 
 			Exclude images embedded in Markdown files
@@ -145,7 +145,7 @@ function noUselessHref(doc) {
 			let href = el.getAttribute('href') || '';
 
 			// in-page anchors
-			if (href.match(/^\#/)) {
+			if (href.match(/^#/)) {
 				return true;
 			}
 

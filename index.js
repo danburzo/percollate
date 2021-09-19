@@ -1,6 +1,7 @@
 import pup from 'puppeteer';
 import archiver from 'archiver';
 import fetch from 'node-fetch';
+// eslint-disable-next-line import/no-unresolved
 import convertBody from '@danburzo/fetch-charset-detection';
 import { JSDOM } from 'jsdom';
 import nunjucks from 'nunjucks';
@@ -119,7 +120,9 @@ function isURL(ref) {
 	try {
 		new URL(ref);
 		return true;
-	} catch (err) {}
+	} catch (err) {
+		// no-op
+	}
 	return false;
 }
 
@@ -170,7 +173,6 @@ async function fetchContent(ref, fetchOptions = {}) {
 				`URL ${url.href} has unsupported content type: ${ct}`
 			);
 		}
-		console.warn(url.href);
 		return convertBody(await response.arrayBuffer(), response.headers);
 	});
 }

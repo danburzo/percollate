@@ -422,7 +422,7 @@ function textToIso6393(text) {
 
 function textToIso6391(text) {
 	const franLanguage = textToIso6393(text);
-	if (iso6393.hasOwnProperty(franLanguage)) {
+	if (iso6393[franLanguage]) {
 		return iso6393[franLanguage];
 	}
 	return null;

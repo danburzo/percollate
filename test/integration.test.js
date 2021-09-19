@@ -1,6 +1,6 @@
 import tape from 'tape';
 import fs from 'fs';
-import { pdf, html, configure } from '../index.js';
+import { pdf, epub, html, configure } from '../index.js';
 import epubchecker from 'epubchecker';
 
 const testUrl = 'https://de.wikipedia.org/wiki/JavaScript';

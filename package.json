@@ -14,6 +14,7 @@
 		"css": "^3.0.0",
 		"dompurify": "^2.3.2",
 		"encoding": "^0.1.13",
+		"eslint-plugin-import": "^2.24.2",
 		"franc": "^6.0.0",
 		"franc-all": "^7.0.0",
 		"hyphenopoly": "^4.12.0",
