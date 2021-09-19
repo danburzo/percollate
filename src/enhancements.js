@@ -41,16 +41,17 @@ function fixLazyLoadedImages(doc) {
 	});
 }
 
-function imagesAtFullSize(doc) {
-	/*
-		Replace:
-			<a href='original-size.png'>
-				<img src='small-size.png'/>
-			</a>
+/*
+	Replace:
+		<a href='original-size.png'>
+			<img src='small-size.png'/>
+		</a>
 
-		With:
-			<img src='original-size.png'/>
-	 */
+	With:
+
+		<img src='original-size.png'/>
+*/
+function imagesAtFullSize(doc) {
 	let include_pattern = /\.(png|jpg|jpeg|gif|svg)$/i;
 	let exclude_patterns = [
 		/*
@@ -68,14 +69,26 @@ function imagesAtFullSize(doc) {
 
 	Array.from(doc.querySelectorAll('a > img:only-child')).forEach(img => {
 		let anchor = img.parentNode;
-		let original = anchor.href;
 
-		// only replace if the HREF matches an image file
+		/* 
+			Handle cases where the `href` to the full-size image
+			includes query parameters, eg. `image.png?w=1024`.
+		*/
+		let href = anchor.href;
+		try {
+			let url = new URL(anchor.href, doc.baseURI);
+			url.search = '';
+			href = url.href;
+		} catch (err) {
+			// no-op, probably due to bad `doc.baseURI`.
+		}
+
+		// Only replace if the `href` matches an image file
 		if (
-			include_pattern.test(original) &&
-			!exclude_patterns.some(pattern => pattern.test(original))
+			include_pattern.test(href) &&
+			!exclude_patterns.some(pattern => pattern.test(href))
 		) {
-			img.setAttribute('src', original);
+			img.setAttribute('src', anchor.href);
 			anchor.parentNode.replaceChild(img, anchor);
 		}
 	});
