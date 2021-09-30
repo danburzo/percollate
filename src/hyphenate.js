@@ -1,4 +1,4 @@
-const Hyphenator = require('hyphenopoly');
+import Hyphenator from 'hyphenopoly';
 
 const DEFAULT_LANG = 'en-us';
 
@@ -27,4 +27,4 @@ function hyphenateDom(el, lang) {
 	return el;
 }
 
-module.exports = { hyphenateDom };
+export { hyphenateDom };

@@ -1,29 +1,25 @@
-'use strict';
+import pup from 'puppeteer';
+import archiver from 'archiver';
+import fetch from 'node-fetch';
+import { JSDOM } from 'jsdom';
+import nunjucks from 'nunjucks';
+import fs from 'fs';
+import stream from 'stream';
+import path from 'path';
+import css from 'css';
+import { Readability } from '@mozilla/readability';
+import { v1 as uuid } from 'uuid';
+import mimetype from 'mimetype';
+import createDOMPurify from 'dompurify';
+import slurp from './src/util/slurp.js';
+import epubDate from './src/util/epub-date.js';
+import humanDate from './src/util/human-date.js';
+import outputPath from './src/util/output-path.js';
+import addExif from './src/exif.js';
+import { hyphenateDom } from './src/hyphenate.js';
+import { textToIso6391, getLanguageAttribute } from './src/util/language.js';
 
-const pup = require('puppeteer');
-const archiver = require('archiver');
-const fetch = require('node-fetch');
-const { JSDOM } = require('jsdom');
-const nunjucks = require('nunjucks');
-const fs = require('fs').promises;
-const _fs = require('fs');
-const stream = require('stream');
-const path = require('path');
-const css = require('css');
-const { Readability } = require('@mozilla/readability');
-const pkg = require('./package.json');
-const { v1: uuid } = require('uuid');
-const mimetype = require('mimetype');
-const createDOMPurify = require('dompurify');
-const slurp = require('./src/util/slurp');
-const epubDate = require('./src/util/epub-date');
-const humanDate = require('./src/util/human-date');
-const outputPath = require('./src/util/output-path');
-const addExif = require('./src/exif');
-const { hyphenateDom } = require('./src/hyphenate');
-const { textToIso6391, getLanguageAttribute } = require('./src/util/language');
-
-const {
+import {
 	ampToHtml,
 	fixLazyLoadedImages,
 	imagesAtFullSize,
@@ -34,12 +30,19 @@ const {
 	expandDetailsElements,
 	githubSpecific,
 	wrapPreBlocks
-} = require('./src/enhancements');
-const mapRemoteResources = require('./src/remote-resources');
-const get_style_attribute_value = require('./src/get-style-attribute-value');
+} from './src/enhancements.js';
+import mapRemoteResources from './src/remote-resources.js';
+import get_style_attribute_value from './src/get-style-attribute-value.js';
 
 const out = process.stdout;
-const UA = `percollate/${pkg.version}`;
+
+const { readFile, writeFile } = fs.promises;
+
+const pkg = JSON.parse(
+	fs.readFileSync(new URL('./package.json', import.meta.url))
+);
+
+let UA = `percollate/${pkg.version}`;
 
 const JUSTIFY_CSS = `
 	.article__content p {
@@ -117,7 +120,9 @@ function isURL(ref) {
 	try {
 		new URL(ref);
 		return true;
-	} catch (err) {}
+	} catch (err) {
+		// no-op
+	}
 	return false;
 }
 
@@ -140,12 +145,12 @@ async function fetchContent(ref, fetchOptions = {}) {
 	}
 
 	if (!url) {
-		return fs.readFile(ref, 'utf8');
+		return readFile(ref, 'utf8');
 	}
 
 	if (url && url.protocol === 'file:') {
 		url = decodeURI(url.href.replace(/^file:\/\//, ''));
-		return fs.readFile(url, 'utf8');
+		return readFile(url, 'utf8');
 	}
 
 	/*
@@ -314,11 +319,14 @@ async function cleanup(url, options) {
 	--------------------------------
  */
 async function bundlePdf(items, options) {
-	const DEFAULT_STYLESHEET = path.join(__dirname, 'templates/default.css');
-	const DEFAULT_TEMPLATE = path.join(__dirname, 'templates/default.html');
+	const DEFAULT_STYLESHEET = new URL(
+		'templates/default.css',
+		import.meta.url
+	);
+	const DEFAULT_TEMPLATE = new URL('templates/default.html', import.meta.url);
 
 	const style =
-		(await fs.readFile(options.style || DEFAULT_STYLESHEET, 'utf8')) +
+		(await readFile(options.style || DEFAULT_STYLESHEET, 'utf8')) +
 		(options.hyphenate === true ? JUSTIFY_CSS : '') +
 		(options.css || '');
 
@@ -328,7 +336,7 @@ async function bundlePdf(items, options) {
 		options.author || (items.length === 1 ? items[0].byline : undefined);
 
 	const html = nunjucks.renderString(
-		await fs.readFile(options.template || DEFAULT_TEMPLATE, 'utf8'),
+		await readFile(options.template || DEFAULT_TEMPLATE, 'utf8'),
 		{
 			filetype: 'pdf',
 			title,
@@ -388,7 +396,7 @@ async function bundlePdf(items, options) {
 	if (options.debug) {
 		out.write('Generating temporary HTML file... ');
 		const temp_file = path.resolve(process.cwd(), `${uuid()}.html`);
-		await fs.writeFile(temp_file, html);
+		await writeFile(temp_file, html);
 		out.write('✓\n');
 		out.write(`Temporary HTML file: file://${temp_file}\n`);
 	}
@@ -427,7 +435,7 @@ async function bundlePdf(items, options) {
 		Author: author
 	});
 
-	await fs.writeFile(output_path, pdf);
+	await writeFile(output_path, pdf);
 
 	out.write(`Saved PDF: ${output_path}\n`);
 }
@@ -437,9 +445,12 @@ async function bundlePdf(items, options) {
 	---------------------------------
  */
 async function bundleEpub(items, options) {
-	const DEFAULT_STYLESHEET = path.join(__dirname, 'templates/default.css');
+	const DEFAULT_STYLESHEET = new URL(
+		'templates/default.css',
+		import.meta.url
+	);
 	const style =
-		(await fs.readFile(options.style || DEFAULT_STYLESHEET, 'utf8')) +
+		(await readFile(options.style || DEFAULT_STYLESHEET, 'utf8')) +
 		(options.hyphenate === true ? JUSTIFY_CSS : '') +
 		(options.css || '');
 
@@ -478,16 +489,19 @@ async function bundleEpub(items, options) {
 	--------------------------------
  */
 async function bundleHtml(items, options) {
-	const DEFAULT_STYLESHEET = path.join(__dirname, 'templates/default.css');
-	const DEFAULT_TEMPLATE = path.join(__dirname, 'templates/default.html');
+	const DEFAULT_STYLESHEET = new URL(
+		'templates/default.css',
+		import.meta.url
+	);
+	const DEFAULT_TEMPLATE = new URL('templates/default.html', import.meta.url);
 
 	const style =
-		(await fs.readFile(options.style || DEFAULT_STYLESHEET, 'utf8')) +
+		(await readFile(options.style || DEFAULT_STYLESHEET, 'utf8')) +
 		(options.hyphenate === true ? JUSTIFY_CSS : '') +
 		(options.css || '');
 
 	const html = nunjucks.renderString(
-		await fs.readFile(options.template || DEFAULT_TEMPLATE, 'utf8'),
+		await readFile(options.template || DEFAULT_TEMPLATE, 'utf8'),
 		{
 			filetype: 'html',
 			title:
@@ -511,7 +525,7 @@ async function bundleHtml(items, options) {
 
 	const output_path = outputPath(items, options, '.html');
 
-	await fs.writeFile(output_path, html);
+	await writeFile(output_path, html);
 
 	out.write(`Saved HTML: ${output_path}\n`);
 }
@@ -597,9 +611,10 @@ async function epubgen(data, output_path, options) {
 	};
 
 	return wrapAsync(async (resolve, reject) => {
-		const template_base = path.join(__dirname, 'templates/epub/');
+		const template_base = new URL('templates/epub/', import.meta.url)
+			.pathname;
 
-		const output = _fs.createWriteStream(output_path);
+		const output = fs.createWriteStream(output_path);
 		const archive = archiver('zip', {
 			store: true
 		});
@@ -619,19 +634,19 @@ async function epubgen(data, output_path, options) {
 		// static files from META-INF
 		archive.directory(path.join(template_base, 'META-INF'), 'META-INF');
 
-		const contentTemplate = await fs.readFile(
+		const contentTemplate = await readFile(
 			path.join(template_base, 'OEBPS/content.xhtml'),
 			'utf8'
 		);
-		const navTemplate = await fs.readFile(
+		const navTemplate = await readFile(
 			path.join(template_base, 'OEBPS/nav.xhtml'),
 			'utf8'
 		);
-		const tocTemplate = await fs.readFile(
+		const tocTemplate = await readFile(
 			path.join(template_base, 'OEBPS/toc.ncx'),
 			'utf8'
 		);
-		const opfTemplate = await fs.readFile(
+		const opfTemplate = await readFile(
 			path.join(template_base, 'OEBPS/content.opf'),
 			'utf8'
 		);
@@ -679,9 +694,12 @@ async function epubgen(data, output_path, options) {
 		];
 
 		if (data.cover) {
-			const COVER_TEMPLATE = path.join(__dirname, 'templates/cover.html');
+			const COVER_TEMPLATE = new URL(
+				'templates/cover.html',
+				import.meta.url
+			);
 			const cover_html = nunjucks.renderString(
-				await fs.readFile(COVER_TEMPLATE, 'utf8'),
+				await readFile(COVER_TEMPLATE, 'utf8'),
 				data
 			);
 
@@ -732,13 +750,9 @@ async function epubgen(data, output_path, options) {
 	});
 }
 
-module.exports = {
-	configure,
-	pdf,
-	epub,
-	html,
-	__test__: {
-		fetchContent,
-		isURL
-	}
+export { configure, pdf, epub, html };
+
+export const __test__ = {
+	fetchContent,
+	isURL
 };

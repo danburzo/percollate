@@ -1,20 +1,21 @@
-const franc = require('franc-all');
-const iso6393 = require('iso-639-3-to-1/6393-6391.json');
+import { francAll } from 'franc-all';
+import convert3To1 from 'iso-639-3-to-1';
 
 function textToIso6393(text) {
-	return franc(text);
+	const res = francAll(text);
+	return Array.isArray(res) && Array.isArray(res[0]) ? res[0][0] : null;
 }
 
 function textToIso6391(text) {
-	const franLanguage = textToIso6393(text);
-	if (iso6393.hasOwnProperty(franLanguage)) {
-		return iso6393[franLanguage];
+	const francLang = textToIso6393(text);
+	if (!francLang) {
+		return null;
 	}
-	return null;
+	return convert3To1(francLang) || null;
 }
 
 function getLanguageAttribute(doc) {
 	return doc.documentElement.getAttribute('lang');
 }
 
-module.exports = { textToIso6391, getLanguageAttribute };
+export { textToIso6391, getLanguageAttribute };

@@ -1,7 +1,7 @@
-let tape = require('tape');
-const { JSDOM } = require('jsdom');
-const querystring = require('querystring');
-let { hyphenateDom } = require('../src/hyphenate');
+import tape from 'tape';
+import { JSDOM } from 'jsdom';
+import querystring from 'querystring';
+import { hyphenateDom } from '../src/hyphenate.js';
 
 const dom = content => new JSDOM(content).window.document.firstChild;
 const serializer = el => el.innerHTML;

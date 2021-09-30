@@ -1,27 +1,36 @@
-let tape = require('tape');
-const fs = require('fs');
-const percollate = require('..');
-const epubchecker = require('epubchecker');
+import tape from 'tape';
+import fs from 'fs';
+import { pdf, epub, html, configure } from '../index.js';
+import epubchecker from 'epubchecker';
 
 const testUrl = 'https://de.wikipedia.org/wiki/JavaScript';
-const testPdf = `${__dirname}/percollate-output.pdf`;
-const testPdfMultipleWebsites = `${__dirname}/percollate-output-multiple-websites.pdf`;
-const testHtml = `${__dirname}/percollate-output.html`;
-const testEpub = `${__dirname}/percollate-output.epub`;
-const testWebtoHtml = `${__dirname}/percollate-output-webToHtml.html`;
-const testHtmltoPdf = `${__dirname}/percollate-output-htmlToPdf.pdf`;
+const testPdf = new URL('percollate-output.pdf', import.meta.url);
+const testPdfMultipleWebsites = new URL(
+	'percollate-output-multiple-websites.pdf',
+	import.meta.url
+);
+const testHtml = new URL('percollate-output.html', import.meta.url);
+const testEpub = new URL('percollate-output.epub', import.meta.url);
+const testWebtoHtml = new URL(
+	'percollate-output-webToHtml.html',
+	import.meta.url
+);
+const testHtmltoPdf = new URL(
+	'percollate-output-htmlToPdf.pdf',
+	import.meta.url
+);
 
 async function generateTestFiles() {
-	await percollate.pdf([testUrl], {
+	await pdf([testUrl], {
 		output: testPdf
 	});
-	await percollate.html([testUrl], {
+	await html([testUrl], {
 		output: testHtml
 	});
 }
 
 tape('files exists', async t => {
-	percollate.configure();
+	configure();
 	await generateTestFiles();
 	t.true(fs.existsSync(testPdf));
 	t.true(fs.existsSync(testHtml));
@@ -29,15 +38,15 @@ tape('files exists', async t => {
 });
 
 tape('generate pdf with multiple websites', async t => {
-	await percollate.pdf([testUrl, testUrl], {
+	await pdf([testUrl, testUrl], {
 		output: testPdfMultipleWebsites
 	});
 	t.true(fs.existsSync(testPdfMultipleWebsites));
 });
 
 tape('generates valid epub', async t => {
-	percollate.configure();
-	await percollate.epub([testUrl], {
+	configure();
+	await epub([testUrl], {
 		output: testEpub
 	});
 
@@ -48,25 +57,25 @@ tape('generates valid epub', async t => {
 });
 
 tape('website to html & html to pdf', async t => {
-	percollate.configure();
-	await percollate.html([testUrl], {
+	configure();
+	await html([testUrl], {
 		output: testWebtoHtml
 	});
-	await percollate.pdf([testWebtoHtml], {
+	await pdf([testWebtoHtml], {
 		output: testHtmltoPdf
 	});
 	t.pass();
 });
 
 tape('programmatic api result', async t => {
-	percollate.configure();
+	configure();
 
-	const resultNull = await percollate.pdf([], {
+	const resultNull = await pdf([], {
 		output: testPdf
 	});
 	t.equal(resultNull, null, 'testing no urls provided');
 
-	const result = await percollate.pdf([testUrl], {
+	const result = await pdf([testUrl], {
 		output: testPdf
 	});
 	t.true(result.items.length > 0);

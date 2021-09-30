@@ -1,6 +1,5 @@
-const srcset = require('srcset');
-const URL = require('url').URL;
-const replaceElementType = require('./replace-element-type');
+import srcset from 'srcset';
+import replaceElementType from './replace-element-type.js';
 
 /* 
 	Convert AMP markup to HMTL markup
@@ -57,7 +56,7 @@ function imagesAtFullSize(doc) {
 		/*
 			Exclude Wikipedia links to image file pages
 		*/
-		/wiki\/File\:/,
+		/wiki\/File:/,
 
 		/* 
 			Exclude images embedded in Markdown files
@@ -146,7 +145,7 @@ function noUselessHref(doc) {
 			let href = el.getAttribute('href') || '';
 
 			// in-page anchors
-			if (href.match(/^\#/)) {
+			if (href.match(/^#/)) {
 				return true;
 			}
 
@@ -251,7 +250,7 @@ function wrapPreBlocks(doc) {
 	});
 }
 
-module.exports = {
+export {
 	ampToHtml,
 	fixLazyLoadedImages,
 	imagesAtFullSize,

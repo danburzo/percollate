@@ -1,7 +1,7 @@
-const srcset = require('srcset');
-const { v1: uuid } = require('uuid');
+import srcset from 'srcset';
+import { v1 as uuid } from 'uuid';
 
-module.exports = function remoteResources(doc) {
+export default function remoteResources(doc) {
 	let srcs = new Map();
 
 	/*
@@ -61,4 +61,4 @@ module.exports = function remoteResources(doc) {
 		}
 	});
 	return Array.from(srcs.entries());
-};
+}

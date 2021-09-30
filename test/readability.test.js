@@ -1,6 +1,6 @@
-let tape = require('tape');
-let { Readability } = require('@mozilla/readability');
-let { JSDOM } = require('jsdom');
+import tape from 'tape';
+import { Readability } from '@mozilla/readability';
+import { JSDOM } from 'jsdom';
 
 /*
 	A custom (XHTML) serializer is needed for

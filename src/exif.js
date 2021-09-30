@@ -1,11 +1,11 @@
-const { PDFDocument } = require('pdf-lib');
+import { PDFDocument } from 'pdf-lib';
 
 /**
  * Adds exif data to a file
  * @param {Buffer} existingPdfBytes
  * @param {Object} metaData
  */
-module.exports = async function addExif(existingPdfBytes, metaData) {
+export default async function addExif(existingPdfBytes, metaData) {
 	const pdfDoc = await PDFDocument.load(existingPdfBytes, {
 		updateMetadata: false
 	});
@@ -16,4 +16,4 @@ module.exports = async function addExif(existingPdfBytes, metaData) {
 		pdfDoc.setAuthor(metaData.Author);
 	}
 	return pdfDoc.save();
-};
+}

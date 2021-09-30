@@ -4,9 +4,10 @@
 
 Percollate is a command-line tool that turns web pages into beautifully formatted PDF, EPUB, or HTML files.
 
-<img alt="Example Output" src="https://raw.githubusercontent.com/danburzo/percollate/master/.github/dimensions-of-colour.png">
-
-<!--Example spread from the generated PDF of [a chapter in Dimensions of Colour](http://www.huevaluechroma.com/072.php); rendered here in black & white for a smaller image file size._-->
+<figure style='margin: 1rem 0'>
+	<img alt="Sample Output" src="./.github/dimensions-of-colour.png">
+	<figcaption style='font-style: italic'>Sample spread from the generated PDF of <a href='http://www.huevaluechroma.com/072.php'>a chapter in Dimensions of Colour</a>; rendered here in black & white for a smaller image file size.</figcaption>
+</figure>
 
 -   [Installation](#installation)
 -   [Usage](#usage)
@@ -32,7 +33,7 @@ Percollate is a command-line tool that turns web pages into beautifully formatte
 npm install -g percollate
 ```
 
-Percollate and its dependencies require Node.js version 10.22.0 or later.
+Percollate and its dependencies **require Node.js 12.20.0** or later.
 
 #### Community-maintained packages
 

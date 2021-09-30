@@ -1,8 +1,9 @@
 {
 	"name": "percollate",
-	"version": "1.2.6",
+	"version": "2.0.0-alpha.0",
 	"description": "A command-line tool to grab web pages as PDF",
 	"main": "index.js",
+	"type": "module",
 	"repository": "danburzo/percollate",
 	"author": "Dan Burzo <danburzo@gmail.com>",
 	"license": "MIT",
@@ -10,35 +11,35 @@
 		"@mozilla/readability": "^0.4.1",
 		"archiver": "^5.3.0",
 		"css": "^3.0.0",
-		"dompurify": "^2.3.0",
+		"dompurify": "^2.3.3",
 		"encoding": "^0.1.13",
-		"franc-all": "^6.0.0",
+		"franc-all": "^7.0.0",
 		"hyphenopoly": "^4.12.0",
 		"iso-639-3-to-1": "^1.0.0",
-		"jsdom": "^16.6.0",
+		"jsdom": "^17.0.0",
 		"mimetype": "^0.0.8",
-		"node-fetch": "^2.6.1",
+		"node-fetch": "^2.6.2",
 		"nunjucks": "^3.2.3",
 		"pdf-lib": "^1.16.0",
-		"puppeteer": "^9.1.1",
+		"puppeteer": "^10.4.0",
 		"slugify": "^1.6.0",
-		"srcset": "^3.0.0",
+		"srcset": "^4.0.0",
 		"uuid": "^8.3.2"
 	},
 	"bin": {
 		"percollate": "./cli.js"
 	},
 	"engines": {
-		"node": ">= 10.22.0"
+		"node": "^12.20.0 || ^14.13.1 || >=16.0.0"
 	},
 	"devDependencies": {
 		"epubchecker": "^4.2.2",
-		"eslint": "^7.31.0",
+		"eslint": "^7.32.0",
+		"eslint-plugin-import": "^2.24.2",
 		"husky": "^4.3.6",
-		"prettier": "^2.3.2",
+		"prettier": "^2.4.1",
 		"pretty-quick": "^3.1.1",
-		"tape": "^5.2.2",
-		"tape-promise": "^4.0.0"
+		"tape": "^5.3.1"
 	},
 	"scripts": {
 		"test": "tape 'test/**/*.test.js'",
@@ -57,7 +58,6 @@
 		"trailingComma": "none",
 		"useTabs": true,
 		"tabWidth": 4,
-		"jsxBracketSameLine": false,
 		"arrowParens": "avoid",
 		"printWidth": 80
 	},

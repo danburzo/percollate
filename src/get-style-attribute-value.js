@@ -1,4 +1,4 @@
-module.exports = function(css_ast, selector) {
+export default function (css_ast, selector) {
 	let rules = css_ast.stylesheet.rules.filter(
 		rule => rule.type === 'rule' && rule.selectors.includes(selector)
 	);
@@ -13,4 +13,4 @@ module.exports = function(css_ast, selector) {
 				.join(';')
 		)
 		.join(';');
-};
+}
