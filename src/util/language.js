@@ -417,12 +417,13 @@ const iso6393 = {
 };
 
 function textToIso6393(text) {
-	return francAll(text);
+	const res = francAll(text);
+	return Array.isArray(res) ? res[0][0] : null;
 }
 
 function textToIso6391(text) {
 	const franLanguage = textToIso6393(text);
-	if (iso6393[franLanguage]) {
+	if (franLanguage && iso6393[franLanguage]) {
 		return iso6393[franLanguage];
 	}
 	return null;

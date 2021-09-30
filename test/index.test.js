@@ -24,15 +24,15 @@ tape('fetchContent', async t => {
 		import.meta.url
 	);
 
+	await t.ok(await fetchContent(template), 'accepts file:// protocol');
+
 	await t.ok(
-		await fetchContent('file://' + template),
-		'accepts file:// protocol'
+		await fetchContent(template.pathname),
+		'accepts existing local file'
 	);
 
-	await t.ok(await fetchContent(template), 'accepts existing local file');
-
 	try {
-		await fetchContent(missing);
+		await fetchContent(missing.pathname);
 		t.fail();
 	} catch (err) {
 		t.ok(true, 'rejects missing local file');

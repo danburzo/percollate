@@ -611,7 +611,8 @@ async function epubgen(data, output_path, options) {
 	};
 
 	return wrapAsync(async (resolve, reject) => {
-		const template_base = new URL('templates/epub/', import.meta.url);
+		const template_base = new URL('templates/epub/', import.meta.url)
+			.pathname;
 
 		const output = fs.createWriteStream(output_path);
 		const archive = archiver('zip', {
