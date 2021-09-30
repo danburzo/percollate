@@ -3,8 +3,7 @@ import archiver from 'archiver';
 import fetch from 'node-fetch';
 import { JSDOM } from 'jsdom';
 import nunjucks from 'nunjucks';
-import fs from 'fs/promises';
-import _fs from 'fs';
+import fs from 'fs';
 import stream from 'stream';
 import path from 'path';
 import css from 'css';
@@ -37,9 +36,12 @@ import get_style_attribute_value from './src/get-style-attribute-value.js';
 
 const out = process.stdout;
 
+const { readFile, writeFile } = fs.promises;
+
 const pkg = JSON.parse(
-	_fs.readFileSync(new URL('./package.json', import.meta.url))
+	fs.readFileSync(new URL('./package.json', import.meta.url))
 );
+
 let UA = `percollate/${pkg.version}`;
 
 const JUSTIFY_CSS = `
@@ -143,12 +145,12 @@ async function fetchContent(ref, fetchOptions = {}) {
 	}
 
 	if (!url) {
-		return fs.readFile(ref, 'utf8');
+		return readFile(ref, 'utf8');
 	}
 
 	if (url && url.protocol === 'file:') {
 		url = decodeURI(url.href.replace(/^file:\/\//, ''));
-		return fs.readFile(url, 'utf8');
+		return readFile(url, 'utf8');
 	}
 
 	/*
@@ -324,7 +326,7 @@ async function bundlePdf(items, options) {
 	const DEFAULT_TEMPLATE = new URL('templates/default.html', import.meta.url);
 
 	const style =
-		(await fs.readFile(options.style || DEFAULT_STYLESHEET, 'utf8')) +
+		(await readFile(options.style || DEFAULT_STYLESHEET, 'utf8')) +
 		(options.hyphenate === true ? JUSTIFY_CSS : '') +
 		(options.css || '');
 
@@ -334,7 +336,7 @@ async function bundlePdf(items, options) {
 		options.author || (items.length === 1 ? items[0].byline : undefined);
 
 	const html = nunjucks.renderString(
-		await fs.readFile(options.template || DEFAULT_TEMPLATE, 'utf8'),
+		await readFile(options.template || DEFAULT_TEMPLATE, 'utf8'),
 		{
 			filetype: 'pdf',
 			title,
@@ -394,7 +396,7 @@ async function bundlePdf(items, options) {
 	if (options.debug) {
 		out.write('Generating temporary HTML file... ');
 		const temp_file = path.resolve(process.cwd(), `${uuid()}.html`);
-		await fs.writeFile(temp_file, html);
+		await writeFile(temp_file, html);
 		out.write('✓\n');
 		out.write(`Temporary HTML file: file://${temp_file}\n`);
 	}
@@ -433,7 +435,7 @@ async function bundlePdf(items, options) {
 		Author: author
 	});
 
-	await fs.writeFile(output_path, pdf);
+	await writeFile(output_path, pdf);
 
 	out.write(`Saved PDF: ${output_path}\n`);
 }
@@ -448,7 +450,7 @@ async function bundleEpub(items, options) {
 		import.meta.url
 	);
 	const style =
-		(await fs.readFile(options.style || DEFAULT_STYLESHEET, 'utf8')) +
+		(await readFile(options.style || DEFAULT_STYLESHEET, 'utf8')) +
 		(options.hyphenate === true ? JUSTIFY_CSS : '') +
 		(options.css || '');
 
@@ -494,12 +496,12 @@ async function bundleHtml(items, options) {
 	const DEFAULT_TEMPLATE = new URL('templates/default.html', import.meta.url);
 
 	const style =
-		(await fs.readFile(options.style || DEFAULT_STYLESHEET, 'utf8')) +
+		(await readFile(options.style || DEFAULT_STYLESHEET, 'utf8')) +
 		(options.hyphenate === true ? JUSTIFY_CSS : '') +
 		(options.css || '');
 
 	const html = nunjucks.renderString(
-		await fs.readFile(options.template || DEFAULT_TEMPLATE, 'utf8'),
+		await readFile(options.template || DEFAULT_TEMPLATE, 'utf8'),
 		{
 			filetype: 'html',
 			title:
@@ -523,7 +525,7 @@ async function bundleHtml(items, options) {
 
 	const output_path = outputPath(items, options, '.html');
 
-	await fs.writeFile(output_path, html);
+	await writeFile(output_path, html);
 
 	out.write(`Saved HTML: ${output_path}\n`);
 }
@@ -611,7 +613,7 @@ async function epubgen(data, output_path, options) {
 	return wrapAsync(async (resolve, reject) => {
 		const template_base = new URL('templates/epub/', import.meta.url);
 
-		const output = _fs.createWriteStream(output_path);
+		const output = fs.createWriteStream(output_path);
 		const archive = archiver('zip', {
 			store: true
 		});
@@ -631,19 +633,19 @@ async function epubgen(data, output_path, options) {
 		// static files from META-INF
 		archive.directory(path.join(template_base, 'META-INF'), 'META-INF');
 
-		const contentTemplate = await fs.readFile(
+		const contentTemplate = await readFile(
 			path.join(template_base, 'OEBPS/content.xhtml'),
 			'utf8'
 		);
-		const navTemplate = await fs.readFile(
+		const navTemplate = await readFile(
 			path.join(template_base, 'OEBPS/nav.xhtml'),
 			'utf8'
 		);
-		const tocTemplate = await fs.readFile(
+		const tocTemplate = await readFile(
 			path.join(template_base, 'OEBPS/toc.ncx'),
 			'utf8'
 		);
-		const opfTemplate = await fs.readFile(
+		const opfTemplate = await readFile(
 			path.join(template_base, 'OEBPS/content.opf'),
 			'utf8'
 		);
@@ -696,7 +698,7 @@ async function epubgen(data, output_path, options) {
 				import.meta.url
 			);
 			const cover_html = nunjucks.renderString(
-				await fs.readFile(COVER_TEMPLATE, 'utf8'),
+				await readFile(COVER_TEMPLATE, 'utf8'),
 				data
 			);
 
