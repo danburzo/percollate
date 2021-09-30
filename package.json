@@ -17,6 +17,7 @@
 		"franc": "^6.0.0",
 		"franc-all": "^7.0.0",
 		"hyphenopoly": "^4.12.0",
+		"iso-639-3-to-1": "^1.0.0",
 		"jsdom": "^17.0.0",
 		"mimetype": "^0.0.8",
 		"node-fetch": "^2.6.2",
