@@ -163,7 +163,7 @@ async function fetchContent(ref, fetchOptions = {}) {
 			...fetchOptions.headers,
 			'user-agent': UA
 		}
-	}).then(async response => {
+	}).then(response => {
 		let ct = (response.headers.get('Content-Type') || '').trim();
 		if (ct.indexOf(';') > -1) {
 			ct = ct.split(';')[0].trim();

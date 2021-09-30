@@ -6,7 +6,8 @@ const OPTS = { strict: true };
 export default function (items, options, ext) {
 	if (options.individual && options.output) {
 		return (
-			options.output.replace(/\.[^.]+$/g, '') +
+			// coerce URL to string
+			(options.output + '').replace(/\.[^.]+$/g, '') +
 			'-' +
 			slugify(items[0].title || DEFAULT_TITLE, OPTS) +
 			(ext || '')

@@ -1,9 +1,9 @@
-import { francAll } from 'franc';
+import { francAll } from 'franc-all';
 import convert3To1 from 'iso-639-3-to-1';
 
 function textToIso6393(text) {
 	const res = francAll(text);
-	return Array.isArray(res) ? res[0][0] : null;
+	return Array.isArray(res) && Array.isArray(res[0]) ? res[0][0] : null;
 }
 
 function textToIso6391(text) {

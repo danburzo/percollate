@@ -13,8 +13,6 @@
 		"css": "^3.0.0",
 		"dompurify": "^2.3.3",
 		"encoding": "^0.1.13",
-		"eslint-plugin-import": "^2.24.2",
-		"franc": "^6.0.0",
 		"franc-all": "^7.0.0",
 		"hyphenopoly": "^4.12.0",
 		"iso-639-3-to-1": "^1.0.0",
@@ -37,6 +35,7 @@
 	"devDependencies": {
 		"epubchecker": "^4.2.2",
 		"eslint": "^7.32.0",
+		"eslint-plugin-import": "^2.24.2",
 		"husky": "^4.3.6",
 		"prettier": "^2.4.1",
 		"pretty-quick": "^3.1.1",
