@@ -97,6 +97,9 @@ Commmon options:
   
   --hyphenate        Enable hyphenation. Enabled by default for PDF.
 
+  --inline           Embed images inline with the content.
+                     Fetches and converts images to Base64 'data:' URLs.
+
 Options to disable features:
 
   --no-amp           Don't prefer the AMP version of the web page.

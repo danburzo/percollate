@@ -9,9 +9,9 @@ import path from 'path';
 import css from 'css';
 import { Readability } from '@mozilla/readability';
 import { v1 as uuid } from 'uuid';
-import mimetype from 'mimetype';
 import createDOMPurify from 'dompurify';
 import slurp from './src/util/slurp.js';
+import mimetype from './src/util/mimetype.js';
 import epubDate from './src/util/epub-date.js';
 import humanDate from './src/util/human-date.js';
 import outputPath from './src/util/output-path.js';
@@ -32,6 +32,7 @@ import {
 	wrapPreBlocks
 } from './src/enhancements.js';
 import mapRemoteResources from './src/remote-resources.js';
+import inlineImages from './src/inline-images.js';
 import get_style_attribute_value from './src/get-style-attribute-value.js';
 
 const out = process.stdout;
@@ -246,7 +247,7 @@ async function cleanup(url, options) {
 
 		// TODO: find better solution to prevent Readability from
 		// making img srcs relative.
-		if (options.mapRemoteResources) {
+		if (options.mapRemoteResources || options.inline) {
 			R._fixRelativeUris = () => {};
 		}
 
@@ -264,6 +265,19 @@ async function cleanup(url, options) {
 			textToIso6391(textContent);
 
 		out.write(' ✓\n');
+
+		if (options.inline) {
+			await inlineImages(
+				parsed.content,
+				{
+					headers: {
+						'user-agent': UA
+					},
+					timeout: 10 * 1000
+				},
+				options.debug ? out : undefined
+			);
+		}
 
 		/*
 			Select the appropriate serialization method
@@ -579,7 +593,7 @@ async function epub(urls, options) {
 	return await generate(bundleEpub, urls, {
 		...options,
 		xhtml: true,
-		mapRemoteResources: true,
+		mapRemoteResources: !options.inline,
 		hyphenate: options.hyphenate !== undefined ? options.hyphenate : false
 	});
 }
@@ -736,7 +750,7 @@ async function epubgen(data, output_path, options) {
 			remoteResources: remoteResources.map(entry => ({
 				id: entry[1].replace(/[^a-z0-9]/gi, ''),
 				href: entry[1],
-				mimetype: mimetype.lookup(entry[1])
+				mimetype: mimetype(entry[1])
 			}))
 		});
 

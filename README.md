@@ -143,6 +143,12 @@ Hyphenation is enabled by default for `pdf`, and disabled for `epub` and `html`.
 
 See also the [Hyphenation and justification](#hyphenation-and-justification) recipe.
 
+#### `--inline`
+
+Embed images inline with the document. Images are fetched and converted to Base64-encoded `data` URLs.
+
+This option is particularly useful for `html` to produce self-contained HTML files.
+
 ## Recipes
 
 ### Basic bundling
@@ -328,11 +334,13 @@ All export formats follow a common pipeline:
 4. Pass the DOM through [`mozilla/readability`](https://github.com/mozilla/readability) to strip unnecessary elements
 5. Apply the [HTML template](./templates/default.html) and the [stylesheet](./templates/default.css) to the resulting HTML
 
-Different formats then use different tools:
+Different formats then use different tools to produce the final file.
 
--   PDFs are generated with [`puppeteer`](https://github.com/GoogleChrome/puppeteer);
--   EPUBs have external images fetched and bundled together with the HTML of each article;
--   HTMLs are saved without any further changes (images are not saved to the disk).
+PDFs are rendered with [`puppeteer`](https://github.com/GoogleChrome/puppeteer).
+
+EPUBs have external images fetched and bundled together with the HTML of each article. When the `--inline` option is used, images are instead converted to `data` URLs and embedded into the HTML.
+
+HTMLs are saved without any further changes. When the `--inline` option is used, images are converted to `data` URLs and embedded into the HTML. External images are not otherwise fetched.
 
 ## Limitations
 
@@ -366,3 +374,4 @@ Here are some other projects to check out if you're interested in building books
 -   [Magicbook](https://github.com/magicbookproject/magicbook)
 -   [monolith](https://github.com/Y2Z/monolith)
 -   [SaraVieira/starter-book](https://github.com/SaraVieira/starter-book)
+-   [SingleFileZ](https://github.com/gildas-lormeau/SingleFileZ)
