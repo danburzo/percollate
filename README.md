@@ -366,3 +366,4 @@ Here are some other projects to check out if you're interested in building books
 -   [Magicbook](https://github.com/magicbookproject/magicbook)
 -   [monolith](https://github.com/Y2Z/monolith)
 -   [SaraVieira/starter-book](https://github.com/SaraVieira/starter-book)
+-   [SingleFileZ](https://github.com/gildas-lormeau/SingleFileZ)
