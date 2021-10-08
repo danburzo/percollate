@@ -1,6 +1,6 @@
-import fetch from 'node-fetch';
 import srcset from 'srcset';
 import mimetype from './util/mimetype.js';
+import fetchBase64 from './util/fetch-base64.js';
 
 const image_mimetypes = new Set([
 	'image/avif',
@@ -21,26 +21,26 @@ function get_mime(src, doc) {
 	return mimetype(pathname);
 }
 
-function to_base64(url, opts) {
-	return fetch(url, opts)
-		.then(r => r.buffer())
-		.then(buff => buff.toString('base64'));
-}
-
-export default async function inlineImages(doc, fetchOptions = {}) {
-	Array.from(doc.querySelectorAll('picture source[src], img[src]')).forEach(
-		async el => {
-			const mime = get_mime(el.src, doc);
-			if (mime && image_mimetypes.has(mime)) {
-				let data = await to_base64(el.src, fetchOptions);
-				el.setAttribute('src', `data:${mime};base64,${data}`);
+export default async function inlineImages(doc, fetchOptions = {}, out) {
+	if (out) {
+		out.write('Inlining images...\n');
+	}
+	let src_promises = Array.from(
+		doc.querySelectorAll('picture source[src], img[src]')
+	).map(async el => {
+		const mime = get_mime(el.src, doc);
+		if (mime && image_mimetypes.has(mime)) {
+			if (out) {
+				out.write(el.src + '\n');
 			}
+			let data = await fetchBase64(el.src, fetchOptions);
+			el.setAttribute('src', `data:${mime};base64,${data}`);
 		}
-	);
+	});
 
-	Array.from(
+	let srcset_promises = Array.from(
 		doc.querySelectorAll('picture source[srcset], img[srcset]')
-	).forEach(el => {
+	).map(async el => {
 		if (el.getAttribute('src')) {
 			/* 
 				If a `src` is present on the <img>/<source> element, 
@@ -60,21 +60,27 @@ export default async function inlineImages(doc, fetchOptions = {}) {
 			el.setAttribute(
 				'srcset',
 				srcset.stringify(
-					items.map(async item => {
-						const mime = get_mime(item.url, doc);
-						if (mime && image_mimetypes.has(mime)) {
-							let data = await to_base64(item.url, fetchOptions);
-							return {
-								...item,
-								url: `data:${mime};base64,${data}`
-							};
-						}
-						return item;
-					})
+					await Promise.all(
+						items.map(async item => {
+							const mime = get_mime(item.url, doc);
+							if (mime && image_mimetypes.has(mime)) {
+								let data = await fetchBase64(
+									item.url,
+									fetchOptions
+								);
+								return {
+									...item,
+									url: `data:${mime};base64,${data}`
+								};
+							}
+							return item;
+						})
+					)
 				)
 			);
 		} catch (err) {
 			console.error(err);
 		}
 	});
+	return Promise.all(src_promises.concat(srcset_promises));
 }

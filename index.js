@@ -247,7 +247,7 @@ async function cleanup(url, options) {
 
 		// TODO: find better solution to prevent Readability from
 		// making img srcs relative.
-		if (options.mapRemoteResources) {
+		if (options.mapRemoteResources || options.inline) {
 			R._fixRelativeUris = () => {};
 		}
 
@@ -258,18 +258,6 @@ async function cleanup(url, options) {
 			remoteResources = mapRemoteResources(parsed.content);
 		}
 
-		if (options.inline) {
-			if (options.debug) {
-				out.write('Inlining images...\n');
-			}
-			await inlineImages(parsed.content, {
-				headers: {
-					'user-agent': UA
-				},
-				timeout: 10 * 1000
-			});
-		}
-
 		// Hyphenate the text
 		const textContent = sanitizer.sanitize(parsed.textContent);
 		const lang =
@@ -277,6 +265,19 @@ async function cleanup(url, options) {
 			textToIso6391(textContent);
 
 		out.write(' ✓\n');
+
+		if (options.inline) {
+			await inlineImages(
+				parsed.content,
+				{
+					headers: {
+						'user-agent': UA
+					},
+					timeout: 10 * 1000
+				},
+				options.debug ? out : undefined
+			);
+		}
 
 		/*
 			Select the appropriate serialization method
