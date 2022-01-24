@@ -83,6 +83,14 @@ Use the `--url` option to supply the source's original URL.
 curl https://example.com | percollate pdf - --url=https://example.com
 ```
 
+#### `-w, --wait`
+
+By default, percollate processes URLs in parallel. Use the `--wait` option to process them sequentially instead, with a pause between items. The delay is specified in seconds, and can be zero.
+
+```bash
+percollate epub --wait=1 url1 url2 url3
+```
+
 #### `--individual`
 
 By default, percollate bundles all web pages in a single file. Use the `--individual` flag to export each source to a separate file.
