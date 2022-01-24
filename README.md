@@ -43,6 +43,8 @@ There's [a packaged version](https://aur.archlinux.org/packages/nodejs-percollat
 yay -S nodejs-percollate
 ```
 
+Some Docker images are available in this [tracking issue](https://github.com/danburzo/percollate/issues/95).
+
 ## Usage
 
 > Run `percollate --help` for a list of available commands and options.
