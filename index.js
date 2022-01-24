@@ -15,6 +15,7 @@ import mimetype from './src/util/mimetype.js';
 import epubDate from './src/util/epub-date.js';
 import humanDate from './src/util/human-date.js';
 import outputPath from './src/util/output-path.js';
+import { resolveSequence, resolveParallel } from './src/util/promises.js';
 import addExif from './src/exif.js';
 import { hyphenateDom } from './src/hyphenate.js';
 import { textToIso6391, getLanguageAttribute } from './src/util/language.js';
@@ -548,19 +549,37 @@ async function generate(fn, urls, options = {}) {
 	if (!configured) {
 		configure();
 	}
-	if (!urls.length) return null;
+	if (!urls.length) {
+		return null;
+	}
+	let w = options.wait * 1000;
+	if (options.debug && w) {
+		if (Number.isFinite(w) && w >= 0) {
+			out.write(
+				`Processing URLs sequentially, waiting ${options.wait} seconds in-between.\n`
+			);
+		} else {
+			out.write(
+				`Invalid --wait: expecting positive number, got ${options.wait}. Processing URLs in parallel.\n`
+			);
+		}
+	}
+	let resolve =
+		Number.isFinite(w) && w >= 0 ? resolveSequence : resolveParallel;
 	let items = (
-		await Promise.all(
-			urls.map((url, i) =>
-				cleanup(url, {
+		await resolve(
+			urls,
+			(url, i) => {
+				return cleanup(url, {
 					...options,
 					preferred_url: options.url ? options.url[i] : undefined
 				}).catch(err => {
 					console.error(err);
 					console.log('Ignoring item');
 					return null;
-				})
-			)
+				});
+			},
+			w
 		)
 	).filter(it => it);
 

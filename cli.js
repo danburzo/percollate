@@ -79,6 +79,9 @@ Commmon options:
   
   -u, --url=<url>    Sets the base URL when HTML is provided on stdin.
                      Multiple URL options can be specified.
+
+  -w, --wait=<sec>   Process the provided URLs sequentially, 
+                     pausing a number of seconds between items.
   
   -t <title>,        The bundle title.
   --title=<title>
