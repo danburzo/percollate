@@ -1,5 +1,6 @@
 import { resolveSequence, resolveParallel } from '../src/util/promises.js';
 import tape from 'tape';
+import { performance } from 'perf_hooks';
 
 let arr = [1, 2, 3];
 let epsilon = 100; // milliseconds +/- error
