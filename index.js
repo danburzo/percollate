@@ -549,12 +549,14 @@ async function generate(fn, urls, options = {}) {
 	if (!configured) {
 		configure();
 	}
-	if (!urls.length) return null;
-	let w = +options.wait;
+	if (!urls.length) {
+		return null;
+	}
+	let w = options.wait * 1000;
 	if (options.debug && w) {
 		if (Number.isFinite(w) && w >= 0) {
 			out.write(
-				`Processing URLs sequentially, waiting ${options.wait}sec in-between.\n`
+				`Processing URLs sequentially, waiting ${options.wait} seconds in-between.\n`
 			);
 		} else {
 			out.write(
@@ -562,21 +564,23 @@ async function generate(fn, urls, options = {}) {
 			);
 		}
 	}
-	let resolveItems =
-		Number.isFinite(w) && w >= 0
-			? resolveSequence(options.wait)
-			: resolveParallel;
+	let resolve =
+		Number.isFinite(w) && w >= 0 ? resolveSequence : resolveParallel;
 	let items = (
-		await resolveItems(urls, (url, i) => {
-			return cleanup(url, {
-				...options,
-				preferred_url: options.url ? options.url[i] : undefined
-			}).catch(err => {
-				console.error(err);
-				console.log('Ignoring item');
-				return null;
-			});
-		})
+		await resolve(
+			urls,
+			(url, i) => {
+				return cleanup(url, {
+					...options,
+					preferred_url: options.url ? options.url[i] : undefined
+				}).catch(err => {
+					console.error(err);
+					console.log('Ignoring item');
+					return null;
+				});
+			},
+			w
+		)
 	).filter(it => it);
 
 	if (options.individual) {
