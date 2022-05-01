@@ -1,4 +1,4 @@
-import srcset from 'srcset';
+import { parseSrcset, stringifySrcset } from 'srcset';
 import replaceElementType from './replace-element-type.js';
 
 /* 
@@ -167,8 +167,8 @@ function noUselessHref(doc) {
  */
 function relativeToAbsoluteURIs(doc) {
 	function absoluteSrcset(str) {
-		return srcset.stringify(
-			srcset.parse(str).map(item => ({
+		return stringifySrcset(
+			parseSrcset(str).map(item => ({
 				...item,
 				url: new URL(item.url, doc.baseURI).href
 			}))

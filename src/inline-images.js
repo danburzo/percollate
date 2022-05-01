@@ -1,4 +1,4 @@
-import srcset from 'srcset';
+import { parseSrcset, stringifySrcset } from 'srcset';
 import mimetype from './util/mimetype.js';
 import fetchBase64 from './util/fetch-base64.js';
 
@@ -56,10 +56,10 @@ export default async function inlineImages(doc, fetchOptions = {}, out) {
 			return;
 		}
 		try {
-			const items = srcset.parse(el.getAttribute('srcset'));
+			const items = parseSrcset(el.getAttribute('srcset'));
 			el.setAttribute(
 				'srcset',
-				srcset.stringify(
+				stringifySrcset(
 					await Promise.all(
 						items.map(async item => {
 							const mime = get_mime(item.url, doc);

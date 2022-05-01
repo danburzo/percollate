@@ -1,4 +1,4 @@
-import srcset from 'srcset';
+import { parseSrcset, stringifySrcset } from 'srcset';
 import { v1 as uuid } from 'uuid';
 
 export default function remoteResources(doc) {
@@ -51,8 +51,8 @@ export default function remoteResources(doc) {
 		try {
 			el.setAttribute(
 				'srcset',
-				srcset.stringify(
-					srcset.parse(el.getAttribute('srcset')).map(item => ({
+				stringifySrcset(
+					parseSrcset(el.getAttribute('srcset')).map(item => ({
 						...item,
 						url: collectAndReplace(item.url)
 					}))
