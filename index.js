@@ -35,6 +35,7 @@ import {
 import mapRemoteResources from './src/remote-resources.js';
 import inlineImages from './src/inline-images.js';
 import get_style_attribute_value from './src/get-style-attribute-value.js';
+import { fileURLToPath } from 'url';
 
 const out = process.stdout;
 
@@ -644,8 +645,9 @@ async function epubgen(data, output_path, options) {
 	};
 
 	return wrapAsync(async (resolve, reject) => {
-		const template_base = new URL('templates/epub/', import.meta.url)
-			.pathname;
+		const template_base = fileURLToPath(
+			new URL('templates/epub/', import.meta.url)
+		);
 
 		const output = fs.createWriteStream(output_path);
 		const archive = archiver('zip', {
