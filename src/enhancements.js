@@ -203,21 +203,25 @@ function relativeToAbsoluteURIs(doc) {
  */
 function singleImgToFigure(doc) {
 	Array.from(doc.querySelectorAll('img:only-child')).forEach(image => {
+		/*
+			Some images have been left as the only children of <a> elements
+			by exclusion rules in `imagesAtFullSize()` (eg. on Wikipedia).
+			If that's the case, include the <a> as well in the <figure>.
+		 */
+		const content =
+			image.parentNode.tagName === 'A' ? image.parentNode : image;
 		let fig = doc.createElement('figure');
-		fig.appendChild(image.cloneNode());
-
+		fig.appendChild(content.cloneNode(true));
 		let alt = image.getAttribute('alt');
 		if (alt) {
 			let figcaption = doc.createElement('figcaption');
 			figcaption.textContent = alt;
 			fig.appendChild(figcaption);
 		}
-
-		// Replace paragraph with figure
-		if (image.parentNode.matches('p') && image.parentNode.parentNode) {
-			image.parentNode.parentNode.replaceChild(fig, image.parentNode);
+		if (content.parentNode.children.length === 1) {
+			content.parentNode.replaceWith(fig);
 		} else {
-			image.parentNode.replaceChild(fig, image);
+			content.replaceWith(fig);
 		}
 	});
 }
