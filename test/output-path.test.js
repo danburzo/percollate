@@ -33,3 +33,12 @@ tape('outputPath', t => {
 	);
 	t.end();
 });
+
+tape('overlapping names', t => {
+	const cache = {};
+	const t1 = outputPath([{ title: 'Overlapping Title' }], {}, '.pdf', cache);
+	const t2 = outputPath([{ title: 'Overlapping Title' }], {}, '.pdf', cache);
+	t.equal(t1, 'Overlapping-Title.pdf');
+	t.equal(t2, 'Overlapping-Title-1.pdf');
+	t.end();
+});

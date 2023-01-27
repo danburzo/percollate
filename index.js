@@ -434,7 +434,7 @@ async function bundlePdf(items, options) {
 
 	await page.setContent(html, { waitUntil: 'load' });
 
-	const output_path = outputPath(items, options, '.pdf');
+	const output_path = outputPath(items, options, '.pdf', options.slugCache);
 
 	let buffer = await page.pdf({
 		preferCSSPageSize: true,
@@ -472,7 +472,7 @@ async function bundleEpub(items, options) {
 
 	out.write('Saving EPUB...\n');
 
-	const output_path = outputPath(items, options, '.epub');
+	const output_path = outputPath(items, options, '.epub', options.slugCache);
 
 	const title =
 		options.title || (items.length === 1 ? items[0].title : 'Untitled');
@@ -539,7 +539,7 @@ async function bundleHtml(items, options) {
 
 	out.write('Saving HTML...\n');
 
-	const output_path = outputPath(items, options, '.html');
+	const output_path = outputPath(items, options, '.html', options.slugCache);
 
 	await writeFile(output_path, html);
 
@@ -602,7 +602,8 @@ async function pdf(urls, options) {
 	return await generate(bundlePdf, urls, {
 		...options,
 		// Hyphenate by default
-		hyphenate: options.hyphenate !== undefined ? options.hyphenate : true
+		hyphenate: options.hyphenate !== undefined ? options.hyphenate : true,
+		slugCache: {}
 	});
 }
 
@@ -614,7 +615,8 @@ async function epub(urls, options) {
 		...options,
 		xhtml: true,
 		mapRemoteResources: !options.inline,
-		hyphenate: options.hyphenate !== undefined ? options.hyphenate : false
+		hyphenate: options.hyphenate !== undefined ? options.hyphenate : false,
+		slugCache: {}
 	});
 }
 
@@ -624,7 +626,8 @@ async function epub(urls, options) {
 async function html(urls, options) {
 	return await generate(bundleHtml, urls, {
 		...options,
-		hyphenate: options.hyphenate !== undefined ? options.hyphenate : false
+		hyphenate: options.hyphenate !== undefined ? options.hyphenate : false,
+		slugCache: {}
 	});
 }
 
