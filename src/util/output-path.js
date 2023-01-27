@@ -3,13 +3,23 @@ import slugify from 'slugify';
 const DEFAULT_TITLE = 'Untitled page';
 const OPTS = { strict: true };
 
-export default function (items, options, ext) {
+function slugifyTitle(title, cache = {}) {
+	const res = slugify(title || DEFAULT_TITLE, OPTS);
+	if (cache[res] !== undefined) {
+		cache[res] += 1;
+		return `${res}-${cache[res]}`;
+	}
+	cache[res] = 0;
+	return res;
+}
+
+export default function (items, options = {}, ext, cache = {}) {
 	if (options.individual && options.output) {
 		return (
 			// coerce URL to string
 			(options.output + '').replace(/\.[^.]+$/g, '') +
 			'-' +
-			slugify(items[0].title || DEFAULT_TITLE, OPTS) +
+			slugifyTitle(items[0].title, cache) +
 			(ext || '')
 		);
 	}
@@ -19,5 +29,5 @@ export default function (items, options, ext) {
 	if (items.length > 1) {
 		return `percollate-${Date.now()}${ext || ''}`;
 	}
-	return slugify(items[0].title || DEFAULT_TITLE, OPTS) + (ext || '');
+	return slugifyTitle(items[0].title, cache) + (ext || '');
 }
