@@ -1,7 +1,5 @@
 import Hyphenator from 'hyphenopoly';
-import { dirname } from 'path';
 import { readFileSync } from 'fs';
-import { fileURLToPath } from 'url';
 
 const DEFAULT_LANG = 'en-us';
 
