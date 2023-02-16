@@ -101,6 +101,7 @@ function launch(options, size) {
 
 	return pup.launch({
 		headless: true,
+		product: options.browser || 'chrome',
 		args,
 		defaultViewport: {
 			// Emulate retina display (@2x)...
