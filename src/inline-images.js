@@ -1,5 +1,5 @@
 import { parseSrcset, stringifySrcset } from 'srcset';
-import mimetype from './util/mimetype.js';
+import fileMimetype from './util/file-mimetype.js';
 import fetchBase64 from './util/fetch-base64.js';
 
 const image_mimetypes = new Set([
@@ -18,7 +18,7 @@ function get_mime(src, doc) {
 	} catch (err) {
 		// no-op, probably due to bad `doc.baseURI`
 	}
-	return mimetype(pathname);
+	return fileMimetype(pathname);
 }
 
 export default async function inlineImages(doc, fetchOptions = {}, out) {

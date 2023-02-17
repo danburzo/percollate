@@ -78,11 +78,16 @@ tape('programmatic api result', async t => {
 	const result = await pdf([testUrl], {
 		output: testPdf
 	});
+
 	t.true(result.items.length > 0, 'has results');
 	t.equal(result.items[0].title, 'JavaScript', 'title is correct');
 	t.true(
-		result.items[0].originalContent?.byteLength > 0,
-		'has non-empty .originalContent ArrayBuffer'
+		result.items[0].originalContent.buffer.byteLength > 0,
+		'has non-empty .originalContent.buffer ArrayBuffer'
+	);
+	t.ok(
+		result.items[0].originalContent.hasOwnProperty('contentType'),
+		'has .originalContent.contentType optional property'
 	);
 	t.true('options' in result, 'has .options object');
 	t.equal(result.options.output, testPdf, 'has correct output path');

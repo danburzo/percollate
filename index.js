@@ -11,9 +11,10 @@ import nunjucks from 'nunjucks';
 import css from 'css';
 import { Readability } from '@mozilla/readability';
 import createDOMPurify from 'dompurify';
+import MimeType from 'whatwg-mimetype';
 
 import slurp from './src/util/slurp.js';
-import mimetype from './src/util/mimetype.js';
+import fileMimetype from './src/util/file-mimetype.js';
 import epubDate from './src/util/epub-date.js';
 import humanDate from './src/util/human-date.js';
 import outputPath from './src/util/output-path.js';
@@ -133,15 +134,12 @@ function isURL(ref) {
 	return false;
 }
 
-const accepted_content_types = new Set([
-	'text/html',
-	'application/xhtml+xml',
-	'application/xml'
-]);
-
 async function fetchContent(ref, fetchOptions = {}) {
 	if (ref instanceof stream.Readable) {
-		return slurp(ref);
+		return {
+			buffer: await slurp(ref),
+			contentType: undefined
+		};
 	}
 
 	let url;
@@ -152,12 +150,18 @@ async function fetchContent(ref, fetchOptions = {}) {
 	}
 
 	if (!url) {
-		return readFile(ref, 'utf8');
+		return {
+			buffer: await readFile(ref),
+			contentType: fileMimetype(ref)
+		};
 	}
 
 	if (url && url.protocol === 'file:') {
 		url = decodeURI(url.href.replace(/^file:\/\//, ''));
-		return readFile(url, 'utf8');
+		return {
+			buffer: await readFile(url),
+			contentType: fileMimetype(url)
+		};
 	}
 
 	/*
@@ -170,17 +174,20 @@ async function fetchContent(ref, fetchOptions = {}) {
 			...fetchOptions.headers,
 			'user-agent': UA
 		}
-	}).then(response => {
-		let ct = (response.headers.get('Content-Type') || '').trim();
-		if (ct.indexOf(';') > -1) {
-			ct = ct.split(';')[0].trim();
-		}
-		if (!accepted_content_types.has(ct)) {
+	}).then(async response => {
+		let contentType = response.headers.get('Content-Type');
+		let mt = new MimeType(contentType);
+
+		if (!mt.isHTML() && !mt.isXML()) {
 			throw new Error(
-				`URL ${url.href} has unsupported content type: ${ct}`
+				`URL ${url.href} has unsupported content type: ${contentType}`
 			);
 		}
-		return response.arrayBuffer();
+
+		return {
+			buffer: await response.arrayBuffer(),
+			contentType
+		};
 	});
 }
 
@@ -191,7 +198,7 @@ async function cleanup(url, options) {
 	try {
 		out.write(`Fetching: ${url}`);
 
-		const content = await fetchContent(
+		const { buffer, contentType } = await fetchContent(
 			url === '-' ? process.stdin : url,
 			options.fetch || {}
 		);
@@ -207,7 +214,10 @@ async function cleanup(url, options) {
 				? url
 				: 'file://' + path.resolve(url);
 
-		const dom = new JSDOM(content, { url: final_url });
+		const dom = new JSDOM(buffer, {
+			contentType,
+			url: final_url
+		});
 
 		// Force relative URL resolution
 		dom.window.document.body.setAttribute(null, null);
@@ -326,7 +336,10 @@ async function cleanup(url, options) {
 			length: parsed.length,
 			siteName: sanitizer.sanitize(parsed.siteName),
 			remoteResources,
-			originalContent: content
+			originalContent: {
+				buffer,
+				contentType
+			}
 		};
 	} catch (error) {
 		console.error(`${url}:`, error.message);
@@ -803,7 +816,7 @@ async function epubgen(data, output_path, options) {
 			remoteResources: remoteResources.map(entry => ({
 				id: entry[1].replace(/[^a-z0-9]/gi, ''),
 				href: entry[1],
-				mimetype: mimetype(entry[1])
+				mimetype: fileMimetype(entry[1])
 			}))
 		});
 
