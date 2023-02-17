@@ -179,7 +179,7 @@ async function fetchContent(ref, fetchOptions = {}) {
 				`URL ${url.href} has unsupported content type: ${ct}`
 			);
 		}
-		return response.textConverted();
+		return response.arrayBuffer();
 	});
 }
 
