@@ -87,7 +87,7 @@ Commmon options:
   --title=<title>
 
   -a <author>,         The bundle author.
-  --author=<title>
+  --author=<author>
   
   --individual         Export each web page as an individual file.
   
