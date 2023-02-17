@@ -437,13 +437,27 @@ async function bundlePdf(items, options) {
 
 	const output_path = outputPath(items, options, '.pdf', options.slugCache);
 
-	let buffer = await page.pdf({
+	const pageSizeStyle = {};
+
+	const pageRule = Array.from(doc.styleSheets)
+		.map(sheet => Array.from(sheet.cssRules))
+		.flat()
+		.find(rule => rule.selectorText === '@page');
+
+	if (pageRule) {
+		// todo pageSizeStyle{}
+	}
+
+	const pdfOptions = {
 		preferCSSPageSize: true,
-		displayHeaderFooter: true,
+		...pageSizeStyle,
+		displayHeaderFooter: options.browser === 'chrome',
 		headerTemplate: header.body.innerHTML,
 		footerTemplate: footer.body.innerHTML,
 		printBackground: true
-	});
+	};
+
+	let buffer = await page.pdf(pdfOptions);
 
 	await browser.close();
 
