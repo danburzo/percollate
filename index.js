@@ -17,6 +17,7 @@ import mimetype from './src/util/mimetype.js';
 import epubDate from './src/util/epub-date.js';
 import humanDate from './src/util/human-date.js';
 import outputPath from './src/util/output-path.js';
+import getCssPageFormat from './src/util/get-css-page-format.js';
 import { resolveSequence, resolveParallel } from './src/util/promises.js';
 import addExif from './src/exif.js';
 import { hyphenateDom } from './src/hyphenate.js';
@@ -439,27 +440,38 @@ async function bundlePdf(items, options) {
 
 	const output_path = outputPath(items, options, '.pdf', options.slugCache);
 
-	const pageSizeStyle = {};
-
-	const pageRule = Array.from(doc.styleSheets)
-		.map(sheet => Array.from(sheet.cssRules))
-		.flat()
-		.find(rule => rule.selectorText === '@page');
-
-	if (pageRule) {
-		// todo pageSizeStyle{}
-	}
-
 	const pdfOptions = {
 		preferCSSPageSize: true,
-		...pageSizeStyle,
 		displayHeaderFooter: options.browser === 'chrome',
 		headerTemplate: header.body.innerHTML,
 		footerTemplate: footer.body.innerHTML,
 		printBackground: true
 	};
 
-	let buffer = await page.pdf(pdfOptions);
+	/*
+		Currently, Firefox does not produce PDFs 
+		with the page format specified by the author 
+		with the `@page/size` CSS declaration.
+
+		We need to extract that value ourselves and produce
+		the appropriate Puppeteer config.
+
+		Once these tasks get done in Firefox,
+		the EXPLICIT_PAGE_SIZE_FROM_CSS code path can be removed:
+
+		https://bugzilla.mozilla.org/show_bug.cgi?id=1793220
+		https://bugzilla.mozilla.org/show_bug.cgi?id=1815565
+	 */
+	const EXPLICIT_PAGE_SIZE_FROM_CSS = options.browser === 'firefox';
+
+	let buffer = await page.pdf(
+		EXPLICIT_PAGE_SIZE_FROM_CSS
+			? {
+					...pdfOptions,
+					...getCssPageFormat(doc)
+			  }
+			: pdfOptions
+	);
 
 	await browser.close();
 
