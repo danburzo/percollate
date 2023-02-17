@@ -33,7 +33,7 @@ Percollate is a command-line tool that turns web pages into beautifully formatte
 npm install -g percollate
 ```
 
-Percollate and its dependencies **require Node.js 12.20.0** or later.
+Percollate and its dependencies **require Node.js 14.17.0** or later.
 
 #### Community-maintained packages
 

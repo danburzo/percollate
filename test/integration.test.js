@@ -1,5 +1,5 @@
+import fs from 'node:fs';
 import tape from 'tape';
-import fs from 'fs';
 import { pdf, epub, html, configure } from '../index.js';
 import epubchecker from 'epubchecker';
 
@@ -78,11 +78,18 @@ tape('programmatic api result', async t => {
 	const result = await pdf([testUrl], {
 		output: testPdf
 	});
-	t.true(result.items.length > 0);
-	t.equal(result.items[0].title, 'JavaScript');
-	t.true('originalContent' in result.items[0]);
-	t.true(result.items[0].originalContent.length > 0);
-	t.true('options' in result);
-	t.equal(result.options.output, testPdf);
+
+	t.true(result.items.length > 0, 'has results');
+	t.equal(result.items[0].title, 'JavaScript', 'title is correct');
+	t.true(
+		result.items[0].originalContent.buffer.byteLength > 0,
+		'has non-empty .originalContent.buffer ArrayBuffer'
+	);
+	t.ok(
+		Object.keys(result.items[0].originalContent).includes('contentType'),
+		'has .originalContent.contentType optional property'
+	);
+	t.true('options' in result, 'has .options object');
+	t.equal(result.options.output, testPdf, 'has correct output path');
 	t.pass();
 });

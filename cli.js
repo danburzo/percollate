@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { readFileSync } from 'fs';
+import { readFileSync } from 'node:fs';
 import cliopts from './src/cli-opts.js';
 import { pdf, epub, html } from './index.js';
 
@@ -64,55 +64,59 @@ Commands:
 
 Commmon options:
 
-  -h, --help         Output usage information.
-  -V, --version      Output program version.
-  --debug            Print more detailed information.
+  -h, --help           Output usage information.
+  -V, --version        Output program version.
+  --debug              Print more detailed information.
 
-  -o <output>,       Path for the generated bundle.
+  -o <output>,         Path for the generated bundle.
   --output=<path>  
 
-  --template=<path>  Path to a custom HTML template.
+  --template=<path>    Path to a custom HTML template.
   
-  --style=<path>     Path to a custom CSS file.
+  --style=<path>       Path to a custom CSS file.
   
-  --css=<style>      Additional inline CSS style.
+  --css=<style>        Additional inline CSS style.
   
-  -u, --url=<url>    Sets the base URL when HTML is provided on stdin.
-                     Multiple URL options can be specified.
+  -u, --url=<url>      Sets the base URL when HTML is provided on stdin.
+                       Multiple URL options can be specified.
 
-  -w, --wait=<sec>   Process the provided URLs sequentially, 
-                     pausing a number of seconds between items.
+  -w, --wait=<sec>     Process the provided URLs sequentially, 
+                       pausing a number of seconds between items.
   
-  -t <title>,        The bundle title.
+  -t <title>,          The bundle title.
   --title=<title>
 
-  -a <author>,       The bundle author.
+  -a <author>,         The bundle author.
   --author=<author>
   
-  --individual       Export each web page as an individual file.
+  --individual         Export each web page as an individual file.
   
-  --toc              Generate a Table of Contents.
-                     Implicitly enabled when bundling more than one item.
+  --toc                Generate a Table of Contents.
+                       Implicitly enabled when bundling more than one item.
   
-  --cover            Generate a cover for the PDF / EPUB.
-                     Implicitly enabled when bundling more than one item
-                     or the --title option is provided.
-  
-  --hyphenate        Enable hyphenation. Enabled by default for PDF.
+  --cover              Generate a cover for the PDF / EPUB.
+                       Implicitly enabled when bundling more than one item
+                       or the --title option is provided.
 
-  --inline           Embed images inline with the content.
-                     Fetches and converts images to Base64 'data:' URLs.
+  --browser=<browser>  One of 'chrome' (default), 'firefox'.
+                       Used for producing PDF and the cover image for EPUB.
+  
+  --hyphenate          Enable hyphenation. Enabled by default for PDF.
+
+  --inline             Embed images inline with the content.
+                       Fetches and converts images to Base64 'data:' URLs.
 
 Options to disable features:
 
-  --no-amp           Don't prefer the AMP version of the web page.
-  --no-toc           Don't generate a table of contents.
-  --no-cover         Don't generate a cover.
-  --no-hyphenate     Disable hyphenation.
+  --no-amp             Don't prefer the AMP version of the web page.
+  --no-toc             Don't generate a table of contents.
+  --no-cover           Don't generate a cover.
+  --no-hyphenate       Disable hyphenation.
 
 PDF options: 
 
-  --no-sandbox       Passed to Puppeteer.
+  --no-sandbox         Passed to Puppeteer.
+
 
 Operands:
 

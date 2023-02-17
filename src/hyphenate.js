@@ -1,5 +1,5 @@
+import { readFileSync } from 'node:fs';
 import Hyphenator from 'hyphenopoly';
-import { readFileSync } from 'fs';
 
 const DEFAULT_LANG = 'en-us';
 

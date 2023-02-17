@@ -1,18 +1,9 @@
-export default stream =>
-	new Promise((fulfill, reject) => {
-		let content = '';
-		stream
-			.setEncoding('utf8')
-			.on('readable', () => {
-				let chunk;
-				while ((chunk = stream.read()) !== null) {
-					content += chunk;
-				}
-			})
-			.on('end', () => {
-				fulfill(content);
-			})
-			.on('error', error => {
-				reject(error);
-			});
-	});
+export default async function (stream) {
+	const result = [];
+	let bufferLength = 0;
+	for await (const chunk of stream) {
+		result.push(chunk);
+		bufferLength += chunk.length;
+	}
+	return Buffer.concat(result, bufferLength);
+}

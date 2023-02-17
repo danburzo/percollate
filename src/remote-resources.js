@@ -1,5 +1,5 @@
+import { randomUUID as uuid } from 'node:crypto';
 import { parseSrcset, stringifySrcset } from 'srcset';
-import { v1 as uuid } from 'uuid';
 
 export default function remoteResources(doc) {
 	let srcs = new Map();

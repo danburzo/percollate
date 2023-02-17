@@ -73,7 +73,8 @@ let opts_with_optarg = new Set([
 	'url',
 	'wait',
 	'title',
-	'author'
+	'author',
+	'browser'
 ]);
 let opts_with_arr = new Set(['url']);
 let aliases = {
