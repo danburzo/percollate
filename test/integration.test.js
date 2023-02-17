@@ -78,11 +78,13 @@ tape('programmatic api result', async t => {
 	const result = await pdf([testUrl], {
 		output: testPdf
 	});
-	t.true(result.items.length > 0);
-	t.equal(result.items[0].title, 'JavaScript');
-	t.true('originalContent' in result.items[0]);
-	t.true(result.items[0].originalContent.length > 0);
-	t.true('options' in result);
-	t.equal(result.options.output, testPdf);
+	t.true(result.items.length > 0, 'has results');
+	t.equal(result.items[0].title, 'JavaScript', 'title is correct');
+	t.true(
+		result.items[0].originalContent?.byteLength > 0,
+		'has non-empty .originalContent ArrayBuffer'
+	);
+	t.true('options' in result, 'has .options object');
+	t.equal(result.options.output, testPdf, 'has correct output path');
 	t.pass();
 });
