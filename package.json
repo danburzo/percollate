@@ -23,14 +23,13 @@
 		"pdf-lib": "^1.17.1",
 		"puppeteer": "^19.7.1",
 		"slugify": "^1.6.5",
-		"srcset": "^5.0.0",
-		"uuid": "^9.0.0"
+		"srcset": "^5.0.0"
 	},
 	"bin": {
 		"percollate": "./cli.js"
 	},
 	"engines": {
-		"node": "^14.13.1 || >=16.0.0"
+		"node": "^14.17.0 || >=16.0.0"
 	},
 	"devDependencies": {
 		"epubchecker": "^5.0.0",

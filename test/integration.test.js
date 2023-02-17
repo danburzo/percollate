@@ -1,5 +1,5 @@
+import fs from 'node:fs';
 import tape from 'tape';
-import fs from 'fs';
 import { pdf, epub, html, configure } from '../index.js';
 import epubchecker from 'epubchecker';
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { readFileSync } from 'fs';
+import { readFileSync } from 'node:fs';
 import cliopts from './src/cli-opts.js';
 import { pdf, epub, html } from './index.js';
 

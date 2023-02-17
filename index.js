@@ -1,15 +1,17 @@
+import fs from 'node:fs';
+import stream from 'node:stream';
+import path from 'node:path';
+import { randomUUID as uuid } from 'node:crypto';
+
 import pup from 'puppeteer';
 import archiver from 'archiver';
 import fetch from 'node-fetch';
 import { JSDOM } from 'jsdom';
 import nunjucks from 'nunjucks';
-import fs from 'fs';
-import stream from 'stream';
-import path from 'path';
 import css from 'css';
 import { Readability } from '@mozilla/readability';
-import { v1 as uuid } from 'uuid';
 import createDOMPurify from 'dompurify';
+
 import slurp from './src/util/slurp.js';
 import mimetype from './src/util/mimetype.js';
 import epubDate from './src/util/epub-date.js';

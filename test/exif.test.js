@@ -1,5 +1,5 @@
+import fs from 'node:fs';
 import tape from 'tape';
-import fs from 'fs';
 import { PDFDocument } from 'pdf-lib';
 import { pdf, configure } from '../index.js';
 
