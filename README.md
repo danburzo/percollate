@@ -309,7 +309,7 @@ See the [default HTML](./templates/default.html) for example usage.
 
 You can add CSS styles to the header / footer with either the `--css` option or a separate CSS stylesheet (the `--style` option).
 
-> 💡 The header / footer template [do not inherit their styles](https://github.com/GoogleChrome/puppeteer/issues/1853) from the rest of the page (i.e. they are not part of the cascade), so you'll have to write the full CSS you want to apply to them.
+> 💡 The header / footer template [do not inherit their styles](https://github.com/puppeteer/puppeteer/issues/1853) from the rest of the page (i.e. they are not part of the cascade), so you'll have to write the full CSS you want to apply to them.
 
 An example from the [default stylesheet](./templates/default.css):
 
@@ -346,7 +346,7 @@ All export formats follow a common pipeline:
 
 Different formats then use different tools to produce the final file.
 
-PDFs are rendered with [`puppeteer`](https://github.com/GoogleChrome/puppeteer).
+PDFs are rendered with [`puppeteer`](https://github.com/puppeteer/puppeteer).
 
 EPUBs have external images fetched and bundled together with the HTML of each article. When the `--inline` option is used, images are instead converted to `data` URLs and embedded into the HTML.
 
@@ -362,9 +362,27 @@ Using a browser to generate the PDF is a double-edged sword. On the one hand, yo
 
 ## Troubleshooting
 
-On some Linux machines you'll need to [install a few more Chrome dependencies](https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md#chrome-headless-doesnt-launch) before `percollate` works correctly. (_Thanks to @ptica for [sorting it out](https://github.com/danburzo/percollate/issues/19#issuecomment-428496041)_)
+On some Linux machines you'll need to [install a few more Chrome dependencies](https://github.com/puppeteer/puppeteer/blob/master/docs/troubleshooting.md#chrome-headless-doesnt-launch) before `percollate` works correctly. (_Thanks to @ptica for [sorting it out](https://github.com/danburzo/percollate/issues/19#issuecomment-428496041)_)
 
-The `percollate pdf` command supports the `--no-sandbox` Puppeteer flag, but make sure you're [aware of the implications](https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md#chrome-headless-fails-due-to-sandbox-issues) before disabling the sandbox.
+The `percollate pdf` command supports the `--no-sandbox` Puppeteer flag, but make sure you're [aware of the implications](https://github.com/puppeteer/puppeteer/blob/master/docs/troubleshooting.md#chrome-headless-fails-due-to-sandbox-issues) before disabling the sandbox.
+
+## Using Firefox to render PDFs
+
+> This feature is experimental. Please log an issue if you notice anything wrong.
+
+Starting with `percollate` 3.x, it's possible to use Firefox Nightly as an alternative browser with which to render PDFs. To make Firefox available to Percollate, use the following install command:
+
+```bash
+PUPPETEER_PRODUCT=firefox npm install percollate
+```
+
+After installation, `percollate pdf` commands can be run with the `--browser=firefox` option.
+
+### Limitations of Firefox PDF rendering
+
+At the moment, rendering PDFs with Firefox has the following limitations:
+
+-   The pages can't have headers and footers, so there are no page numbers.
 
 ## Contributing
 
