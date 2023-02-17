@@ -455,7 +455,7 @@ async function bundlePdf(items, options) {
 
 	const pdfOptions = {
 		preferCSSPageSize: true,
-		displayHeaderFooter: options.browser === 'chrome',
+		displayHeaderFooter: options.browser !== 'firefox',
 		headerTemplate: header.body.innerHTML,
 		footerTemplate: footer.body.innerHTML,
 		printBackground: true
