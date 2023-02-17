@@ -86,7 +86,7 @@ tape('programmatic api result', async t => {
 		'has non-empty .originalContent.buffer ArrayBuffer'
 	);
 	t.ok(
-		result.items[0].originalContent.hasOwnProperty('contentType'),
+		Object.keys(result.items[0].originalContent).includes('contentType'),
 		'has .originalContent.contentType optional property'
 	);
 	t.true('options' in result, 'has .options object');

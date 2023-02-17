@@ -1,8 +1,8 @@
 export default async function (stream) {
-	const array = [];
+	const result = [];
 	let bufferLength = 0;
 	for await (const chunk of stream) {
-		array.push(chunk);
+		result.push(chunk);
 		bufferLength += chunk.length;
 	}
 	return Buffer.concat(result, bufferLength);
