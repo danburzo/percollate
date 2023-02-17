@@ -18,7 +18,7 @@
 		"iso-639-3-to-1": "^1.0.0",
 		"jsdom": "^21.1.0",
 		"mimetype": "^0.0.8",
-		"node-fetch": "^2.6.2",
+		"node-fetch": "^2.6.9",
 		"nunjucks": "^3.2.3",
 		"pdf-lib": "^1.17.1",
 		"puppeteer": "^19.7.1",
