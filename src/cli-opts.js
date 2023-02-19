@@ -1,3 +1,5 @@
+import { AVAILABLE_MARKDOWN_OPTIONS } from './constants/markdown.js';
+
 /*
 	Command-Line Interface definition
 	---------------------------------
@@ -74,7 +76,8 @@ let opts_with_optarg = new Set([
 	'wait',
 	'title',
 	'author',
-	'browser'
+	'browser',
+	Array.from(AVAILABLE_MARKDOWN_OPTIONS).map(o => `md.${o}`)
 ]);
 let opts_with_arr = new Set(['url']);
 let aliases = {
@@ -87,7 +90,26 @@ let aliases = {
 	V: 'version'
 };
 
-export default function (args) {
+export function cast(val) {
+	if (val === 'true') return true;
+	if (val === 'false') return false;
+	const num = parseFloat(val);
+	if (!Number.isNaN(num)) return num;
+	return val;
+}
+
+export function namespacedOptions(options, namespace) {
+	const matcher = new RegExp(String.raw`${namespace}\.(.+)`);
+	return Object.keys(options).reduce((obj, k) => {
+		const m = k.match(matcher);
+		if (m) {
+			obj[m[1]] = cast(options[k]);
+		}
+		return obj;
+	}, {});
+}
+
+export function cliopts(args) {
 	let opts = {};
 	let command;
 	let operands = [];

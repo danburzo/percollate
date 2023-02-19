@@ -20,6 +20,10 @@ import { fromDom } from 'hast-util-from-dom';
 import { toMdast } from 'hast-util-to-mdast';
 import { gfmToMarkdown } from 'mdast-util-gfm';
 import { toMarkdown } from 'mdast-util-to-markdown';
+import {
+	AVAILABLE_MARKDOWN_OPTIONS,
+	DEFAULT_MARKDOWN_OPTIONS
+} from './src/constants/markdown.js';
 
 import slurp from './src/util/slurp.js';
 import fileMimetype from './src/util/file-mimetype.js';
@@ -605,7 +609,8 @@ async function bundleHtml(items, options) {
 /*
 	Bundle the HTML files into a Markdown
 	-------------------------------------
- */
+*/
+
 async function bundleMd(items, options) {
 	const DEFAULT_STYLESHEET = new URL(
 		'templates/default.css',
@@ -640,6 +645,12 @@ async function bundleMd(items, options) {
 	);
 
 	const md = toMarkdown(toMdast(fromDom(new JSDOM(html).window.document)), {
+		...DEFAULT_MARKDOWN_OPTIONS,
+		...Object.fromEntries(
+			Object.entries(options.markdownOptions).filter(entry =>
+				AVAILABLE_MARKDOWN_OPTIONS.has(entry[0])
+			)
+		),
 		extensions: gfmToMarkdown()
 	});
 

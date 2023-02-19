@@ -160,6 +160,20 @@ Embed images inline with the document. Images are fetched and converted to Base6
 
 This option is particularly useful for `html` to produce self-contained HTML files.
 
+#### `--md.<option>=<value>`
+
+Pass options to the underlying Markdown stringifier, [`mdast-util-to-markdown`](https://github.com/syntax-tree/mdast-util-to-markdown#options). These are the default Markdown options:
+
+```js
+const DEFAULT_MARKDOWN_OPTIONS = {
+	fences: true,
+	emphasis: '_',
+	strong: '_',
+	resourceLink: true,
+	rule: '-'
+};
+```
+
 ## Recipes
 
 ### Basic bundling
