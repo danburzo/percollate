@@ -2,7 +2,7 @@
 
 <a href="https://www.npmjs.org/package/percollate"><img src="https://img.shields.io/npm/v/percollate.svg?style=flat-square&labelColor=324A97&color=black" alt="npm version"></a>
 
-Percollate is a command-line tool that turns web pages into beautifully formatted PDF, EPUB, or HTML files.
+Percollate is a command-line tool that turns web pages into beautifully formatted PDF, EPUB, HTML or Markdown files.
 
 <figure style='margin: 1rem 0'>
 	<img alt="Sample Output" src="./.github/dimensions-of-colour.png">
@@ -60,6 +60,7 @@ The following commands are available:
 -   `percollate pdf` produces a PDF file;
 -   `percollate epub` produces an EPUB file;
 -   `percollate html` produces a HTML file.
+-   `percollate md` produces a Markdown file.
 
 The operands can be URLs, paths to local files, or the `-` character which stands for `stdin` (the standard inputs).
 
@@ -103,7 +104,7 @@ percollate pdf --individual http://example.com/page1 http://example.com/page2
 
 #### `--template`
 
-Path to a custom HTML template. Applies to `pdf` and `html`.
+Path to a custom HTML template. Applies to `pdf`, `html`, and `md`.
 
 #### `--style`
 
@@ -145,11 +146,11 @@ Generate a cover. The option is implicitly enabled when the `--title` option is 
 
 Generate a hyperlinked table of contents. The option is implicitly enabled when bundling more than one web page to a single file. Disable this implicit behavior by passing the `--no-toc` flag.
 
-Applies to `pdf` and `html`.
+Applies to `pdf`, `html`, and `md`.
 
 #### `--hyphenate`
 
-Hyphenation is enabled by default for `pdf`, and disabled for `epub` and `html`. You can opt into hyphenation with the `--hyphenate` flag, or disable it with the `--no-hyphenate` flag.
+Hyphenation is enabled by default for `pdf`, and disabled for `epub`, `html`, and `md`. You can opt into hyphenation with the `--hyphenate` flag, or disable it with the `--no-hyphenate` flag.
 
 See also the [Hyphenation and justification](#hyphenation-and-justification) recipe.
 
@@ -351,6 +352,8 @@ PDFs are rendered with [`puppeteer`](https://github.com/puppeteer/puppeteer).
 EPUBs have external images fetched and bundled together with the HTML of each article. When the `--inline` option is used, images are instead converted to `data` URLs and embedded into the HTML.
 
 HTMLs are saved without any further changes. When the `--inline` option is used, images are converted to `data` URLs and embedded into the HTML. External images are not otherwise fetched.
+
+Markdown files are produced the same way as HTMLs, then processed with a series of utilities from the [unified.js](https://unifiedjs.com/) umbrella.
 
 ## Limitations
 
