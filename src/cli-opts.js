@@ -64,7 +64,7 @@ function opsh(arr, fn) {
 	return;
 }
 
-const available_commands = new Set(['pdf', 'epub', 'html']);
+const available_commands = new Set(['pdf', 'epub', 'html', 'md']);
 let opts_with_optarg = new Set([
 	'output',
 	'template',

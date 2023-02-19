@@ -2,7 +2,7 @@
 
 import { readFileSync } from 'node:fs';
 import cliopts from './src/cli-opts.js';
-import { pdf, epub, html } from './index.js';
+import { pdf, epub, html, md } from './index.js';
 
 const { command, opts, operands } = cliopts(process.argv.slice(2));
 
@@ -34,20 +34,27 @@ if (!operands.length) {
 switch (command) {
 	case 'pdf':
 		if (opts.output === '-') {
-			console.error(`Output to <stdout> is only supported for HTML.`);
+			console.error(
+				`Output to <stdout> is only supported for commands: 'html', 'md'.`
+			);
 			process.exit(1);
 		}
 		pdf(operands, opts);
 		break;
 	case 'epub':
 		if (opts.output === '-') {
-			console.error(`Output to <stdout> is only supported for HTML.`);
+			console.error(
+				`Output to <stdout> is only supported for commands: 'html', 'md'.`
+			);
 			process.exit(1);
 		}
 		epub(operands, opts);
 		break;
 	case 'html':
 		html(operands, opts);
+		break;
+	case 'md':
+		md(operands, opts);
 		break;
 	default:
 		outputHelp(true);
@@ -68,6 +75,7 @@ Commands:
 	pdf                  Bundle web pages as a PDF file.
 	epub                 Bundle web pages as an EPUB file.
 	html                 Bundle web pages as a HTML file.
+	md                   Bundle web pages as a Markdown file.
 
 Commmon options:
 
