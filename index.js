@@ -13,6 +13,18 @@ import { Readability } from '@mozilla/readability';
 import createDOMPurify from 'dompurify';
 import MimeType from 'whatwg-mimetype';
 
+/*
+	Markdown functions
+*/
+import { fromDom } from 'hast-util-from-dom';
+import { toMdast } from 'hast-util-to-mdast';
+import { gfmToMarkdown } from 'mdast-util-gfm';
+import { toMarkdown } from 'mdast-util-to-markdown';
+import {
+	AVAILABLE_MARKDOWN_OPTIONS,
+	DEFAULT_MARKDOWN_OPTIONS
+} from './src/constants/markdown.js';
+
 import slurp from './src/util/slurp.js';
 import fileMimetype from './src/util/file-mimetype.js';
 import epubDate from './src/util/epub-date.js';
@@ -547,7 +559,7 @@ async function bundleEpub(items, options) {
 
 /*
 	Bundle the HTML files into a HTML
-	--------------------------------
+	---------------------------------
  */
 async function bundleHtml(items, options) {
 	const DEFAULT_STYLESHEET = new URL(
@@ -591,6 +603,66 @@ async function bundleHtml(items, options) {
 	const output_path = outputPath(items, options, '.html', options.slugCache);
 	await writeFile(output_path, html);
 	err.write(`Saved HTML: `);
+	out.write(String(output_path));
+}
+
+/*
+	Bundle the HTML files into a Markdown
+	-------------------------------------
+*/
+
+async function bundleMd(items, options) {
+	const DEFAULT_STYLESHEET = new URL(
+		'templates/default.css',
+		import.meta.url
+	);
+	const DEFAULT_TEMPLATE = new URL('templates/default.html', import.meta.url);
+
+	const style =
+		(await readFile(options.style || DEFAULT_STYLESHEET, 'utf8')) +
+		(options.hyphenate === true ? JUSTIFY_CSS : '') +
+		(options.css || '');
+
+	const html = nunjucks.renderString(
+		await readFile(options.template || DEFAULT_TEMPLATE, 'utf8'),
+		{
+			filetype: 'html',
+			title:
+				options.title ||
+				(items.length === 1 ? items[0].title : 'Untitled'),
+			date: humanDate(new Date()),
+			items,
+			style,
+			options: {
+				use_toc:
+					options.toc || (items.length > 1 && options.toc !== false),
+				use_cover:
+					options.cover ||
+					(options.cover !== false &&
+						(options.title || items.length > 1))
+			}
+		}
+	);
+
+	const md = toMarkdown(toMdast(fromDom(new JSDOM(html).window.document)), {
+		...DEFAULT_MARKDOWN_OPTIONS,
+		...Object.fromEntries(
+			Object.entries(options.markdownOptions).filter(entry =>
+				AVAILABLE_MARKDOWN_OPTIONS.has(entry[0])
+			)
+		),
+		extensions: gfmToMarkdown()
+	});
+
+	if (options.output === '-') {
+		out.write(md);
+		return;
+	}
+
+	err.write('Saving MD...\n');
+	const output_path = outputPath(items, options, '.md', options.slugCache);
+	await writeFile(output_path, md);
+	err.write(`Saved MD: `);
 	out.write(String(output_path));
 }
 
@@ -673,6 +745,17 @@ async function epub(urls, options) {
  */
 async function html(urls, options) {
 	return await generate(bundleHtml, urls, {
+		...options,
+		hyphenate: options.hyphenate !== undefined ? options.hyphenate : false,
+		slugCache: {}
+	});
+}
+
+/*
+	Generate Markdown
+ */
+async function md(urls, options) {
+	return await generate(bundleMd, urls, {
 		...options,
 		hyphenate: options.hyphenate !== undefined ? options.hyphenate : false,
 		slugCache: {}
@@ -836,7 +919,7 @@ async function epubgen(data, output_path, options) {
 	});
 }
 
-export { configure, pdf, epub, html };
+export { configure, pdf, epub, html, md };
 
 export const __test__ = {
 	fetchContent,
