@@ -497,7 +497,7 @@ async function bundlePdf(items, options) {
 	await writeFile(output_path, pdf);
 
 	err.write(`Saved PDF: `);
-	out.write(output_path);
+	out.write(String(output_path));
 }
 
 /*
@@ -542,7 +542,7 @@ async function bundleEpub(items, options) {
 	);
 
 	err.write(`Saved EPUB: `);
-	out.write(output_path);
+	out.write(String(output_path));
 }
 
 /*
@@ -591,7 +591,7 @@ async function bundleHtml(items, options) {
 	const output_path = outputPath(items, options, '.html', options.slugCache);
 	await writeFile(output_path, html);
 	err.write(`Saved HTML: `);
-	out.write(output_path);
+	out.write(String(output_path));
 }
 
 async function generate(fn, urls, options = {}) {
