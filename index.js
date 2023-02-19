@@ -42,6 +42,7 @@ import get_style_attribute_value from './src/get-style-attribute-value.js';
 import { fileURLToPath } from 'url';
 
 const out = process.stdout;
+const err = process.stderr;
 
 const { readFile, writeFile } = fs.promises;
 
@@ -196,14 +197,14 @@ async function cleanup(url, options) {
 		return null;
 	}
 	try {
-		out.write(`Fetching: ${url}`);
+		err.write(`Fetching: ${url}`);
 
 		const { buffer, contentType } = await fetchContent(
 			url === '-' ? process.stdin : url,
 			options.fetch || {}
 		);
 
-		out.write(' ✓\n');
+		err.write(' ✓\n');
 
 		const final_url =
 			options.preferred_url !== undefined
@@ -226,11 +227,11 @@ async function cleanup(url, options) {
 
 		const amp = dom.window.document.querySelector('link[rel~=amphtml]');
 		if (amp && options.amp) {
-			out.write('\nFound AMP version (use `--no-amp` to ignore)\n');
+			err.write('\nFound AMP version (use `--no-amp` to ignore)\n');
 			return cleanup(amp.href, options, amp.href);
 		}
 
-		out.write(`Enhancing web page: ${url}`);
+		err.write(`Enhancing web page: ${url}`);
 
 		/* 
 			Run enhancements
@@ -280,7 +281,7 @@ async function cleanup(url, options) {
 			getLanguageAttribute(dom.window.document) ||
 			textToIso6391(textContent);
 
-		out.write(' ✓\n');
+		err.write(' ✓\n');
 
 		if (options.inline) {
 			await inlineImages(
@@ -427,11 +428,11 @@ async function bundlePdf(items, options) {
 	}
 
 	if (options.debug) {
-		out.write('Generating temporary HTML file... ');
+		err.write('Generating temporary HTML file... ');
 		const temp_file = path.resolve(process.cwd(), `${uuid()}.html`);
 		await writeFile(temp_file, html);
-		out.write('✓\n');
-		out.write(`Temporary HTML file: file://${temp_file}\n`);
+		err.write('✓\n');
+		err.write(`Temporary HTML file: file://${temp_file}\n`);
 	}
 
 	const browser = await launch(options);
@@ -445,7 +446,7 @@ async function bundlePdf(items, options) {
 
 	if (options.debug) {
 		page.on('response', response => {
-			out.write(`Fetched: ${response.url()}\n`);
+			err.write(`Fetched: ${response.url()}\n`);
 		});
 	}
 
@@ -495,7 +496,8 @@ async function bundlePdf(items, options) {
 
 	await writeFile(output_path, pdf);
 
-	out.write(`Saved PDF: ${output_path}\n`);
+	err.write(`Saved PDF: `);
+	out.write(output_path);
 }
 
 /*
@@ -512,7 +514,7 @@ async function bundleEpub(items, options) {
 		(options.hyphenate === true ? JUSTIFY_CSS : '') +
 		(options.css || '');
 
-	out.write('Saving EPUB...\n');
+	err.write('Saving EPUB...\n');
 
 	const output_path = outputPath(items, options, '.epub', options.slugCache);
 
@@ -539,7 +541,8 @@ async function bundleEpub(items, options) {
 		options
 	);
 
-	out.write(`Saved EPUB: ${output_path}\n`);
+	err.write(`Saved EPUB: `);
+	out.write(output_path);
 }
 
 /*
@@ -579,13 +582,16 @@ async function bundleHtml(items, options) {
 		}
 	);
 
-	out.write('Saving HTML...\n');
+	if (options.output === '-') {
+		out.write(html);
+		return;
+	}
 
+	err.write('Saving HTML...\n');
 	const output_path = outputPath(items, options, '.html', options.slugCache);
-
 	await writeFile(output_path, html);
-
-	out.write(`Saved HTML: ${output_path}\n`);
+	err.write(`Saved HTML: `);
+	out.write(output_path);
 }
 
 async function generate(fn, urls, options = {}) {
@@ -598,11 +604,11 @@ async function generate(fn, urls, options = {}) {
 	let w = options.wait * 1000;
 	if (options.debug && w) {
 		if (Number.isFinite(w) && w >= 0) {
-			out.write(
+			err.write(
 				`Processing URLs sequentially, waiting ${options.wait} seconds in-between.\n`
 			);
 		} else {
-			out.write(
+			err.write(
 				`Invalid --wait: expecting positive number, got ${options.wait}. Processing URLs in parallel.\n`
 			);
 		}
@@ -618,7 +624,7 @@ async function generate(fn, urls, options = {}) {
 					preferred_url: options.url ? options.url[i] : undefined
 				}).catch(err => {
 					console.error(err);
-					console.log('Ignoring item');
+					console.error('Ignoring item');
 					return null;
 				});
 			},
@@ -701,7 +707,7 @@ async function epubgen(data, output_path, options) {
 
 		output
 			.on('finish', () => {
-				out.write(`${archive.pointer()} total bytes, archive closed\n`);
+				err.write(`${archive.pointer()} total bytes, archive closed\n`);
 				resolve();
 			})
 			.on('error', reject);
@@ -749,7 +755,7 @@ async function epubgen(data, output_path, options) {
 			let entry = remoteResources[i];
 			try {
 				if (options.debug) {
-					out.write(`Fetching: ${entry[0]}\n`);
+					err.write(`Fetching: ${entry[0]}\n`);
 				}
 				let stream = (
 					await fetch(entry[0], {
@@ -761,7 +767,7 @@ async function epubgen(data, output_path, options) {
 				).body;
 				archive.append(stream, { name: `OEBPS/${entry[1]}` });
 			} catch (err) {
-				console.log(err);
+				console.error(err);
 			}
 		}
 
