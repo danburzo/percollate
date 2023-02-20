@@ -1,6 +1,6 @@
 {
 	"name": "percollate",
-	"version": "3.0.0",
+	"version": "4.0.0",
 	"description": "A command-line tool to grab web pages as PDF",
 	"main": "index.js",
 	"type": "module",
