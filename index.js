@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import stream from 'node:stream';
 import path from 'node:path';
 import { randomUUID as uuid } from 'node:crypto';
+import { fileURLToPath } from 'node:url';
 
 import pup from 'puppeteer';
 import archiver from 'archiver';
@@ -51,7 +52,6 @@ import {
 import mapRemoteResources from './src/remote-resources.js';
 import inlineImages from './src/inline-images.js';
 import get_style_attribute_value from './src/get-style-attribute-value.js';
-import { fileURLToPath } from 'url';
 
 const out = process.stdout;
 const err = process.stderr;
