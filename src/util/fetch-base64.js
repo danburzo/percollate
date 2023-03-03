@@ -1,4 +1,5 @@
 import fetch from 'node-fetch';
+import { Buffer } from 'node:buffer';
 
 export default function fetchBase64(url, fetchOptions = {}) {
 	return fetch(url, fetchOptions)
