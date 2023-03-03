@@ -3,5 +3,5 @@ import fetch from 'node-fetch';
 export default function fetchBase64(url, fetchOptions = {}) {
 	return fetch(url, fetchOptions)
 		.then(r => r.arrayBuffer())
-		.then(buff => buff.toString('base64'));
+		.then(buff => Buffer.from(buff).toString('base64'));
 }
