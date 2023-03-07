@@ -2,12 +2,21 @@ import { parseSrcset, stringifySrcset } from 'srcset';
 import fileMimetype from './util/file-mimetype.js';
 import fetchBase64 from './util/fetch-base64.js';
 
+/* 
+	Note: it is unfortunate that we use two separate mechanisms
+	to discern when an URL points to an image, but here we are.
+
+	`image_mimetypes` here needs to be kept in sync with the
+	`REGEX_IMAGE_URL` constant!
+*/
 const image_mimetypes = new Set([
 	'image/avif',
 	'image/bmp',
 	'image/gif',
 	'image/jpeg',
 	'image/png',
+	'image/svg+xml',
+	'image/tiff',
 	'image/webp'
 ]);
 
