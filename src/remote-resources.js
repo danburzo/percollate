@@ -1,5 +1,6 @@
 import { randomUUID as uuid } from 'node:crypto';
 import { parseSrcset, stringifySrcset } from 'srcset';
+import { REGEX_IMAGE_URL } from './constants/regex.js';
 
 export default function remoteResources(doc) {
 	let srcs = new Map();
@@ -15,7 +16,7 @@ export default function remoteResources(doc) {
 		} catch (err) {
 			// no-op, probably due to bad `doc.baseURI`.
 		}
-		let match = pathname.match(/\.(gif|jpe?g|bmp|png|svg|webp)$/);
+		let match = pathname.match(REGEX_IMAGE_URL);
 		if (!match) {
 			return src;
 		}

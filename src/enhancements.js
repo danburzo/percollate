@@ -1,5 +1,6 @@
 import { parseSrcset, stringifySrcset } from 'srcset';
 import replaceElementType from './replace-element-type.js';
+import { REGEX_IMAGE_URL } from './constants/regex.js';
 
 /* 
 	Convert AMP markup to HMTL markup
@@ -51,7 +52,7 @@ function fixLazyLoadedImages(doc) {
 		<img src='original-size.png'/>
 */
 function imagesAtFullSize(doc) {
-	let include_pattern = /\.(png|jpg|jpeg|gif|svg|webp|avif|bmp|tiff?)$/i;
+	let include_pattern = REGEX_IMAGE_URL;
 	let exclude_patterns = [
 		/*
 			Exclude Wikipedia links to image file pages
