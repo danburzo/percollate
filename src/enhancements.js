@@ -51,7 +51,7 @@ function fixLazyLoadedImages(doc) {
 		<img src='original-size.png'/>
 */
 function imagesAtFullSize(doc) {
-	let include_pattern = /\.(png|jpg|jpeg|gif|svg)$/i;
+	let include_pattern = /\.(png|jpg|jpeg|gif|svg|webp|avif|bmp|tiff?)$/i;
 	let exclude_patterns = [
 		/*
 			Exclude Wikipedia links to image file pages

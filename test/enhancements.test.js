@@ -124,6 +124,31 @@ tape('imagesAtFullSize', t => {
 			t.end();
 		}
 	);
+
+	t.test('should ignore Wikipedia special File: URLs', t => {
+		const doc = dom`
+			<a href="https://en.wikipedia.org/wiki/File:JavaScript_code.png" class="image"><img alt="JavaScript code.png" src="//upload.wikimedia.org/wikipedia/commons/thumb/a/a4/JavaScript_code.png/300px-JavaScript_code.png" decoding="async" srcset="//upload.wikimedia.org/wikipedia/commons/thumb/a/a4/JavaScript_code.png/450px-JavaScript_code.png 1.5x, //upload.wikimedia.org/wikipedia/commons/thumb/a/a4/JavaScript_code.png/600px-JavaScript_code.png 2x" data-file-width="882" data-file-height="587" width="300" height="200"></a>
+            <a href="https://de.wikipedia.org/wiki/Datei:Wien_logo.svg" class="image" title="Logo"><img alt="Logo" src="//upload.wikimedia.org/wikipedia/commons/thumb/1/15/Wien_logo.svg/150px-Wien_logo.svg.png" decoding="async" srcset="//upload.wikimedia.org/wikipedia/commons/thumb/1/15/Wien_logo.svg/225px-Wien_logo.svg.png 1.5x, //upload.wikimedia.org/wikipedia/commons/thumb/1/15/Wien_logo.svg/300px-Wien_logo.svg.png 2x" data-file-width="512" data-file-height="234" width="150" height="69"></a>
+            <a href="https://da.m.wikipedia.org/wiki/Fil:Danmark-locator.png" class="image"><img src="//upload.wikimedia.org/wikipedia/commons/thumb/3/37/Danmark-locator.png/220px-Danmark-locator.png" decoding="async" class="thumbimage" srcset="//upload.wikimedia.org/wikipedia/commons/3/37/Danmark-locator.png 1.5x" data-file-width="330" data-file-height="355" width="220" height="237"></a>
+        `;
+		const urls = [
+			'//upload.wikimedia.org/wikipedia/commons/thumb/a/a4/JavaScript_code.png/300px-JavaScript_code.png',
+			'//upload.wikimedia.org/wikipedia/commons/thumb/1/15/Wien_logo.svg/150px-Wien_logo.svg.png',
+			'//upload.wikimedia.org/wikipedia/commons/thumb/3/37/Danmark-locator.png/220px-Danmark-locator.png'
+		];
+		t.deepEqual(
+			Array.from(doc.querySelectorAll('img')).map(img => img.src),
+			urls,
+			'before imagesAtFullSize'
+		);
+		imagesAtFullSize(doc);
+		t.deepEqual(
+			Array.from(doc.querySelectorAll('img')).map(img => img.src),
+			urls,
+			'after imagesAtFullSize'
+		);
+		t.end();
+	});
 });
 
 tape('githubSpecific', t => {
