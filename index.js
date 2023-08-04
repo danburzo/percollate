@@ -117,7 +117,7 @@ function launch(options, size) {
 	}
 
 	return pup.launch({
-		headless: true,
+		headless: 'new',
 		product: options.browser || 'chrome',
 		args,
 		defaultViewport: {
