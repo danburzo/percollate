@@ -651,7 +651,7 @@ async function bundleMd(items, options) {
 				AVAILABLE_MARKDOWN_OPTIONS.has(entry[0])
 			)
 		),
-		extensions: gfmToMarkdown()
+		extensions: [gfmToMarkdown()]
 	});
 
 	if (options.output === '-') {
