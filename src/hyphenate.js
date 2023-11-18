@@ -1,6 +1,8 @@
 import { readFileSync } from 'node:fs';
 import Hyphenator from 'hyphenopoly';
+import { createRequire } from 'module';
 
+const require = createRequire(import.meta.url);
 const DEFAULT_LANG = 'en-us';
 
 function getHypenatorByLang(lang) {
@@ -11,10 +13,7 @@ function getHypenatorByLang(lang) {
 		sync: true,
 		loaderSync: file => {
 			return readFileSync(
-				new URL(
-					`../node_modules/hyphenopoly/patterns/${file}`,
-					import.meta.url
-				)
+				require.resolve(`hyphenopoly/patterns/${file}`)
 			);
 		},
 		require: [language],
