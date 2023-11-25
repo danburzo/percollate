@@ -9,13 +9,8 @@ function getHypenatorByLang(lang) {
 		: DEFAULT_LANG;
 	return Hyphenator.config({
 		sync: true,
-		loaderSync: file => {
-			return readFileSync(
-				new URL(
-					`../node_modules/hyphenopoly/patterns/${file}`,
-					import.meta.url
-				)
-			);
+		loaderSync: (file, patDir) => {
+			return readFileSync(new URL(file, patDir));
 		},
 		require: [language],
 		defaultLanguage: DEFAULT_LANG,

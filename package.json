@@ -16,7 +16,7 @@
 		"hast-util-from-dom": "^4.2.0",
 		"hast-util-to-mdast": "^9.0.0",
 		"html-encoding-sniffer": "^3.0.0",
-		"hyphenopoly": "^5.1.0",
+		"hyphenopoly": "^5.3.0",
 		"iso-639-3-to-1": "^1.0.0",
 		"jsdom": "^21.1.0",
 		"mdast-util-gfm": "^2.0.2",
