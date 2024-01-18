@@ -242,6 +242,10 @@ function expandDetailsElements(doc) {
  */
 function wrapPreBlocks(doc) {
 	Array.from(doc.querySelectorAll('pre')).forEach(pre => {
+		/* Avoid processing nested <pre> elements (#165) */
+		if (pre.querySelector('pre')) {
+			return;
+		}
 		if (pre.parentNode && !pre.parentNode.matches('figure')) {
 			let fig = doc.createElement('figure');
 			fig.appendChild(pre.cloneNode(true));

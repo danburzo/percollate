@@ -15,7 +15,7 @@ function textToIso6391(text) {
 }
 
 function getLanguageAttribute(doc) {
-	return doc.documentElement.getAttribute('lang');
+	return doc.documentElement?.getAttribute('lang');
 }
 
 export { textToIso6391, getLanguageAttribute };
