@@ -1,4 +1,17 @@
 <!DOCTYPE html>
+
+{% macro toc(headings) %}
+<ol class="toc__sublist">
+	{% for heading in headings %}
+	<li class="toc__list-item">
+		<a href="#{{ heading.id }}" class="no-href">{{heading.content}}</a>
+		{% if heading.subheadings | length %} {{ toc(heading.subheadings) }} {%
+		endif %}
+	</li>
+	{% endfor %}
+</ol>
+{% endmacro %}
+
 <html class="type--{{filetype}}">
 	<head>
 		<meta charset="utf-8" />
@@ -30,9 +43,10 @@
 			<ol class="toc__list">
 				{% for item in items %}
 				<li class="toc__list-item">
-					<a href="#{{ item.id }}" class="no-href"
-						>{{ item.title }}</a
-					>
+					<a href="#{{ item.id }}" class="no-href">
+						{{ item.title }}
+					</a>
+					{% if item.toc | length %} {{ toc(item.toc) }} {% endif %}
 				</li>
 				{% endfor %}
 			</ol>

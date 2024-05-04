@@ -148,6 +148,12 @@ Generate a hyperlinked table of contents. The option is implicitly enabled when 
 
 Applies to `pdf`, `html`, and `md`.
 
+#### `--toc-level=<level>`
+
+By default, the table of contents is a flat list of article titles. With the `--toc-level` option the table of contents will include headings under each article title (`<h2>`, `<h3>`, etc.), up to the specified heading depth. A number between `1` and `6` is expected.
+
+Using `--toc-level` with a value greater than `1` implies `--toc`.
+
 #### `--hyphenate`
 
 Hyphenation is enabled by default for `pdf`, and disabled for `epub`, `html`, and `md`. You can opt into hyphenation with the `--hyphenate` flag, or disable it with the `--no-hyphenate` flag.

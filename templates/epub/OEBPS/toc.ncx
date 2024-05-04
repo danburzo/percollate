@@ -1,4 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+{% macro toc(headings, item_id) %}
+{% for heading in headings %}
+<navPoint id="{{heading.id}}">
+	<navLabel>
+		<text>{{heading.text | e }}</text>
+	</navLabel>
+	<content src="{{item_id}}.xhtml#{{ heading.id }}" />
+	{% if heading.subheadings | length %}
+		{{ toc(heading.subheadings, item_id) }}
+	{% endif %}
+</navPoint>
+{% endfor %}
+{% endmacro %}
+
 <ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1">
 	<head>
 		<meta name="dtb:uid" content="urn:uuid:{{uuid}}"/>
@@ -11,11 +26,14 @@
 	</docTitle>
 	<navMap>
 		{% for item in items %}
-		<navPoint id="{{item.id}}" playOrder="{{loop.index}}">
+		<navPoint id="{{item.id}}">
 			<navLabel>
 				<text>{{item.title}}</text>
 			</navLabel>
 			<content src="{{item.id}}.xhtml" />
+			{% if item.toc | length %}
+				{{ toc(item.toc, item.id) }}
+			{% endif %}
 		</navPoint>
 		{% endfor %}
 	</navMap>

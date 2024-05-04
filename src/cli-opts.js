@@ -77,6 +77,7 @@ let opts_with_optarg = new Set([
 	'title',
 	'author',
 	'browser',
+	'toc-level',
 	Array.from(AVAILABLE_MARKDOWN_OPTIONS).map(o => `md.${o}`)
 ]);
 let opts_with_arr = new Set(['url']);
