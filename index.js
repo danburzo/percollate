@@ -36,6 +36,7 @@ import { resolveSequence, resolveParallel } from './src/util/promises.js';
 import addExif from './src/exif.js';
 import { hyphenateDom } from './src/hyphenate.js';
 import { textToIso6391, getLanguageAttribute } from './src/util/language.js';
+import { setIdsAndReturnHeadings, nestHeadings } from './src/headings.js';
 
 import {
 	ampToHtml,
@@ -332,6 +333,24 @@ async function cleanup(url, options) {
 
 		const content_els = sanitize_to_dom(parsed.content);
 
+		// `--toc-level` implies `--toc`, unless disabled with `--no-toc`.
+		let headings = [];
+		if (options['toc-level'] > 1 && options.toc !== false) {
+			headings = setIdsAndReturnHeadings(
+				content_els,
+				options['toc-level']
+			).map(heading => {
+				return {
+					id: heading.id,
+					level: heading.level,
+					// Plain text used in EPUB
+					text: heading.node.textContent.trim(),
+					// Sanitized marked-up text used in HTML/PDF
+					content: serializer([heading.node])
+				};
+			});
+		}
+
 		return {
 			id: `percollate-page-${uuid()}`,
 			url: final_url,
@@ -346,6 +365,7 @@ async function cleanup(url, options) {
 			),
 			lang,
 			textContent,
+			toc: nestHeadings(headings || []),
 			length: parsed.length,
 			siteName: sanitizer.sanitize(parsed.siteName),
 			remoteResources,
@@ -381,6 +401,12 @@ async function bundlePdf(items, options) {
 	const author =
 		options.author || (items.length === 1 ? items[0].byline : undefined);
 
+	// either explicit `--toc` or implicit ToC in the absence of `--no-toc`.
+	const use_toc =
+		options.toc ||
+		((items.length > 1 || options['toc-level'] > 1) &&
+			options.toc !== false);
+
 	const html = nunjucks.renderString(
 		await readFile(options.template || DEFAULT_TEMPLATE, 'utf8'),
 		{
@@ -391,8 +417,7 @@ async function bundlePdf(items, options) {
 			items,
 			style,
 			options: {
-				use_toc:
-					options.toc || (items.length > 1 && options.toc !== false),
+				use_toc,
 				use_cover:
 					options.cover ||
 					(options.cover !== false &&
@@ -573,6 +598,12 @@ async function bundleHtml(items, options) {
 		(options.hyphenate === true ? JUSTIFY_CSS : '') +
 		(options.css || '');
 
+	// either explicit `--toc` or implicit ToC in the absence of `--no-toc`.
+	const use_toc =
+		options.toc ||
+		((items.length > 1 || options['toc-level'] > 1) &&
+			options.toc !== false);
+
 	const html = nunjucks.renderString(
 		await readFile(options.template || DEFAULT_TEMPLATE, 'utf8'),
 		{
@@ -584,8 +615,7 @@ async function bundleHtml(items, options) {
 			items,
 			style,
 			options: {
-				use_toc:
-					options.toc || (items.length > 1 && options.toc !== false),
+				use_toc,
 				use_cover:
 					options.cover ||
 					(options.cover !== false &&
@@ -623,6 +653,12 @@ async function bundleMd(items, options) {
 		(options.hyphenate === true ? JUSTIFY_CSS : '') +
 		(options.css || '');
 
+	// either explicit `--toc` or implicit ToC in the absence of `--no-toc`.
+	const use_toc =
+		options.toc ||
+		((items.length > 1 || options['toc-level'] > 1) &&
+			options.toc !== false);
+
 	const html = nunjucks.renderString(
 		await readFile(options.template || DEFAULT_TEMPLATE, 'utf8'),
 		{
@@ -634,8 +670,7 @@ async function bundleMd(items, options) {
 			items,
 			style,
 			options: {
-				use_toc:
-					options.toc || (items.length > 1 && options.toc !== false),
+				use_toc,
 				use_cover:
 					options.cover ||
 					(options.cover !== false &&

@@ -1,4 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+{% macro toc(headings, item_id) %}
+<ol>
+	{% for heading in headings %}
+	<li>
+		<a href="{{item_id}}.xhtml#{{heading.id}}">{{ heading.text | e }}</a>
+		{% if heading.subheadings | length %} {{ toc(heading.subheadings,
+		item_id) }} {% endif %}
+	</li>
+	{% endfor %}
+</ol>
+{% endmacro %}
+
 <html
 	xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:epub="http://www.idpf.org/2007/ops"
@@ -13,6 +26,8 @@
 				{% for item in items %}
 				<li>
 					<a href="{{item.id}}.xhtml">{{ item.title | e }}</a>
+					{% if item.toc | length %} {{ toc(item.toc, item.id) }} {%
+					endif %}
 				</li>
 				{% endfor %}
 			</ol>

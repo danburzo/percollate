@@ -121,6 +121,10 @@ Commmon options:
   --toc                  Generate a Table of Contents.
                          Implicitly enabled when bundling more than one item.
 
+  --toc-level=<level>    A number between 1 (default) and 6, representing
+                         the maximum level of headings to include in the 
+                         Table of Contents. Implies '--toc'.
+
   --cover                Generate a cover for the PDF / EPUB.
                          Implicitly enabled when bundling more than one item
                          or the --title option is provided.
