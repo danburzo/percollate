@@ -820,7 +820,10 @@ async function epubgen(data, output_path, options) {
 
 		const output = fs.createWriteStream(output_path);
 		const archive = archiver('zip', {
-			store: true
+			zlib: {
+				// Best DEFLATE compression level
+				level: 9
+			}
 		});
 
 		output
@@ -833,7 +836,11 @@ async function epubgen(data, output_path, options) {
 		archive.on('warning', reject).on('error', reject).pipe(output);
 
 		// mimetype file must be first
-		archive.append('application/epub+zip', { name: 'mimetype' });
+		archive.append('application/epub+zip', {
+			name: 'mimetype',
+			// don’t compress the mimetype file as per EPUB spec
+			store: true
+		});
 
 		// static files from META-INF
 		archive.directory(path.join(template_base, 'META-INF'), 'META-INF');
