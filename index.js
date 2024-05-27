@@ -297,8 +297,6 @@ async function cleanup(url, options) {
 
 		err.write(' ✓\n');
 
-		console.log(getUrlOrigin(final_url));
-
 		if (options.inline) {
 			await inlineImages(
 				parsed.content,
@@ -314,7 +312,7 @@ async function cleanup(url, options) {
 						stripping the URL down to its origin, 
 						but just in case, let’s strip it ourselves.
 					*/
-					referrer: final_url,
+					referrer: getUrlOrigin(final_url),
 					referrerPolicy: 'strict-origin-when-cross-origin',
 					timeout: 10 * 1000
 				},
@@ -893,17 +891,23 @@ async function epubgen(data, output_path, options) {
 			let entry = remoteResources[i];
 			try {
 				if (options.debug) {
-					err.write(`Fetching: ${entry[0]}\n`);
+					err.write(`Fetching: ${entry.original}\n`);
 				}
 				let stream = (
-					await fetch(entry[0], {
+					await fetch(entry.original, {
 						headers: {
 							'user-agent': UA
 						},
+						/*
+							Send the referrer as the browser would 
+							when fetching the image to render it.
+						*/
+						referrer: entry.origin,
+						referrerPolicy: 'strict-origin-when-cross-origin',
 						timeout: 10 * 1000
 					})
 				).body;
-				archive.append(stream, { name: `OEBPS/${entry[1]}` });
+				archive.append(stream, { name: `OEBPS/${entry.mapped}` });
 			} catch (err) {
 				console.error(err);
 			}
@@ -958,9 +962,9 @@ async function epubgen(data, output_path, options) {
 				  }
 				: undefined,
 			remoteResources: remoteResources.map(entry => ({
-				id: entry[1].replace(/[^a-z0-9]/gi, ''),
-				href: entry[1],
-				mimetype: fileMimetype(entry[1])
+				id: entry.mapped.replace(/[^a-z0-9]/gi, ''),
+				href: entry.mapped,
+				mimetype: fileMimetype(entry.mapped)
 			}))
 		});
 
