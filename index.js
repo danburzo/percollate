@@ -33,6 +33,7 @@ import humanDate from './src/util/human-date.js';
 import outputPath from './src/util/output-path.js';
 import getCssPageFormat from './src/util/get-css-page-format.js';
 import { resolveSequence, resolveParallel } from './src/util/promises.js';
+import { getUrlOrigin } from './src/util/url-origin.js';
 import addExif from './src/exif.js';
 import { hyphenateDom } from './src/hyphenate.js';
 import { textToIso6391, getLanguageAttribute } from './src/util/language.js';
@@ -303,6 +304,16 @@ async function cleanup(url, options) {
 					headers: {
 						'user-agent': UA
 					},
+					/*
+						Send the referrer as the browser would 
+						when fetching the image to render it.
+
+						The referrer policy would take care of 
+						stripping the URL down to its origin, 
+						but just in case, let’s strip it ourselves.
+					*/
+					referrer: getUrlOrigin(final_url),
+					referrerPolicy: 'strict-origin-when-cross-origin',
 					timeout: 10 * 1000
 				},
 				options.debug ? out : undefined
@@ -880,17 +891,23 @@ async function epubgen(data, output_path, options) {
 			let entry = remoteResources[i];
 			try {
 				if (options.debug) {
-					err.write(`Fetching: ${entry[0]}\n`);
+					err.write(`Fetching: ${entry.original}\n`);
 				}
 				let stream = (
-					await fetch(entry[0], {
+					await fetch(entry.original, {
 						headers: {
 							'user-agent': UA
 						},
+						/*
+							Send the referrer as the browser would 
+							when fetching the image to render it.
+						*/
+						referrer: entry.origin,
+						referrerPolicy: 'strict-origin-when-cross-origin',
 						timeout: 10 * 1000
 					})
 				).body;
-				archive.append(stream, { name: `OEBPS/${entry[1]}` });
+				archive.append(stream, { name: `OEBPS/${entry.mapped}` });
 			} catch (err) {
 				console.error(err);
 			}
@@ -945,9 +962,9 @@ async function epubgen(data, output_path, options) {
 				  }
 				: undefined,
 			remoteResources: remoteResources.map(entry => ({
-				id: entry[1].replace(/[^a-z0-9]/gi, ''),
-				href: entry[1],
-				mimetype: fileMimetype(entry[1])
+				id: entry.mapped.replace(/[^a-z0-9]/gi, ''),
+				href: entry.mapped,
+				mimetype: fileMimetype(entry.mapped)
 			}))
 		});
 

@@ -1,6 +1,7 @@
 import { randomUUID as uuid } from 'node:crypto';
 import { parseSrcset, stringifySrcset } from 'srcset';
 import { REGEX_IMAGE_URL } from './constants/regex.js';
+import { getUrlOrigin } from './util/url-origin.js';
 
 export default function remoteResources(doc) {
 	let srcs = new Map();
@@ -21,9 +22,13 @@ export default function remoteResources(doc) {
 			return src;
 		}
 		if (!srcs.has(src)) {
-			srcs.set(src, `rr-${uuid()}.${match[1]}`);
+			srcs.set(src, {
+				original: src,
+				mapped: `rr-${uuid()}.${match[1]}`,
+				origin: getUrlOrigin(doc.baseURI)
+			});
 		}
-		return `./${srcs.get(src)}`;
+		return `./${srcs.get(src).mapped}`;
 	}
 
 	Array.from(doc.querySelectorAll('picture source[src], img[src]')).forEach(
@@ -63,5 +68,5 @@ export default function remoteResources(doc) {
 			console.error(err);
 		}
 	});
-	return Array.from(srcs.entries());
+	return Array.from(srcs.values());
 }
