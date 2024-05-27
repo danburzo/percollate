@@ -4,7 +4,8 @@ const DEFAULT_TITLE = 'Untitled page';
 const OPTS = { strict: true };
 
 function slugifyTitle(title, cache = {}) {
-	const res = slugify(title || DEFAULT_TITLE, OPTS);
+	const res =
+		slugify(title || DEFAULT_TITLE, OPTS) || `percollate-${Date.now()}`;
 	if (cache[res] !== undefined) {
 		cache[res] += 1;
 		return `${res}-${cache[res]}`;
