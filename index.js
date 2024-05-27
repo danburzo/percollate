@@ -33,6 +33,7 @@ import humanDate from './src/util/human-date.js';
 import outputPath from './src/util/output-path.js';
 import getCssPageFormat from './src/util/get-css-page-format.js';
 import { resolveSequence, resolveParallel } from './src/util/promises.js';
+import { getUrlOrigin } from './src/util/url-origin.js';
 import addExif from './src/exif.js';
 import { hyphenateDom } from './src/hyphenate.js';
 import { textToIso6391, getLanguageAttribute } from './src/util/language.js';
@@ -296,6 +297,8 @@ async function cleanup(url, options) {
 
 		err.write(' ✓\n');
 
+		console.log(getUrlOrigin(final_url));
+
 		if (options.inline) {
 			await inlineImages(
 				parsed.content,
@@ -303,6 +306,16 @@ async function cleanup(url, options) {
 					headers: {
 						'user-agent': UA
 					},
+					/*
+						Send the referrer as the browser would 
+						when fetching the image to render it.
+
+						The referrer policy would take care of 
+						stripping the URL down to its origin, 
+						but just in case, let’s strip it ourselves.
+					*/
+					referrer: final_url,
+					referrerPolicy: 'strict-origin-when-cross-origin',
 					timeout: 10 * 1000
 				},
 				options.debug ? out : undefined
