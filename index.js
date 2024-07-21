@@ -8,6 +8,8 @@ import pup from 'puppeteer';
 import archiver from 'archiver';
 import fetch from 'node-fetch';
 import { JSDOM } from 'jsdom';
+import validateNames from 'jsdom/lib/jsdom/living/helpers/validate-names.js';
+
 import nunjucks from 'nunjucks';
 import css from 'css';
 import { Readability } from '@mozilla/readability';
@@ -228,6 +230,18 @@ async function cleanup(url, options) {
 				: isURL(url)
 				? url
 				: 'file://' + path.resolve(url);
+
+		/*
+			Disable some validations in JSDOM to allow
+			some invalid HTML files to be processed correctly.
+
+			Currently done via monkey-patching. See:
+			https://github.com/danburzo/percollate/issues/177
+		*/
+		if (options.unsafe) {
+			// make no-op
+			validateNames.name = () => {};
+		}
 
 		const dom = new JSDOM(buffer, {
 			contentType,

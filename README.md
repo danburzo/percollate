@@ -180,6 +180,10 @@ const DEFAULT_MARKDOWN_OPTIONS = {
 };
 ```
 
+#### `--unsafe`
+
+Disables some [JSDOM validations](https://github.com/jsdom/jsdom/blob/main/lib/jsdom/living/helpers/validate-names.js) that may throw an error when parsing invalid HTML pages (See [#177](https://github.com/danburzo/percollate/issues/177)).
+
 ## Recipes
 
 ### Basic bundling
