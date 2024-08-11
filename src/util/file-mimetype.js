@@ -1,5 +1,16 @@
 import mimetype from 'mimetype';
 
+const IMAGE_MIMETYPES = new Set([
+	'image/avif',
+	'image/bmp',
+	'image/gif',
+	'image/jpeg',
+	'image/png',
+	'image/svg+xml',
+	'image/tiff',
+	'image/webp'
+]);
+
 /*
 	Add newer image formats to the MIME type database.
  */
@@ -25,16 +36,5 @@ export function getMimetypeFromURL(src, doc) {
 }
 
 export function isImageURL(src, doc) {
-	return imageMimetypes.has(getMimetypeFromURL(src, doc));
+	return IMAGE_MIMETYPES.has(getMimetypeFromURL(src, doc));
 }
-
-export const imageMimetypes = new Set([
-	'image/avif',
-	'image/bmp',
-	'image/gif',
-	'image/jpeg',
-	'image/png',
-	'image/svg+xml',
-	'image/tiff',
-	'image/webp'
-]);
