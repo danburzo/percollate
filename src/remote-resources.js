@@ -1,6 +1,10 @@
 import { randomUUID as uuid } from 'node:crypto';
 import { parseSrcset, stringifySrcset } from 'srcset';
-import { REGEX_IMAGE_URL } from './constants/regex.js';
+import {
+	getMimetypeFromURL,
+	extForMimetype,
+	isImageURL
+} from './util/file-mimetype.js';
 import { getUrlOrigin } from './util/url-origin.js';
 
 export default function remoteResources(doc) {
@@ -11,21 +15,24 @@ export default function remoteResources(doc) {
 		and return a uniquely generated file name instead.
 	 */
 	function collectAndReplace(src) {
-		let pathname = src;
-		try {
-			pathname = new URL(src, doc.baseURI).pathname;
-		} catch (err) {
-			// no-op, probably due to bad `doc.baseURI`.
-		}
-		let match = pathname.match(REGEX_IMAGE_URL);
-		if (!match) {
-			return src;
+		/*
+			If image URLs don’t have an extension with which
+			to figure out the image format, use the generic
+			`image` MIME media type and the `.image` extension
+			for EPUB remote resources.
+		*/
+		let mime = 'image',
+			ext = '.image';
+		if (isImageURL(src, doc)) {
+			mime = getMimetypeFromURL(src, doc);
+			ext = extForMimetype(mime);
 		}
 		if (!srcs.has(src)) {
 			srcs.set(src, {
 				original: src,
-				mapped: `rr-${uuid()}.${match[1]}`,
-				origin: getUrlOrigin(doc.baseURI)
+				mapped: `rr-${uuid()}${ext}`,
+				origin: getUrlOrigin(doc.baseURI),
+				mimetype: mime
 			});
 		}
 		return `./${srcs.get(src).mapped}`;

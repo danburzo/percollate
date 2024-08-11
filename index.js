@@ -29,7 +29,7 @@ import {
 } from './src/constants/markdown.js';
 
 import slurp from './src/util/slurp.js';
-import fileMimetype from './src/util/file-mimetype.js';
+import { lookupMimetype } from './src/util/file-mimetype.js';
 import epubDate from './src/util/epub-date.js';
 import humanDate from './src/util/human-date.js';
 import outputPath from './src/util/output-path.js';
@@ -169,7 +169,7 @@ async function fetchContent(ref, fetchOptions = {}) {
 	if (!url) {
 		return {
 			buffer: await readFile(ref),
-			contentType: fileMimetype(ref)
+			contentType: lookupMimetype(ref)
 		};
 	}
 
@@ -177,7 +177,7 @@ async function fetchContent(ref, fetchOptions = {}) {
 		url = decodeURI(url.href.replace(/^file:\/\//, ''));
 		return {
 			buffer: await readFile(url),
-			contentType: fileMimetype(url)
+			contentType: lookupMimetype(url)
 		};
 	}
 
@@ -978,7 +978,7 @@ async function epubgen(data, output_path, options) {
 			remoteResources: remoteResources.map(entry => ({
 				id: entry.mapped.replace(/[^a-z0-9]/gi, ''),
 				href: entry.mapped,
-				mimetype: fileMimetype(entry.mapped)
+				mimetype: entry.mimetype
 			}))
 		});
 
