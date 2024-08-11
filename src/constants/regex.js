@@ -5,6 +5,6 @@
 	to discern when an URL points to an image, but here we are.
 	
 	`REGEX_IMAGE_URL` here needs to be kept in sync 
-	with the `image_mimetypes` set defined in `inline-images.js`.
+	with the `imageMimetypes` set defined in `file-mimetype.js`.
 */
 export const REGEX_IMAGE_URL = /\.(jpe?g|png|svg|gif|bmp|webp|avif|tiff?)$/i;

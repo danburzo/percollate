@@ -1,24 +1,6 @@
 import { parseSrcset, stringifySrcset } from 'srcset';
-import fileMimetype from './util/file-mimetype.js';
+import { lookupMimetype, imageMimetypes } from './util/file-mimetype.js';
 import fetchBase64 from './util/fetch-base64.js';
-
-/* 
-	Note: it is unfortunate that we use two separate mechanisms
-	to discern when an URL points to an image, but here we are.
-
-	`image_mimetypes` here needs to be kept in sync with the
-	`REGEX_IMAGE_URL` constant!
-*/
-const image_mimetypes = new Set([
-	'image/avif',
-	'image/bmp',
-	'image/gif',
-	'image/jpeg',
-	'image/png',
-	'image/svg+xml',
-	'image/tiff',
-	'image/webp'
-]);
 
 function get_mime(src, doc) {
 	let pathname = src;
@@ -27,7 +9,7 @@ function get_mime(src, doc) {
 	} catch (err) {
 		// no-op, probably due to bad `doc.baseURI`
 	}
-	return fileMimetype(pathname);
+	return lookupMimetype(pathname);
 }
 
 export default async function inlineImages(doc, fetchOptions = {}, out) {
@@ -37,14 +19,22 @@ export default async function inlineImages(doc, fetchOptions = {}, out) {
 	let src_promises = Array.from(
 		doc.querySelectorAll('picture source[src], img[src]')
 	).map(async el => {
-		const mime = get_mime(el.src, doc);
-		if (mime && image_mimetypes.has(mime)) {
-			if (out) {
-				out.write(el.src + '\n');
-			}
-			let data = await fetchBase64(el.src, fetchOptions);
-			el.setAttribute('src', `data:${mime};base64,${data}`);
+		let mime = get_mime(el.src, doc);
+		/*
+			For web pages using atypical URLs for images
+			let’s just use a generic MIME type and hope it works.
+			
+			For an example, see:
+			https://github.com/danburzo/percollate/issues/174
+		*/
+		if (!mime || !imageMimetypes.has(mime)) {
+			mime = 'image';
 		}
+		if (out) {
+			out.write(el.src + '\n');
+		}
+		let data = await fetchBase64(el.src, fetchOptions);
+		el.setAttribute('src', `data:${mime};base64,${data}`);
 	});
 
 	let srcset_promises = Array.from(
@@ -71,18 +61,26 @@ export default async function inlineImages(doc, fetchOptions = {}, out) {
 				stringifySrcset(
 					await Promise.all(
 						items.map(async item => {
-							const mime = get_mime(item.url, doc);
-							if (mime && image_mimetypes.has(mime)) {
-								let data = await fetchBase64(
-									item.url,
-									fetchOptions
-								);
-								return {
-									...item,
-									url: `data:${mime};base64,${data}`
-								};
+							let mime = get_mime(item.url, doc);
+
+							/*
+								For web pages using atypical URLs for images
+								let’s just use a generic MIME type and hope it works.
+								
+								For an example, see:
+								https://github.com/danburzo/percollate/issues/174
+							*/
+							if (!mime || !imageMimetypes.has(mime)) {
+								mime = 'image';
 							}
-							return item;
+							let data = await fetchBase64(
+								item.url,
+								fetchOptions
+							);
+							return {
+								...item,
+								url: `data:${mime};base64,${data}`
+							};
 						})
 					)
 				)
