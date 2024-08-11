@@ -1,6 +1,10 @@
 import { randomUUID as uuid } from 'node:crypto';
 import { parseSrcset, stringifySrcset } from 'srcset';
-import { REGEX_IMAGE_URL } from './constants/regex.js';
+import {
+	getMimetypeFromURL,
+	imageMimetypes,
+	extForMimetype
+} from './util/file-mimetype.js';
 import { getUrlOrigin } from './util/url-origin.js';
 
 export default function remoteResources(doc) {
@@ -11,21 +15,20 @@ export default function remoteResources(doc) {
 		and return a uniquely generated file name instead.
 	 */
 	function collectAndReplace(src) {
-		let pathname = src;
-		try {
-			pathname = new URL(src, doc.baseURI).pathname;
-		} catch (err) {
-			// no-op, probably due to bad `doc.baseURI`.
-		}
-		let match = pathname.match(REGEX_IMAGE_URL);
-		if (!match) {
-			return src;
+		let ext;
+		let mime = getMimetypeFromURL(src);
+		if (mime && imageMimetypes.has(mime)) {
+			ext = extForMimetype(mime);
+		} else {
+			ext = '.image';
+			mime = 'image';
 		}
 		if (!srcs.has(src)) {
 			srcs.set(src, {
 				original: src,
-				mapped: `rr-${uuid()}.${match[1]}`,
-				origin: getUrlOrigin(doc.baseURI)
+				mapped: `rr-${uuid()}${ext}`,
+				origin: getUrlOrigin(doc.baseURI),
+				mimetype: mime
 			});
 		}
 		return `./${srcs.get(src).mapped}`;

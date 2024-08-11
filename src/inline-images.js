@@ -1,16 +1,6 @@
 import { parseSrcset, stringifySrcset } from 'srcset';
-import { lookupMimetype, imageMimetypes } from './util/file-mimetype.js';
+import { getMimetypeFromURL, imageMimetypes } from './util/file-mimetype.js';
 import fetchBase64 from './util/fetch-base64.js';
-
-function get_mime(src, doc) {
-	let pathname = src;
-	try {
-		pathname = new URL(src, doc.baseURI).pathname;
-	} catch (err) {
-		// no-op, probably due to bad `doc.baseURI`
-	}
-	return lookupMimetype(pathname);
-}
 
 export default async function inlineImages(doc, fetchOptions = {}, out) {
 	if (out) {
@@ -19,7 +9,7 @@ export default async function inlineImages(doc, fetchOptions = {}, out) {
 	let src_promises = Array.from(
 		doc.querySelectorAll('picture source[src], img[src]')
 	).map(async el => {
-		let mime = get_mime(el.src, doc);
+		let mime = getMimetypeFromURL(el.src, doc);
 		/*
 			For web pages using atypical URLs for images
 			let’s just use a generic MIME type and hope it works.
@@ -61,7 +51,7 @@ export default async function inlineImages(doc, fetchOptions = {}, out) {
 				stringifySrcset(
 					await Promise.all(
 						items.map(async item => {
-							let mime = get_mime(item.url, doc);
+							let mime = getMimetypeFromURL(item.url, doc);
 
 							/*
 								For web pages using atypical URLs for images

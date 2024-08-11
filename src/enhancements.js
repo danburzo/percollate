@@ -1,6 +1,6 @@
 import { parseSrcset, stringifySrcset } from 'srcset';
 import replaceElementType from './replace-element-type.js';
-import { REGEX_IMAGE_URL } from './constants/regex.js';
+import { isImageURL } from './util/file-mimetype.js';
 
 /* 
 	Convert AMP markup to HMTL markup
@@ -52,7 +52,6 @@ function fixLazyLoadedImages(doc) {
 		<img src='original-size.png'/>
 */
 function imagesAtFullSize(doc) {
-	let include_pattern = REGEX_IMAGE_URL;
 	let exclude_patterns = [
 		/*
 			Exclude Wikipedia links to image file pages
@@ -85,7 +84,7 @@ function imagesAtFullSize(doc) {
 
 		// Only replace if the `href` matches an image file
 		if (
-			include_pattern.test(href) &&
+			isImageURL(href, doc) &&
 			!exclude_patterns.some(pattern => pattern.test(href))
 		) {
 			img.setAttribute('src', anchor.href);

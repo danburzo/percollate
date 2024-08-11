@@ -10,17 +10,24 @@ export function lookupMimetype(filepath) {
 	return mimetype.lookup(filepath);
 }
 
-export function extForMimetype(mimetype) {
-	return Object.entries(mimetype.catalog).find(it => it[1] === mimetype)?.[0];
+export function extForMimetype(type) {
+	return Object.entries(mimetype.catalog).find(it => it[1] === type)?.[0];
 }
 
-/* 
-	Note: it is unfortunate that we use two separate mechanisms
-	to discern when an URL points to an image, but here we are.
+export function getMimetypeFromURL(src, doc) {
+	let pathname = src;
+	try {
+		pathname = new URL(src, doc.baseURI).pathname;
+	} catch (err) {
+		// no-op, probably due to bad `doc.baseURI`
+	}
+	return lookupMimetype(pathname);
+}
 
-	`imageMimetypes` here needs to be kept in sync with the
-	`REGEX_IMAGE_URL` constant!
-*/
+export function isImageURL(src, doc) {
+	return imageMimetypes.has(getMimetypeFromURL(src, doc));
+}
+
 export const imageMimetypes = new Set([
 	'image/avif',
 	'image/bmp',

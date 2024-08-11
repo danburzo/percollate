@@ -978,7 +978,7 @@ async function epubgen(data, output_path, options) {
 			remoteResources: remoteResources.map(entry => ({
 				id: entry.mapped.replace(/[^a-z0-9]/gi, ''),
 				href: entry.mapped,
-				mimetype: lookupMimetype(entry.mapped)
+				mimetype: entry.mimetype
 			}))
 		});
 
