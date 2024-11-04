@@ -3,7 +3,7 @@ import replaceElementType from './replace-element-type.js';
 import { isImageURL } from './util/file-mimetype.js';
 
 /* 
-	Convert AMP markup to HMTL markup
+	Convert AMP markup to HTML markup
 	(naive / incomplete implementation)
 */
 function ampToHtml(doc) {

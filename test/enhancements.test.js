@@ -87,7 +87,7 @@ tape('imagesAtFullSize', t => {
 	);
 
 	t.test(
-		'should not unlink linked img elements if the link doesnt point to an image',
+		'should not unlink linked img elements if the link doesn\'t point to an image',
 		t => {
 			const doc = dom`
             <a href="/some-random-link">
