@@ -89,7 +89,7 @@ Commands:
   html                   Bundle web pages as a HTML file.
   md                     Bundle web pages as a Markdown file.
 
-Commmon options:
+Common options:
 
   -h, --help             Output usage information.
   -V, --version          Output program version.

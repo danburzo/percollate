@@ -353,7 +353,7 @@ To keep the tool up-to-date, you can run:
 npm install -g percollate
 ```
 
-Occasionally, an ugrade might not go according to plan; in this case, you can uninstall and re-install `percollate`:
+Occasionally, an upgrade might not go according to plan; in this case, you can uninstall and re-install `percollate`:
 
 ```bash
 npm uninstall -g percollate && npm install -g percollate
