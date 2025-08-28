@@ -51,21 +51,37 @@ function fixLazyLoadedImages(doc) {
 
 		<img src='original-size.png'/>
 */
-function imagesAtFullSize(doc) {
-	let exclude_patterns = [
-		/*
+
+const IMAGE_EXCLUDE_PATTERNS = [
+	/*
 			Exclude Wikipedia links to image file pages
 		*/
-		/wikipedia\.org\/wiki\/[a-z]+:/i,
+	/wikipedia\.org\/wiki\/[a-z]+:/i,
 
-		/* 
+	/* 
 			Exclude images embedded in Markdown files
 			hosted on github.com.
 			See: https://github.com/danburzo/percollate/issues/84
 		*/
-		/github\.com/
-	];
+	/github\.com/
+];
 
+/*
+	Some image URLs can be used but must be adjusted
+*/
+const IMAGE_URL_MAPPERS = [
+	/* 
+		Some Blogger images use a /s1600-h/ segment
+		that loads an HTML file with an <img> element,
+		while /s1600/ loads the image itself.
+	*/
+	{
+		matcher: /\/blogger.googleusercontent.com\/img\//,
+		replace: url => url.replace(/\/(s\d+)-h\//, '/$1/')
+	}
+];
+
+function imagesAtFullSize(doc) {
 	Array.from(doc.querySelectorAll('a > img:only-child')).forEach(img => {
 		let anchor = img.parentNode;
 
@@ -85,9 +101,15 @@ function imagesAtFullSize(doc) {
 		// Only replace if the `href` matches an image file
 		if (
 			isImageURL(href, doc) &&
-			!exclude_patterns.some(pattern => pattern.test(href))
+			!IMAGE_EXCLUDE_PATTERNS.some(pattern => pattern.test(href))
 		) {
-			img.setAttribute('src', anchor.href);
+			href = anchor.href;
+			IMAGE_URL_MAPPERS.forEach(it => {
+				if (it.matcher.test(href)) {
+					href = it.replace(href);
+				}
+			});
+			img.setAttribute('src', href);
 			anchor.parentNode.replaceChild(img, anchor);
 		}
 	});
