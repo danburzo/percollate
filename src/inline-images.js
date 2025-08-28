@@ -23,6 +23,7 @@ export default async function inlineImages(doc, fetchOptions = {}, out) {
 			out.write(el.src + '\n');
 		}
 		let data = await fetchBase64(el.src, fetchOptions);
+		el.dataset.originalSrc = el.getAttribute('src');
 		el.setAttribute('src', `data:${mime};base64,${data}`);
 	});
 
@@ -44,7 +45,9 @@ export default async function inlineImages(doc, fetchOptions = {}, out) {
 			return;
 		}
 		try {
-			const items = parseSrcset(el.getAttribute('srcset'));
+			const srcset = el.getAttribute('srcset');
+			const items = parseSrcset(srcset);
+			el.dataset.originalSrcset = srcset;
 			el.setAttribute(
 				'srcset',
 				stringifySrcset(
