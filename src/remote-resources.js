@@ -5,7 +5,7 @@ import {
 	extForMimetype,
 	isImageURL
 } from './util/file-mimetype.js';
-import { getUrlOrigin } from './util/url-origin.js';
+import { getURLOrigin } from './util/url.js';
 
 export default function remoteResources(doc) {
 	let srcs = new Map();
@@ -31,7 +31,7 @@ export default function remoteResources(doc) {
 			srcs.set(src, {
 				original: src,
 				mapped: `rr-${uuid()}${ext}`,
-				origin: getUrlOrigin(doc.baseURI),
+				origin: getURLOrigin(doc.baseURI),
 				mimetype: mime
 			});
 		}

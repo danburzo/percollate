@@ -36,7 +36,7 @@ import { resolveSequence, resolveParallel } from './src/util/promises.js';
 import addExif from './src/exif.js';
 
 import { isURL } from './src/util/url.js';
-import { isFeed, processFeed } from './src/util/feeds.js';
+import { isFeed, processFeed } from './src/feeds.js';
 
 import get_style_attribute_value from './src/get-style-attribute-value.js';
 

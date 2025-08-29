@@ -5,7 +5,7 @@ import createDOMPurify from 'dompurify';
 
 import { hyphenateDom } from './hyphenate.js';
 import { textToIso6391, getLanguageAttribute } from './util/language.js';
-import { getUrlOrigin } from './util/url-origin.js';
+import { getURLOrigin } from './util/url.js';
 import { setIdsAndReturnHeadings, nestHeadings } from './headings.js';
 
 import {
@@ -120,7 +120,7 @@ export default async function cleanupItem(
 					stripping the URL down to its origin, 
 					but just in case, let’s strip it ourselves.
 				*/
-				referrer: getUrlOrigin(url),
+				referrer: getURLOrigin(url),
 				referrerPolicy: 'strict-origin-when-cross-origin',
 				timeout: 10 * 1000
 			},

@@ -1,5 +1,11 @@
-import { isURL } from './url.js';
+import { isURL } from './util/url.js';
 
+/*
+	Specification:
+	
+	RFC 4287: The Atom Syndication Format
+	https://datatracker.ietf.org/doc/html/rfc4287
+*/
 function isAtomFeed(doc) {
 	return (
 		doc.documentElement.localName === 'feed' &&
@@ -7,6 +13,12 @@ function isAtomFeed(doc) {
 	);
 }
 
+/*
+	Specification:
+
+	RSS 2.0 Specification
+	https://www.rssboard.org/rss-specification
+*/
 function isRssFeed(doc) {
 	return doc.documentElement.localName === 'rss';
 }
