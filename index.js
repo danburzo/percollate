@@ -67,7 +67,11 @@ const JUSTIFY_CSS = `
 let configured = false;
 function configure() {
 	if (!configured) {
-		nunjucks.configure({ autoescape: false, noCache: true });
+		const env = nunjucks.configure({
+			autoescape: false,
+			noCache: true
+		});
+		env.addFilter('humandate', humanDate);
 		configured = true;
 	}
 }
@@ -299,7 +303,7 @@ async function bundlePdf(items, options) {
 			filetype: 'pdf',
 			title,
 			author,
-			date: humanDate(new Date()),
+			date: new Date(),
 			items,
 			style,
 			options: {
@@ -497,7 +501,7 @@ async function bundleHtml(items, options) {
 			title:
 				options.title ||
 				(items.length === 1 ? items[0].title : 'Untitled'),
-			date: humanDate(new Date()),
+			date: new Date(),
 			items,
 			style,
 			options: {
@@ -552,7 +556,7 @@ async function bundleMd(items, options) {
 			title:
 				options.title ||
 				(items.length === 1 ? items[0].title : 'Untitled'),
-			date: humanDate(new Date()),
+			date: new Date(),
 			items,
 			style,
 			options: {

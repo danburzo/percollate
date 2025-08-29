@@ -173,6 +173,8 @@ export default async function cleanupItem(
 		url,
 		title: sanitizer.sanitize(parsed.title),
 		byline: sanitizer.sanitize(parsed.byline),
+		published: sanitizer.sanitize(parsed.published || parsed.publishedTime),
+		updated: sanitizer.sanitize(parsed.updated),
 		dir: sanitizer.sanitize(parsed.dir),
 		excerpt: serializer(sanitize_to_dom(parsed.excerpt)),
 		content: serializer(
