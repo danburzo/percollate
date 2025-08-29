@@ -239,6 +239,21 @@ percollate epub --individual https://example.com/posts.xml
 
 The content of the articles is read from the feed file rather than fetched anew. The content is passed through the DOM enhancements and sanitized as usual, but it’s not processed with Readability.
 
+<details>
+<summary>To fetch the HTML pages for entries in Atom and RSS feeds</summary>
+
+If instead you’d like to fetch and process the original HTML pages corresponding to the entries in the Atom/RSS feed, use [`hred`](https://github.com/danburzo/hred/) to extract the URLs and feed them to percollate with `xargs`.
+
+Below is an example `hred` query for extracting URLs from Atom feeds, explained in more detail on the [hred recipes](https://danburzo.ro/toolbox/hred/) page.
+
+```bash
+curl https://example.com/posts.xml | \
+hred -xcr 'entry > link:is([rel=alternate],:not([rel]))@href' | \
+xargs percollate epub
+```
+
+</details>
+
 ### The `--css` option
 
 The `--css` option lets you pass a small snippet of CSS to percollate. Here are some common use-cases:
