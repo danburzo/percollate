@@ -1,6 +1,13 @@
-export default function humanDate(d) {
-	const pad = num => (num < 10 ? '0' + num : num);
-	return `${pad(d.getUTCFullYear())}-${pad(d.getUTCMonth() + 1)}-${pad(
-		d.getUTCDate()
-	)}`;
+const dateTimeFormatter = new Intl.DateTimeFormat('en', {
+	dateStyle: 'medium',
+	timeStyle: 'short'
+});
+
+const dateFormatter = new Intl.DateTimeFormat('en', {
+	dateStyle: 'medium'
+});
+
+export default function humanDate(date, includeTime = false) {
+	const d = new Date(date);
+	return includeTime ? dateTimeFormatter.format(d) : dateFormatter.format(d);
 }

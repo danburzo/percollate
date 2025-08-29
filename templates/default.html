@@ -31,7 +31,7 @@
 				<h1 class="cover__title">{{ title }}</h1>
 				<p class="cover__subtitle">
 					<time class="cover__date" datetime="{{ date }}"
-						>{{ date }}</time
+						>{{ date | humandate }}</time
 					>
 				</p>
 			</div>
@@ -57,6 +57,18 @@
 				<h1 class="article__title">{{ item.title }}</h1>
 				{% if item.byline %}
 				<p class="article__byline">By <span>{{ item.byline }}</span></p>
+				{% endif %} {% if item.published %}
+				<p class="article__time">
+					Published
+					<time datetime="{{item.published}}">
+						{{item.published | humandate(true) }} </time
+					>{% if item.updated and item.updated !== item.published %}
+					&middot; Updated
+					<time datetime="{{item.updated}}">
+						{{item.updated | humandate(true) }}
+					</time>
+					{% endif %}
+				</p>
 				{% endif %}
 				<p class="article__url">
 					Source:

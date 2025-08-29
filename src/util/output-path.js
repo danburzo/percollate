@@ -27,7 +27,7 @@ export default function (items, options = {}, ext, cache = {}) {
 	if (options.output) {
 		return options.output;
 	}
-	if (items.length > 1) {
+	if (!items.length || items.length > 1) {
 		return `percollate-${Date.now()}${ext || ''}`;
 	}
 	return slugifyTitle(items[0].title, cache) + (ext || '');

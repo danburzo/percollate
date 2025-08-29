@@ -12,8 +12,6 @@ import validateNames from 'jsdom/lib/jsdom/living/helpers/validate-names.js';
 
 import nunjucks from 'nunjucks';
 import css from 'css';
-import { Readability } from '@mozilla/readability';
-import createDOMPurify from 'dompurify';
 import MimeType from 'whatwg-mimetype';
 
 /*
@@ -35,27 +33,15 @@ import humanDate from './src/util/human-date.js';
 import outputPath from './src/util/output-path.js';
 import getCssPageFormat from './src/util/get-css-page-format.js';
 import { resolveSequence, resolveParallel } from './src/util/promises.js';
-import { getUrlOrigin } from './src/util/url-origin.js';
 import addExif from './src/exif.js';
-import { hyphenateDom } from './src/hyphenate.js';
-import { textToIso6391, getLanguageAttribute } from './src/util/language.js';
-import { setIdsAndReturnHeadings, nestHeadings } from './src/headings.js';
 
-import {
-	ampToHtml,
-	fixLazyLoadedImages,
-	imagesAtFullSize,
-	wikipediaSpecific,
-	noUselessHref,
-	relativeToAbsoluteURIs,
-	singleImgToFigure,
-	expandDetailsElements,
-	githubSpecific,
-	wrapPreBlocks
-} from './src/enhancements.js';
-import mapRemoteResources from './src/remote-resources.js';
-import inlineImages from './src/inline-images.js';
+import { isURL } from './src/util/url.js';
+import { isFeed, processFeed } from './src/feeds.js';
+
 import get_style_attribute_value from './src/get-style-attribute-value.js';
+
+import cleanupItem from './src/cleanup-item.js';
+import wrapHTMLFragment from './src/util/wrap-html-fragment.js';
 
 const out = process.stdout;
 const err = process.stderr;
@@ -74,24 +60,6 @@ const JUSTIFY_CSS = `
 	}
 `;
 
-const enhancePage = function (dom) {
-	// Note: the order of the enhancements matters!
-	[
-		ampToHtml,
-		fixLazyLoadedImages,
-		relativeToAbsoluteURIs,
-		imagesAtFullSize,
-		singleImgToFigure,
-		noUselessHref,
-		expandDetailsElements,
-		wikipediaSpecific,
-		githubSpecific,
-		wrapPreBlocks
-	].forEach(enhancement => {
-		enhancement(dom.window.document);
-	});
-};
-
 /*
 	Some setup
 	----------
@@ -99,7 +67,11 @@ const enhancePage = function (dom) {
 let configured = false;
 function configure() {
 	if (!configured) {
-		nunjucks.configure({ autoescape: false, noCache: true });
+		const env = nunjucks.configure({
+			autoescape: false,
+			noCache: true
+		});
+		env.addFilter('humandate', humanDate);
 		configured = true;
 	}
 }
@@ -140,16 +112,6 @@ function launch(options, size) {
 	Fetch a web page and clean the HTML
 	-----------------------------------
  */
-
-function isURL(ref) {
-	try {
-		new URL(ref);
-		return true;
-	} catch (err) {
-		// no-op
-	}
-	return false;
-}
 
 async function fetchContent(ref, fetchOptions = {}) {
 	if (ref instanceof stream.Readable) {
@@ -248,152 +210,65 @@ async function cleanup(url, options) {
 			url: final_url
 		});
 
-		// Force relative URL resolution
-		dom.window.document.body.setAttribute(null, null);
+		const doc = dom.window.document;
 
-		const sanitizer = createDOMPurify(dom.window);
+		// Stop-gap solution as some of these are still referenced in cleanupItem()
+		const ENV = {
+			err,
+			out,
+			UA
+		};
 
-		const amp = dom.window.document.querySelector('link[rel~=amphtml]');
+		/*
+			If the file is a valid RSS/Atom feed
+			extract the feed entries to be processed further.
+		*/
+
+		if (isFeed(doc)) {
+			const w = options.wait * 1000;
+			const entries = processFeed(doc);
+			return resolveSequence(
+				entries,
+				async entry => {
+					const itemDOM = new JSDOM(wrapHTMLFragment(entry), {
+						url: entry.url
+					});
+					entry.content = itemDOM.window.document.body;
+					const clean = await cleanupItem(
+						itemDOM,
+						options,
+						entry,
+						ENV
+					);
+					return {
+						...clean,
+						// TODO
+						originalContent: {
+							buffer: null,
+							contentType: 'text/html'
+						}
+					};
+				},
+				Number.isFinite(w) && w >= 0 ? w : 0
+			);
+		}
+
+		/*
+			Use the AMP version of the article 
+			if one is available and the user has not opted out.
+		*/
+		const amp = doc.querySelector('link[rel~=amphtml]');
 		if (amp && options.amp) {
 			err.write('\nFound AMP version (use `--no-amp` to ignore)\n');
 			return cleanup(amp.href, options, amp.href);
 		}
 
-		err.write(`Enhancing web page: ${url}`);
-
-		/* 
-			Run enhancements
-			----------------
-		*/
-		enhancePage(dom);
-
-		// Run through readability and return
-		const R = new Readability(dom.window.document, {
-			classesToPreserve: [
-				'no-href',
-
-				/*
-					Placed on some <a> elements
-					as in-page anchors
-				 */
-				'anchor'
-			],
-			/*
-				Change Readability's serialization to return 
-				a DOM element (instead of a HTML string) 
-				as the `.content` property returned from `.parse()`
-
-				This makes it easier for us to run subsequent
-				transformations (sanitization, hyphenation, etc.)
-				without having to parse/serialize the HTML repeatedly.
-			 */
-			serializer: el => el
-		});
-
-		// TODO: find better solution to prevent Readability from
-		// making img srcs relative.
-		if (options.mapRemoteResources || options.inline) {
-			R._fixRelativeUris = () => {};
-		}
-
-		const parsed = R.parse() || {};
-
-		let remoteResources;
-		if (options.mapRemoteResources) {
-			remoteResources = mapRemoteResources(parsed.content);
-		}
-
-		// Hyphenate the text
-		const textContent = sanitizer.sanitize(parsed.textContent);
-		const lang =
-			getLanguageAttribute(dom.window.document) ||
-			textToIso6391(textContent);
-
-		err.write(' ✓\n');
-
-		if (options.inline) {
-			await inlineImages(
-				parsed.content,
-				{
-					headers: {
-						'user-agent': UA
-					},
-					/*
-						Send the referrer as the browser would 
-						when fetching the image to render it.
-
-						The referrer policy would take care of 
-						stripping the URL down to its origin, 
-						but just in case, let’s strip it ourselves.
-					*/
-					referrer: getUrlOrigin(final_url),
-					referrerPolicy: 'strict-origin-when-cross-origin',
-					timeout: 10 * 1000
-				},
-				options.debug ? out : undefined
-			);
-		}
-
-		/*
-			Select the appropriate serialization method
-			based on the bundle target. EPUBs need the 
-			content to be XHTML (produced by a XML serializer),
-			rather than normal HTML.
-		 */
-		const serializer = options.xhtml
-			? arr => {
-					const xs = new dom.window.XMLSerializer();
-					return arr.map(el => xs.serializeToString(el)).join('');
-			  }
-			: arr => arr.map(el => el.innerHTML).join('');
-
-		/*
-			When dompurify returns a DOM node, it always wraps it 
-			in a HTMLBodyElement. We only need its children.
-		 */
-		const sanitize_to_dom = dirty =>
-			Array.from(
-				sanitizer.sanitize(dirty, { RETURN_DOM: true }).children
-			);
-
-		const content_els = sanitize_to_dom(parsed.content);
-
-		// `--toc-level` implies `--toc`, unless disabled with `--no-toc`.
-		let headings = [];
-		if (options['toc-level'] > 1 && options.toc !== false) {
-			headings = setIdsAndReturnHeadings(
-				content_els,
-				options['toc-level']
-			).map(heading => {
-				return {
-					id: heading.id,
-					level: heading.level,
-					// Plain text used in EPUB
-					text: heading.node.textContent.trim(),
-					// Sanitized marked-up text used in HTML/PDF
-					content: serializer([heading.node])
-				};
-			});
-		}
-
 		return {
-			id: `percollate-page-${uuid()}`,
-			url: final_url,
-			title: sanitizer.sanitize(parsed.title),
-			byline: sanitizer.sanitize(parsed.byline),
-			dir: sanitizer.sanitize(parsed.dir),
-			excerpt: serializer(sanitize_to_dom(parsed.excerpt)),
-			content: serializer(
-				options.hyphenate === true
-					? content_els.map(el => hyphenateDom(el, lang))
-					: content_els
-			),
-			lang,
-			textContent,
-			toc: nestHeadings(headings || []),
-			length: parsed.length,
-			siteName: sanitizer.sanitize(parsed.siteName),
-			remoteResources,
+			...(await cleanupItem(dom, options, null, ENV)),
+			/* 
+				Augument for original content, useful when
+				percollate is used as an API.
+			*/
 			originalContent: {
 				buffer,
 				contentType
@@ -438,7 +313,7 @@ async function bundlePdf(items, options) {
 			filetype: 'pdf',
 			title,
 			author,
-			date: humanDate(new Date()),
+			date: new Date(),
 			items,
 			style,
 			options: {
@@ -636,7 +511,7 @@ async function bundleHtml(items, options) {
 			title:
 				options.title ||
 				(items.length === 1 ? items[0].title : 'Untitled'),
-			date: humanDate(new Date()),
+			date: new Date(),
 			items,
 			style,
 			options: {
@@ -691,7 +566,7 @@ async function bundleMd(items, options) {
 			title:
 				options.title ||
 				(items.length === 1 ? items[0].title : 'Untitled'),
-			date: humanDate(new Date()),
+			date: new Date(),
 			items,
 			style,
 			options: {
@@ -762,7 +637,9 @@ async function generate(fn, urls, options = {}) {
 			},
 			w
 		)
-	).filter(it => it);
+	)
+		.filter(it => it)
+		.flat();
 
 	if (options.individual) {
 		await Promise.all(items.map(item => fn([item], options)));
@@ -995,6 +872,5 @@ async function epubgen(data, output_path, options) {
 export { configure, pdf, epub, html, md };
 
 export const __test__ = {
-	fetchContent,
-	isURL
+	fetchContent
 };
