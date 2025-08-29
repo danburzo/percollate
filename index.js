@@ -223,14 +223,23 @@ async function cleanup(url, options) {
 			If the file is a valid RSS/Atom feed
 			extract the feed entries to be processed further.
 		*/
+
 		if (isFeed(doc)) {
-			return await Promise.all(
-				processFeed(doc).map(async it => {
-					const itemDOM = new JSDOM(wrapHTMLFragment(it), {
-						url: it.url
+			const w = options.wait * 1000;
+			const entries = processFeed(doc);
+			return resolveSequence(
+				entries,
+				async entry => {
+					const itemDOM = new JSDOM(wrapHTMLFragment(entry), {
+						url: entry.url
 					});
-					it.content = itemDOM.window.document.body;
-					const clean = await cleanupItem(itemDOM, options, it, ENV);
+					entry.content = itemDOM.window.document.body;
+					const clean = await cleanupItem(
+						itemDOM,
+						options,
+						entry,
+						ENV
+					);
 					return {
 						...clean,
 						// TODO
@@ -239,7 +248,8 @@ async function cleanup(url, options) {
 							contentType: 'text/html'
 						}
 					};
-				})
+				},
+				Number.isFinite(w) && w >= 0 ? w : 0
 			);
 		}
 
