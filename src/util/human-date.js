@@ -1,6 +1,7 @@
+const formatter = new Intl.DateTimeFormat('en', {
+	dateStyle: 'medium'
+});
+
 export default function humanDate(d) {
-	const pad = num => (num < 10 ? '0' + num : num);
-	return `${pad(d.getUTCFullYear())}-${pad(d.getUTCMonth() + 1)}-${pad(
-		d.getUTCDate()
-	)}`;
+	return formatter.format(d);
 }
