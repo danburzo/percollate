@@ -15,6 +15,7 @@ Percollate is a command-line tool that turns web pages into beautifully formatte
     -   [Available options](#available-options)
 -   [Recipes](#recipes)
     -   [Basic bundling](#basic-bundling)
+    -   [Web feeds](#web-feeds)
     -   [The `--css` option](#the---css-option)
     -   [The `--style` option](#the---style-option)
     -   [The `--template` option](#the---template-option)
@@ -220,6 +221,24 @@ curl https://example.com/page1 | percollate pdf --url=https://example.com/page1 
 
 Notice we're using the `url` option to tell percollate the source of our (now-anonymous) HTML it gets on stdin, so that relative URLs on links and images resolve correctly.
 
+### Web feeds
+
+Percollate has basic support for processing XML web feeds in [Atom](https://datatracker.ietf.org/doc/html/rfc4287) or [RSS](https://www.rssboard.org/rss-specification) format.
+
+When processing a web feed, every entry in the feed becomes its own article, as if percollate received all the entry URLs as operands. The command below produces an EPUB book from the feed contents:
+
+```bash
+percollate epub https://example.com/posts.xml
+```
+
+To produce individual output files for the feed entries, use the `--individual` flag:
+
+```bash
+percollate epub --individual https://example.com/posts.xml
+```
+
+The content of the articles is read from the feed file rather than fetched anew. The content is passed through the DOM enhancements and sanitized as usual, but it’s not processed with Readability.
+
 ### The `--css` option
 
 The `--css` option lets you pass a small snippet of CSS to percollate. Here are some common use-cases:
@@ -366,7 +385,7 @@ All export formats follow a common pipeline:
 1. Fetch the page(s) using [`node-fetch`](https://github.com/node-fetch/node-fetch)
 2. If an AMP version of the page exists, use that instead (disable with `--no-amp` flag)
 3. [Enhance](./src/enhancements.js) the DOM using [`jsdom`](https://github.com/jsdom/jsdom)
-4. Pass the DOM through [`mozilla/readability`](https://github.com/mozilla/readability) to strip unnecessary elements
+4. Pass the DOM through [`@mozilla/readability`](https://github.com/mozilla/readability) to strip unnecessary elements
 5. Apply the [HTML template](./templates/default.html) and the [stylesheet](./templates/default.css) to the resulting HTML
 
 Different formats then use different tools to produce the final file.
@@ -383,7 +402,7 @@ Markdown files are produced the same way as HTMLs, then processed with a series 
 
 Percollate inherits the limitations of two of its main components, Readability and Puppeteer (headless Chrome).
 
-The imperative approach Readability takes will not be perfect in each case, especially on HTML pages with atypical markup; you may occasionally notice that it either leaves in superfluous content, or that it strips out parts of the content. You can confirm the problem against [Firefox's Reader View](https://blog.mozilla.org/firefox/reader-view/). In this case, consider [filing an issue on `mozilla/readability`](https://github.com/mozilla/readability/issues).
+The imperative approach Readability takes will not be perfect in each case, especially on HTML pages with atypical markup; you may occasionally notice that it either leaves in superfluous content, or that it strips out parts of the content. You can confirm the problem against [Firefox's Reader View](https://blog.mozilla.org/firefox/reader-view/). In this case, consider [filing an issue on `@mozilla/readability`](https://github.com/mozilla/readability/issues).
 
 Using a browser to generate the PDF is a double-edged sword. On the one hand, you get excellent support for web platform features. On the other hand, [print CSS](https://www.smashingmagazine.com/2018/05/print-stylesheets-in-2018/) as defined by W3C specifications is only partially implemented, and it seems unlikely that support will be improved any time soon. However, even with modest print support, I think Chrome is the best (free) tool for the job.
 
@@ -419,14 +438,12 @@ Contributions of all kinds are welcome! See [CONTRIBUTING.md](./CONTRIBUTING.md)
 
 Here are some other projects to check out if you're interested in building books using the browser:
 
--   [weasyprint](https://github.com/Kozea/WeasyPrint) ([website](https://weasyprint.org/))
--   [bindery.js](https://github.com/evnbr/bindery) ([website](https://evanbrooks.info/bindery/))
--   [HummusJS](https://github.com/galkahana/HummusJS)
--   [Editoria](https://gitlab.coko.foundation/editoria/editoria) ([website](https://editoria.pub/))
--   [pagedjs](https://gitlab.pagedmedia.org/tools/pagedjs) ([article](https://www.pagedmedia.org/pagedjs-sneak-peeks/))
--   [Mercury](https://mercury.postlight.com/)
+-   [bindery.js](https://github.com/evnbr/bindery) ([website](https://bindery.info/))
 -   [Foliojs](https://github.com/foliojs)
+-   [Ketty](https://gitlab.coko.foundation/coko-org/products/ketty/ketty) ([website](https://ketty.community/))
 -   [Magicbook](https://github.com/magicbookproject/magicbook)
 -   [monolith](https://github.com/Y2Z/monolith)
--   [SaraVieira/starter-book](https://github.com/SaraVieira/starter-book)
+-   [paged.js](https://github.com/pagedjs/pagedjs/) ([website](https://pagedjs.org/))
+-   [Postlight Parser](https://github.com/postlight/parser)
 -   [SingleFileZ](https://github.com/gildas-lormeau/SingleFileZ)
+-   [weasyprint](https://github.com/Kozea/WeasyPrint) ([website](https://weasyprint.org/))
