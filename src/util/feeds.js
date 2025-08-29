@@ -8,7 +8,7 @@ function isAtomFeed(doc) {
 }
 
 function isRssFeed(doc) {
-	return doc.documentElement.localName === 'channel';
+	return doc.documentElement.localName === 'rss';
 }
 
 function processAtomFeed(doc) {
@@ -40,13 +40,38 @@ function processAtomFeed(doc) {
 			return ret;
 		}
 	);
-	// console.log(entries);
 	return entries;
 }
 
 function processRssFeed(doc) {
-	console.error('TODO: process RSS');
-	return [];
+	const feedLink = doc.querySelector(
+		'channel > link:not([rel]), channel > link[rel=alternate]'
+	)?.textContent;
+	const feedAuthor = doc.querySelector('channel > author')?.textContent;
+	const entries = Array.from(doc.querySelectorAll('channel > item')).map(
+		entry => {
+			const ret = {
+				title: entry.querySelector('title')?.textContent ?? '',
+				published: entry.querySelector('pubDate')?.textContent,
+				updated: entry.querySelector('atom\\:updated')?.textContent,
+				byline:
+					entry.querySelector('author')?.textContent ?? feedAuthor,
+				url:
+					entry.querySelector('link:not([rel]), link[rel=alternate]')
+						?.textContent ?? '',
+				content: entry.querySelector('description')?.textContent ?? ''
+			};
+			if (isURL(ret.link)) {
+				// Resolve relative entry link, TODO: also use xml:base
+				ret.link = new URL(ret.link, feedLink).href;
+			}
+			if (ret.updated && !ret.published) {
+				ret.published = ret.updated;
+			}
+			return ret;
+		}
+	);
+	return entries;
 }
 
 export function isFeed(doc) {
